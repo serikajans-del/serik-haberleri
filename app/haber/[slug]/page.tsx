@@ -4,19 +4,19 @@ import Link from "next/link";
 import Image from "next/image";
 import Sidebar from "@/components/Sidebar";
 import NewsCard from "@/components/NewsCard";
-import { newsData, getNewsBySlug, getLatestNews, formatDate } from "@/lib/news";
+import { formatDate } from "@/lib/news";
+import { getNewsBySlugFromDB, getLatestNewsFromDB } from "@/lib/db";
+
+export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  return newsData.map((news) => ({ slug: news.slug }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const news = getNewsBySlug(slug);
+  const news = await getNewsBySlugFromDB(slug);
   if (!news) return {};
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
   const url = `${SITE_URL}/haber/${slug}`;
@@ -42,10 +42,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function NewsDetailPage({ params }: Props) {
   const { slug } = await params;
-  const news = getNewsBySlug(slug);
+  const news = await getNewsBySlugFromDB(slug);
   if (!news) notFound();
 
-  const related = getLatestNews(5).filter((n) => n.slug !== slug).slice(0, 3);
+  const latest = await getLatestNewsFromDB(6);
+  const related = latest.filter((n) => n.slug !== slug).slice(0, 3);
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
 
   const jsonLd = {
@@ -74,7 +75,6 @@ export default async function NewsDetailPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-4">
-        {/* Breadcrumb */}
         <nav className="text-xs text-gray-500 mb-3 flex items-center gap-1 flex-wrap">
           <Link href="/" className="hover:text-red-700">Ana Sayfa</Link>
           <span>›</span>
@@ -84,10 +84,8 @@ export default async function NewsDetailPage({ params }: Props) {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          {/* Makale */}
           <article className="lg:col-span-3">
             <div className="bg-white rounded-sm shadow-sm overflow-hidden">
-              {/* Görsel */}
               <div className="relative w-full" style={{ paddingBottom: "58.6%" }}>
                 <Image
                   src={news.image}
@@ -100,22 +98,18 @@ export default async function NewsDetailPage({ params }: Props) {
               </div>
 
               <div className="p-4 md:p-6">
-                {/* Kategori */}
                 <Link href={`/kategori/${news.categorySlug}`}>
                   <span className="inline-block text-white text-xs font-bold px-2 py-0.5 mb-3 rounded-sm uppercase" style={{ backgroundColor: "#cc0000" }}>
                     {news.category}
                   </span>
                 </Link>
 
-                {/* Başlık */}
                 <h1 className="text-xl md:text-3xl font-bold leading-tight mb-3">{news.title}</h1>
 
-                {/* Özet */}
                 <p className="text-gray-600 text-sm md:text-base border-l-4 pl-4 py-1 mb-4 bg-gray-50 italic" style={{ borderColor: "#cc0000" }}>
                   {news.summary}
                 </p>
 
-                {/* Meta */}
                 <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 border-b border-t border-gray-100 py-2 mb-4">
                   <span className="flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,50 +125,26 @@ export default async function NewsDetailPage({ params }: Props) {
                   </span>
                 </div>
 
-                {/* Paylaş */}
                 <div className="flex items-center gap-2 mb-5">
                   <span className="text-xs text-gray-500">Paylaş:</span>
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${SITE_URL}/haber/${news.slug}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="text-white text-xs px-3 py-1.5 rounded-sm font-semibold"
-                    style={{ backgroundColor: "#1877f2" }}
-                  >Facebook</a>
-                  <a
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(news.title)}&url=${SITE_URL}/haber/${news.slug}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="text-white text-xs px-3 py-1.5 rounded-sm font-semibold bg-black"
-                  >Twitter</a>
-                  <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(news.title + " " + SITE_URL + "/haber/" + news.slug)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="text-white text-xs px-3 py-1.5 rounded-sm font-semibold"
-                    style={{ backgroundColor: "#25d366" }}
-                  >WhatsApp</a>
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${SITE_URL}/haber/${news.slug}`} target="_blank" rel="noopener noreferrer" className="text-white text-xs px-3 py-1.5 rounded-sm font-semibold" style={{ backgroundColor: "#1877f2" }}>Facebook</a>
+                  <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(news.title)}&url=${SITE_URL}/haber/${news.slug}`} target="_blank" rel="noopener noreferrer" className="text-white text-xs px-3 py-1.5 rounded-sm font-semibold bg-black">Twitter</a>
+                  <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(news.title + " " + SITE_URL + "/haber/" + news.slug)}`} target="_blank" rel="noopener noreferrer" className="text-white text-xs px-3 py-1.5 rounded-sm font-semibold" style={{ backgroundColor: "#25d366" }}>WhatsApp</a>
                 </div>
 
-                {/* İçerik */}
-                <div
-                  className="text-gray-700 leading-relaxed text-base space-y-4"
-                  style={{ lineHeight: "1.9" }}
-                  dangerouslySetInnerHTML={{ __html: news.content }}
-                />
+                <div className="text-gray-700 leading-relaxed text-base space-y-4" style={{ lineHeight: "1.9" }} dangerouslySetInnerHTML={{ __html: news.content }} />
 
-                {/* Etiketler */}
                 {news.tags && news.tags.length > 0 && (
                   <div className="mt-6 pt-4 border-t border-gray-100">
                     <span className="text-xs text-gray-500 mr-2">Etiketler:</span>
                     {news.tags.map((tag) => (
-                      <span key={tag} className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded mr-1 mb-1">
-                        #{tag}
-                      </span>
+                      <span key={tag} className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded mr-1 mb-1">#{tag}</span>
                     ))}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* İlgili Haberler */}
             {related.length > 0 && (
               <div className="mt-5">
                 <div className="flex items-center gap-2 border-b-2 pb-1 mb-3" style={{ borderColor: "#cc0000" }}>
@@ -190,7 +160,6 @@ export default async function NewsDetailPage({ params }: Props) {
             )}
           </article>
 
-          {/* Sidebar */}
           <div className="lg:col-span-1">
             <Sidebar />
           </div>

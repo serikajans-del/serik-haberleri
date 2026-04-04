@@ -3,17 +3,16 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
-import { categories, getCategoryBySlug, getNewsByCategory } from "@/lib/news";
+import { categories, getCategoryBySlug } from "@/lib/news";
+import { getNewsByCategoryFromDB } from "@/lib/db";
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   return categories.map((cat) => ({ slug: cat.slug }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const category = getCategoryBySlug(slug);
   if (!category) return {};
@@ -25,22 +24,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const category = getCategoryBySlug(slug);
   if (!category) notFound();
-  const news = getNewsByCategory(slug);
+
+  const news = await getNewsByCategoryFromDB(slug, 24);
 
   return (
     <div className="max-w-7xl mx-auto px-3 md:px-4 py-4">
-      {/* Breadcrumb */}
       <nav className="text-xs text-gray-500 mb-3 flex items-center gap-1">
         <Link href="/" className="hover:text-red-700">Ana Sayfa</Link>
         <span>›</span>
         <span className="text-gray-700 font-medium">{category.name}</span>
       </nav>
 
-      {/* Başlık */}
       <div className="flex items-center gap-2 border-b-2 pb-1 mb-4" style={{ borderColor: "#cc0000" }}>
         <span className="w-1.5 h-6 rounded-sm" style={{ backgroundColor: "#cc0000" }} />
         <h1 className="text-xl font-bold uppercase tracking-wide">{category.name} Haberleri</h1>

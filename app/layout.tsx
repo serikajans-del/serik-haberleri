@@ -5,13 +5,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const playfair = Playfair_Display({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-playfair",
   display: "swap",
 });
 
 const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-source",
   display: "swap",
 });

@@ -2,10 +2,13 @@ import Link from "next/link";
 import BreakingNews from "@/components/BreakingNews";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
-import { categories, getLatestNews, getNewsByCategory } from "@/lib/news";
+import { categories } from "@/lib/news";
+import { getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
-export default function HomePage() {
-  const latest = getLatestNews(12);
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const latest = await getLatestNewsFromDB(12);
   const [hero, second, third, ...rest] = latest;
   const gridNews = rest.slice(0, 6);
 
@@ -16,7 +19,6 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-4">
 
         {/* ═══ MANŞET ═══ */}
-        {/* Masaüstü: büyük sol + 2 küçük sağ */}
         <div className="hidden md:grid md:grid-cols-12 gap-1 mb-1" style={{ height: "420px" }}>
           <div className="md:col-span-8 h-full">
             {hero && <NewsCard news={hero} variant="featured" />}
@@ -27,7 +29,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Mobil: büyük haber + 2'li grid */}
+        {/* Mobil */}
         <div className="md:hidden space-y-1 mb-3">
           {hero && <NewsCard news={hero} variant="featured" />}
           <div className="grid grid-cols-2 gap-1">
@@ -36,13 +38,11 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Çift çizgi ayırıcı */}
         <div className="my-4 border-t-4 border-double border-gray-800" />
 
         {/* ═══ ANA İÇERİK + SIDEBAR ═══ */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-          {/* Sol: Haberler */}
           <div className="lg:col-span-3 space-y-6">
 
             {/* Son Haberler */}
@@ -68,8 +68,8 @@ export default function HomePage() {
             </div>
 
             {/* ═══ KATEGORİ BLOKLARI ═══ */}
-            {categories.slice(0, 6).map((cat, idx) => {
-              const catNews = getNewsByCategory(cat.slug);
+            {await Promise.all(categories.slice(0, 6).map(async (cat, idx) => {
+              const catNews = await getNewsByCategoryFromDB(cat.slug, 4);
               if (catNews.length === 0) return null;
               const [catMain, ...catRest] = catNews;
 
@@ -87,7 +87,6 @@ export default function HomePage() {
                   </div>
 
                   {idx % 2 === 0 ? (
-                    /* Masaüstü: Büyük sol + metin listesi sağ | Mobil: üst üste */
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                       <div className="md:col-span-3">
                         <NewsCard news={catMain} variant="default" />
@@ -99,7 +98,6 @@ export default function HomePage() {
                       </div>
                     </div>
                   ) : (
-                    /* 2 kolon mobil, 3 kolon masaüstü */
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {catNews.slice(0, 3).map((n) => (
                         <NewsCard key={n.id} news={n} variant="default" />
@@ -110,10 +108,9 @@ export default function HomePage() {
                   <div className="mt-4 border-t border-dashed border-gray-400" />
                 </section>
               );
-            })}
+            }))}
           </div>
 
-          {/* Sağ: Sidebar — mobilde alta gider */}
           <div className="lg:col-span-1">
             <Sidebar />
           </div>
