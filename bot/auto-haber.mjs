@@ -1,26 +1,21 @@
 /**
  * Serik Haberleri - Otomatik Haber Botu
- * Kaynak: sondakika.com, serikpostasi.com, iha.com.tr
- * AI: Groq (Ücretsiz) | Fotoğraf: Pexels | DB: Supabase
+ * Haberleri direkt kaynaktan çeker, aynen yayınlar
+ * Kaynak: serikpostasi.com, iha.com.tr, sondakika.com
  */
 
-import Groq from "groq-sdk";
 import { createClient } from "@supabase/supabase-js";
 
-// ── Ortam Değişkenleri ────────────────────────────────────────────────────────
-const GROQ_API_KEY         = process.env.GROQ_API_KEY;
-const PEXELS_API_KEY       = process.env.PEXELS_API_KEY;
 const SUPABASE_URL         = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const TEST_MODE   = process.argv.includes("--test");
-const DAEMON_MODE = process.argv.includes("--daemon");
+const TEST_MODE            = process.argv.includes("--test");
+const DAEMON_MODE          = process.argv.includes("--daemon");
 
-if (!GROQ_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error("❌ Eksik ortam değişkeni!");
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  console.error("❌ Eksik ortam değişkeni: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY");
   process.exit(1);
 }
 
-const groq    = new Groq({ apiKey: GROQ_API_KEY });
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // ── Kategoriler ───────────────────────────────────────────────────────────────
@@ -35,28 +30,25 @@ const KATEGORILER = [
   { name: "Turizm",  slug: "turizm"  },
 ];
 
-// ── Haber Kaynakları ──────────────────────────────────────────────────────────
+// ── Kaynaklar ─────────────────────────────────────────────────────────────────
 const KAYNAKLAR = [
   {
     ad: "Serik Postası",
     url: "https://serikpostasi.com/",
     base: "https://serikpostasi.com",
     linkRegex: /href=['"]?(https?:\/\/serikpostasi\.com\/haber\/[^'">\s]+)|href=['"]?(\/haber\/[^'">\s]+)/g,
-    kaynak: "Serik Postası",
   },
   {
-    ad: "İHA Antalya",
+    ad: "İHA",
     url: "https://www.iha.com.tr/antalya-haberleri/",
     base: "https://www.iha.com.tr",
     linkRegex: /href="(\/antalya-haberleri\/[^"#?]+)"/g,
-    kaynak: "İHA",
   },
   {
-    ad: "Son Dakika Antalya",
+    ad: "Son Dakika",
     url: "https://www.sondakika.com/antalya/",
     base: "https://www.sondakika.com",
     linkRegex: /href="(\/[a-z-]+\/haber-[^"#?]+)"/g,
-    kaynak: "Son Dakika",
   },
 ];
 
@@ -70,83 +62,136 @@ function slugify(text) {
     .slice(0, 80);
 }
 
-function htmlDecode(str) {
+function htmlDecode(str = "") {
   return str
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code)))
+    .replace(/&#(\d+);/g, (_, c) => String.fromCharCode(parseInt(c)))
     .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ")
     .replace(/&ccedil;/g, "ç").replace(/&uuml;/g, "ü").replace(/&ouml;/g, "ö")
-    .replace(/&iuml;/g, "ı").replace(/&szlig;/g, "ş").replace(/&yuml;/g, "ğ");
+    .replace(/&iuml;/g, "ı").replace(/&szlig;/g, "ş").replace(/&yuml;/g, "ğ")
+    .replace(/&Ccedil;/g, "Ç").replace(/&Uuml;/g, "Ü").replace(/&Ouml;/g, "Ö")
+    .replace(/&Iuml;/g, "İ").replace(/&Szlig;/g, "Ş").replace(/&Yuml;/g, "Ğ");
 }
 
-function metinTemizle(html) {
+function htmlTemizle(html = "") {
   return htmlDecode(html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 2000));
+    .replace(/<\/?(?:div|section|aside|nav|header|footer|figure|figcaption|form|button|iframe|noscript)[^>]*>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]+/g, " ")
+    .trim());
 }
 
 function kategoriTahmini(metin) {
   const m = metin.toLowerCase();
-  if (/polis|jandarma|kaza|yangın|suç|gözaltı|yaralı|öldü|hayatını|hırsız|uyuşturucu|soygun|tutuklama/.test(m)) return KATEGORILER[1];
-  if (/ekonomi|işsizlik|enflasyon|fiyat|market|esnaf|vergi|ticaret|ihracat|ihale/.test(m))                      return KATEGORILER[2];
-  if (/futbol|maç|lig|gol|spor|serikspor|şampiyona|basketbol|voleybol|turnuva/.test(m))                         return KATEGORILER[3];
-  if (/sağlık|hastane|doktor|ameliyat|aşı|hastalık|tedavi|korona|salgın/.test(m))                               return KATEGORILER[4];
-  if (/okul|öğrenci|eğitim|üniversite|sınav|mezun|öğretmen|burs/.test(m))                                       return KATEGORILER[5];
-  if (/turizm|tatil|plaj|otel|kültür|festival|tarihi|antik|side|boğazkent/.test(m))                             return KATEGORILER[7];
-  if (/yemek|yaşam|doğa|hava|çevre|sosyal|aile|etkinlik/.test(m))                                               return KATEGORILER[6];
+  if (/polis|jandarma|kaza|yangın|suç|gözaltı|yaralı|öldü|hayatını|hırsız|uyuşturucu|tutuklama|cinayet|soygun/.test(m)) return KATEGORILER[1];
+  if (/ekonomi|enflasyon|fiyat|market|esnaf|vergi|ticaret|ihale|bütçe|kredi|faiz/.test(m))                               return KATEGORILER[2];
+  if (/futbol|maç|lig|gol|spor|serikspor|şampiyona|basketbol|voleybol|turnuva|güreş|atletizm/.test(m))                   return KATEGORILER[3];
+  if (/sağlık|hastane|doktor|ameliyat|aşı|hastalık|tedavi|ilaç|ambulans/.test(m))                                        return KATEGORILER[4];
+  if (/okul|öğrenci|eğitim|üniversite|sınav|mezun|öğretmen|burs|lise/.test(m))                                           return KATEGORILER[5];
+  if (/turizm|tatil|plaj|otel|kültür|festival|tarihi|antik|side|boğazkent|manavgat/.test(m))                             return KATEGORILER[7];
+  if (/yemek|yaşam|doğa|hava|çevre|etkinlik|konser|sergi/.test(m))                                                       return KATEGORILER[6];
   return KATEGORILER[0];
 }
 
 async function sayfaCek(url) {
   try {
     const res = await fetch(url, {
-      signal: AbortSignal.timeout(12000),
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36" },
+      signal: AbortSignal.timeout(15000),
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "tr-TR,tr;q=0.9",
+      },
     });
+    if (!res.ok) return null;
     return await res.text();
-  } catch (e) {
+  } catch {
     return null;
   }
 }
 
+// ── Makale Çekici ─────────────────────────────────────────────────────────────
 async function makaleCek(url) {
   const html = await sayfaCek(url);
-  if (!html) return "";
+  if (!html) return null;
 
-  // Önce makale gövdesini bul
-  const patterns = [
-    /<article[\s\S]*?<\/article>/i,
-    /<div[^>]+class="[^"]*(?:haber[-_]?detay|haber[-_]?icerik|haber[-_]?metin|news[-_]?detail|news[-_]?body|article[-_]?body|entry[-_]?content|post[-_]?content|icerik)[^"]*"[^>]*>([\s\S]{200,}?)<\/div>/i,
-    /<div[^>]+id="[^"]*(?:habericerik|haber|icerik|content|article)[^"]*"[^>]*>([\s\S]{200,}?)<\/div>/i,
+  // Başlık
+  const baslikMatch =
+    html.match(/<h1[^>]*>([\s\S]{5,200}?)<\/h1>/i) ||
+    html.match(/<title>([\s\S]{5,200}?)<\/title>/i);
+  const baslik = baslikMatch ? htmlDecode(baslikMatch[1].replace(/<[^>]+>/g, "").trim()) : "";
+
+  // Görsel — og:image veya ilk büyük resim
+  const ogImage = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i) ||
+                  html.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/i);
+  let gorsel = ogImage ? ogImage[1] : "";
+
+  if (!gorsel) {
+    const imgMatch = html.match(/<img[^>]+src="(https?:\/\/[^"]{20,}\.(?:jpg|jpeg|png|webp)[^"]*)"/i);
+    gorsel = imgMatch ? imgMatch[1] : "";
+  }
+
+  // Özet — og:description
+  const descMatch = html.match(/<meta[^>]+(?:property="og:description"|name="description")[^>]+content="([^"]{10,300})"/i) ||
+                    html.match(/<meta[^>]+content="([^"]{10,300})"[^>]+(?:property="og:description"|name="description")/i);
+  const ozet = descMatch ? htmlDecode(descMatch[1].trim()) : "";
+
+  // İçerik — makale gövdesi
+  const icerikPatterns = [
+    /<article[^>]*>([\s\S]*?)<\/article>/i,
+    /<div[^>]+class="[^"]*(?:haber-detay|haberDetay|haber_detay|haber-icerik|habericerik|news-detail|news-body|article-body|entry-content|post-content|icerik-alani)[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i,
+    /<div[^>]+id="[^"]*(?:habericerik|haber-icerik|icerik|content|article-content)[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
   ];
 
-  for (const pat of patterns) {
+  let icerikHtml = "";
+  for (const pat of icerikPatterns) {
     const m = html.match(pat);
-    if (m) {
-      const temiz = metinTemizle(m[0]);
-      if (temiz.length > 100) return temiz.slice(0, 2500);
-    }
+    if (m) { icerikHtml = m[0]; break; }
   }
 
   // Paragrafları topla
-  const paragraflar = [];
-  const pRegex = /<p[^>]*>([\s\S]{20,400}?)<\/p>/gi;
-  let pm;
-  while ((pm = pRegex.exec(html)) !== null) {
-    const metin = metinTemizle(pm[1]);
-    if (metin.length > 20 && !metin.includes("cookie") && !metin.includes("reklam")) {
-      paragraflar.push(metin);
+  let paragraflar = [];
+  if (icerikHtml) {
+    const pRegex = /<p[^>]*>([\s\S]{15,600}?)<\/p>/gi;
+    let pm;
+    while ((pm = pRegex.exec(icerikHtml)) !== null) {
+      const t = htmlTemizle(pm[1]);
+      if (t.length > 15 && !/cookie|reklam|abone|paylaş|yorumlar/i.test(t)) {
+        paragraflar.push(t);
+      }
     }
   }
-  if (paragraflar.length > 2) return paragraflar.slice(0, 8).join(" ").slice(0, 2500);
 
-  return metinTemizle(html).slice(200, 1500);
+  // Paragraf bulunamadıysa tüm sayfadan çek
+  if (paragraflar.length < 2) {
+    const pRegex = /<p[^>]*>([\s\S]{30,600}?)<\/p>/gi;
+    let pm;
+    while ((pm = pRegex.exec(html)) !== null) {
+      const t = htmlTemizle(pm[1]);
+      if (t.length > 30 && !/cookie|reklam|abone|paylaş|javascript/i.test(t)) {
+        paragraflar.push(t);
+      }
+    }
+    paragraflar = paragraflar.slice(0, 8);
+  }
+
+  if (paragraflar.length === 0) return null;
+
+  // HTML içeriği oluştur
+  const icerik = paragraflar
+    .slice(0, 10)
+    .map(p => `<p>${p}</p>`)
+    .join("\n");
+
+  return { baslik, ozet, icerik, gorsel };
 }
 
+// ── Haber Listesi Çekici ──────────────────────────────────────────────────────
 async function haberlerCek(kaynak) {
   console.log(`\n📡 ${kaynak.ad} çekiliyor...`);
   const html = await sayfaCek(kaynak.url);
@@ -157,188 +202,48 @@ async function haberlerCek(kaynak) {
   const regex = new RegExp(kaynak.linkRegex.source, "g");
   while ((match = regex.exec(html)) !== null) {
     const path = match[1] || match[2];
-    if (!path || path.length < 10 || path.includes("javascript") || path.includes("rss") || path.includes("feed")) continue;
+    if (!path || path.length < 10 || /rss|feed|javascript|#/.test(path)) continue;
     const fullUrl = path.startsWith("http") ? path : kaynak.base + path;
     linkler.add(fullUrl);
   }
 
-  // Başlıkları bul
-  const titleRegex = /title="([^"]{10,150})"/g;
-  const altRegex   = /alt="([^"]{10,150})"/g;
-  const h3Regex    = /<h[23][^>]*>([^<]{10,150})<\/h[23]>/g;
-  const basliklar  = [];
-
-  for (const r of [titleRegex, altRegex, h3Regex]) {
-    let m;
-    const re = new RegExp(r.source, "g");
-    while ((m = re.exec(html)) !== null) {
-      const baslik = htmlDecode(m[1] || "").trim();
-      if (baslik && baslik.length > 5 && !baslik.toLowerCase().includes("logo") && !/^https?:/.test(baslik)) {
-        basliklar.push(baslik);
-      }
-    }
-  }
-
-  const urlArr = [...linkler].slice(0, 20);
-  console.log(`   ✓ ${urlArr.length} link bulundu`);
-
-  return urlArr.map((url, i) => ({
-    url,
-    baslik: basliklar[i] || "",
-    kaynak: kaynak.kaynak,
-  }));
+  const urls = [...linkler].slice(0, 30);
+  console.log(`   ✓ ${urls.length} haber linki bulundu`);
+  return urls.map(url => ({ url, kaynak: kaynak.ad }));
 }
 
-// ── Pexels Fotoğraf ───────────────────────────────────────────────────────────
-const KATEGORI_ARAMALAR = {
-  gundem:  ["turkey city news", "ankara turkey", "protest crowd"],
-  asayis:  ["police car", "security officer", "law enforcement"],
-  ekonomi: ["turkish market bazaar", "business meeting", "economy"],
-  spor:    ["football stadium turkey", "soccer match", "sports"],
-  saglik:  ["hospital medical", "doctor nurse", "health care"],
-  egitim:  ["school classroom", "university students", "education"],
-  yasam:   ["turkish lifestyle", "nature park", "daily life"],
-  turizm:  ["antalya beach", "side ruins turkey", "mediterranean coast"],
-};
-
-async function gorselBul(baslik, kategoriSlug) {
-  if (!PEXELS_API_KEY) return `https://picsum.photos/seed/${Date.now()}/860/504`;
-  try {
-    const aramalar = KATEGORI_ARAMALAR[kategoriSlug] || ["turkey news"];
-    const arama   = aramalar[Math.floor(Math.random() * aramalar.length)];
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(arama)}&per_page=15&orientation=landscape`,
-      { headers: { Authorization: PEXELS_API_KEY }, signal: AbortSignal.timeout(8000) }
-    );
-    const data = await res.json();
-    if (data.photos?.length > 0) {
-      const foto = data.photos[Math.floor(Math.random() * data.photos.length)];
-      return foto.src.large2x || foto.src.large;
-    }
-  } catch {}
-  return `https://picsum.photos/seed/${Date.now()}/860/504`;
-}
-
-// ── Haber Yazımı (Groq AI) ────────────────────────────────────────────────────
-async function haberYaz(item) {
-  const icerik = item.icerik || "";
-  const kat    = kategoriTahmini(item.baslik + " " + icerik);
-
-  const prompt = `Sen deneyimli bir Türk haber ajansı muhabirissin (İHA/DHA/AA üslubu).
-Aşağıdaki kaynak habere dayanarak Serik Haberleri için profesyonel bir haber yaz.
-
-KAYNAK AJANS: ${item.kaynak}
-HABERİN BAŞLIĞI: ${item.baslik}
-HABERİN İÇERİĞİ:
-${icerik.slice(0, 2000) || "(İçerik çekilemedi, başlıktan yararlan)"}
-
-─── HABER YAZIM KURALLARI ───────────────────────────────────────
-
-1. KURAL — 5N1K: Her haberde şu soruların yanıtı mutlaka olmalı:
-   Ne? Kim? Nerede? Ne zaman? Nasıl? Neden?
-   İlk paragrafta en önemli bilgiyi ver.
-
-2. KURAL — DİL: Ajans dili kullan.
-   ✓ Kısa ve net cümleler (max 20 kelime/cümle)
-   ✓ Üçüncü şahıs anlatım: "yaralandı", "açıkladı", "belirtildi"
-   ✓ Alıntılar tırnak içinde: Yetkili, "..." ifadelerini kullandı.
-   ✗ Yorum ve süslü sıfat yasak: "korkunç", "trajik", "müthiş" gibi kelimeler kullanma
-   ✗ "Sanki", "adeta", "âdeta" gibi mecazi ifade kullanma
-
-3. KURAL — YAPI (Ters Piramit):
-   • 1. paragraf: Kim, ne yaptı/oldu, nerede, ne zaman (özet)
-   • 2. paragraf: Olayın detayları, nasıl gelişti
-   • 3. paragraf: Yetkili açıklaması veya arka plan bilgisi
-   • 4. paragraf: Sonuç, gelişmeler, ya da kısa ek bilgi
-   • Son satır: "(${item.kaynak})" — kaynak ibaresi
-
-4. KURAL — DOĞRULUK:
-   ✗ Kaynakta olmayan hiçbir bilgiyi ekleme veya uydurma
-   ✓ Sadece verilen kaynaktan çıkarılabilecek gerçekleri yaz
-   ✓ Emin olmadığın bilgiyi "iddia edildi", "belirtildi" ile yaz
-
-5. KURAL — TÜRKÇE:
-   ✓ Doğru Türkçe imla: ş, ğ, ı, ö, ü, ç harflerini doğru kullan
-   ✓ Cümle başları büyük harf, özel isimler büyük harf
-   ✓ Noktalama işaretlerine dikkat et
-
-─── ÇIKTI FORMATI ───────────────────────────────────────────────
-SADECE şu JSON'ı döndür, başka hiçbir şey yazma:
-{
-  "baslik": "Kısa, bilgi içerikli başlık — fiil içermeli, max 80 karakter",
-  "ozet": "Haberin özünü tek cümlede anlat, max 155 karakter",
-  "icerik": "<p>1. paragraf — 5N1K özeti</p><p>2. paragraf — detaylar</p><p>3. paragraf — açıklama/arka plan</p><p>4. paragraf — sonuç/gelişmeler</p><p>(${item.kaynak})</p>",
-  "etiketler": ["konu1", "konu2", "konu3"]
-}`;
-
-  const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      {
-        role: "system",
-        content: "Sen İHA, DHA ve AA gibi Türk haber ajansları için haber yazan bir muhabirsin. Türkçe dil bilgin mükemmel, ajans haberciliği kurallarını çok iyi biliyorsun. Sadece gerçek bilgileri yazar, asla uydurmazsın. JSON formatında yanıt verirsin.",
-      },
-      { role: "user", content: prompt },
-    ],
-    max_tokens: 1500,
-    temperature: 0.3,
-  });
-
-  const jsonMetin = completion.choices[0].message.content.trim();
-  const jsonMatch = jsonMetin.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("JSON bulunamadı");
-
-  // Güvenli JSON parse — özel karakterleri temizle
-  let jsonStr = jsonMatch[0];
-  let parsed;
-  try {
-    parsed = JSON.parse(jsonStr);
-  } catch {
-    // Satır içi kontrol karakterleri ve bozuk escape'leri temizle
-    jsonStr = jsonStr
-      .replace(/[\x00-\x1F\x7F]/g, " ")
-      .replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
-    try {
-      parsed = JSON.parse(jsonStr);
-    } catch (e2) {
-      throw new Error("JSON parse hatası: " + e2.message);
-    }
-  }
-  return { ...parsed, kategori: kat };
+// ── Mevcut Haberler ───────────────────────────────────────────────────────────
+async function mevcutSluglar() {
+  const { data } = await supabase
+    .from("haberler")
+    .select("slug, title")
+    .order("published_at", { ascending: false })
+    .limit(500);
+  return new Set((data || []).map(h => slugify(h.title).slice(0, 30)));
 }
 
 // ── Supabase Kayıt ────────────────────────────────────────────────────────────
-async function supabaseKaydet(haber) {
-  const slug = slugify(haber.baslik) + "-" + Date.now().toString(36);
-  const gorsel = await gorselBul(haber.baslik, haber.kategori.slug);
+async function supabaseKaydet(haber, kaynak) {
+  const slug  = slugify(haber.baslik) + "-" + Date.now().toString(36);
+  const kat   = kategoriTahmini(haber.baslik + " " + haber.ozet + " " + haber.icerik);
 
   const kayit = {
     title:         haber.baslik,
     slug,
-    summary:       haber.ozet,
+    summary:       haber.ozet || haber.baslik,
     content:       haber.icerik,
-    category:      haber.kategori.name,
-    category_slug: haber.kategori.slug,
-    image:         gorsel,
-    author:        "Serik Haberleri",
+    category:      kat.name,
+    category_slug: kat.slug,
+    image:         haber.gorsel || `https://picsum.photos/seed/${Date.now()}/860/504`,
+    author:        kaynak,
     published_at:  new Date().toISOString(),
     featured:      false,
-    tags:          haber.etiketler || [],
+    tags:          [],
   };
 
   const { error } = await supabase.from("haberler").insert([kayit]);
   if (error) throw error;
-  return slug;
-}
-
-// ── Mevcut Sluglar ────────────────────────────────────────────────────────────
-async function mevcutBasliklar() {
-  const { data } = await supabase
-    .from("haberler")
-    .select("title, slug")
-    .order("published_at", { ascending: false })
-    .limit(300);
-  return (data || []).map((h) => slugify(h.title).slice(0, 25));
+  return { slug, kategori: kat.name };
 }
 
 // ── Ana Fonksiyon ─────────────────────────────────────────────────────────────
@@ -346,90 +251,65 @@ async function main() {
   console.log(`\n🤖 Serik Haber Botu — ${new Date().toLocaleString("tr-TR")}`);
   if (TEST_MODE) console.log("⚠️  TEST MODU\n");
 
-  // 1. Tüm kaynaklardan haber topla
-  let tumHaberler = [];
+  // Tüm kaynaklardan linkleri topla
+  let tumLinkler = [];
   for (const kaynak of KAYNAKLAR) {
-    const haberler = await haberlerCek(kaynak);
-    tumHaberler = [...tumHaberler, ...haberler];
+    const linkler = await haberlerCek(kaynak);
+    tumLinkler = [...tumLinkler, ...linkler];
   }
 
-  // 2. Tekrar olmayan haberleri filtrele
-  const mevcutlar = await mevcutBasliklar();
-  const benzersiz = [];
-  const gorulmus  = new Set();
+  // Mevcut haberleri kontrol et
+  const mevcutlar = await mevcutSluglar();
 
-  for (const h of tumHaberler) {
-    const anahtar = slugify(h.baslik || h.url).slice(0, 25);
-    if (anahtar.length < 5) continue;
-    if (gorulmus.has(anahtar)) continue;
-    if (mevcutlar.some((m) => m === anahtar)) continue;
-    gorulmus.add(anahtar);
-    benzersiz.push(h);
-  }
-
-  console.log(`\n📰 Toplam yeni haber: ${benzersiz.length}`);
-  if (benzersiz.length === 0) { console.log("ℹ️  Yeni haber yok."); return; }
-
-  // 3. Her haber için makale içeriğini çek ve yaz
-  const islenecekler = benzersiz.slice(0, 5);
+  // Her haber için makaleyi çek
   let basarili = 0;
+  let denenen  = 0;
 
-  for (const item of islenecekler) {
+  for (const item of tumLinkler) {
+    if (basarili >= 10) break; // Her çalışmada max 10 haber
+
     try {
-      // Makale sayfasından içerik çek
-      const icerik = await makaleCek(item.url);
-      item.icerik  = icerik;
+      const makale = await makaleCek(item.url);
+      if (!makale || !makale.baslik || makale.baslik.length < 5) continue;
+      if (makale.paragraflar?.length === 0 && !makale.icerik) continue;
 
-      // Başlık hala boşsa URL'den çıkar
-      item.baslik = htmlDecode(item.baslik || "");
-      if (!item.baslik || item.baslik.length < 5) {
-        item.baslik = item.url.split("/").filter(Boolean).pop()?.replace(/-/g, " ") || "Haber";
-      }
+      // Daha önce eklendi mi?
+      const anahtar = slugify(makale.baslik).slice(0, 30);
+      if (mevcutlar.has(anahtar)) continue;
+      mevcutlar.add(anahtar);
 
-      console.log(`\n✍️  [${item.kaynak}] "${item.baslik.slice(0, 60)}"`);
-      const haber = await haberYaz(item);
-      console.log(`   📝 ${haber.baslik}`);
-      console.log(`   📁 ${haber.kategori.name}`);
+      denenen++;
+      console.log(`\n✍️  [${item.kaynak}] ${makale.baslik.slice(0, 65)}`);
 
       if (!TEST_MODE) {
-        const slug = await supabaseKaydet(haber);
-        console.log(`   ✅ /haber/${slug}`);
+        const { slug, kategori } = await supabaseKaydet(makale, item.kaynak);
+        console.log(`   ✅ [${kategori}] /haber/${slug}`);
       } else {
-        console.log("   🔍 [TEST] Kayıt atlandı");
+        const kat = kategoriTahmini(makale.baslik + " " + makale.ozet);
+        console.log(`   🔍 [TEST] Kategori: ${kat.name} | Görsel: ${makale.gorsel ? "✓" : "✗"}`);
+        console.log(`   📄 İçerik: ${makale.icerik.slice(0, 120)}...`);
       }
 
       basarili++;
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise(r => setTimeout(r, 1000));
     } catch (err) {
       console.error(`   ❌ ${err.message}`);
     }
   }
 
-  console.log(`\n🎉 ${basarili}/${islenecekler.length} haber eklendi`);
+  console.log(`\n🎉 ${basarili} haber eklendi`);
   console.log(`⏰ Sonraki: ${new Date(Date.now() + 3 * 60 * 60 * 1000).toLocaleString("tr-TR")}\n`);
 }
 
-// ── Daemon modu: sürekli çalışır ─────────────────────────────────────────────
+// ── Daemon Modu ───────────────────────────────────────────────────────────────
 if (DAEMON_MODE) {
-  const ARALIK_SAAT = 3;
-  console.log(`\n⚙️  DAEMON MODU — Her ${ARALIK_SAAT} saatte bir otomatik çalışır`);
-  console.log(`   Durdurmak için: Ctrl+C\n`);
-
-  async function loop() {
+  console.log(`\n⚙️  DAEMON — Her 3 saatte otomatik çalışır. Durdurmak: Ctrl+C\n`);
+  (async () => {
     while (true) {
-      try {
-        await main();
-      } catch (err) {
-        console.error("❌ Bot hatası:", err.message);
-      }
-      const sonrakiMs = ARALIK_SAAT * 60 * 60 * 1000;
-      const sonraki   = new Date(Date.now() + sonrakiMs);
-      console.log(`💤 Bekleniyor... Sonraki çalışma: ${sonraki.toLocaleString("tr-TR")}`);
-      await new Promise((r) => setTimeout(r, sonrakiMs));
+      try { await main(); } catch (e) { console.error("❌", e.message); }
+      await new Promise(r => setTimeout(r, 3 * 60 * 60 * 1000));
     }
-  }
-
-  loop();
+  })();
 } else {
   main().catch(console.error);
 }
