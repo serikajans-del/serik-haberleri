@@ -1,13 +1,15 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { categories } from "@/lib/news";
 
-const today = new Date().toLocaleDateString("tr-TR", {
-  weekday: "long", year: "numeric", month: "long", day: "numeric",
-});
-
 export default function Header() {
+  const [today, setToday] = useState("");
+  useEffect(() => {
+    setToday(new Date().toLocaleDateString("tr-TR", {
+      weekday: "long", year: "numeric", month: "long", day: "numeric",
+    }));
+  }, []);
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
