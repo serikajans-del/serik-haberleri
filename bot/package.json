@@ -1,0 +1,17 @@
+{
+  "name": "serik-haber-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Serik Haberleri otomatik haber botu",
+  "main": "auto-haber.mjs",
+  "scripts": {
+    "start": "node auto-haber.mjs",
+    "test": "node auto-haber.mjs --test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.101.1",
+    "groq-sdk": "^1.1.2"
+  }
+}
