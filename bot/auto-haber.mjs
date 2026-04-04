@@ -154,37 +154,45 @@ async function makaleCek(url) {
     if (m) { icerikHtml = m[0]; break; }
   }
 
+  // Gereksiz bölümleri html'den temizle (ilgili haberler, yorumlar, sidebar)
+  const temizHtml = (icerikHtml || html)
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<(?:div|section)[^>]*(?:ilgili|related|yorum|comment|sidebar|reklam|banner|social|share|tag|etiket)[^>]*>[\s\S]*?<\/(?:div|section)>/gi, "")
+    .replace(/<(?:div|section)[^>]*(?:class|id)="[^"]*(?:ilgili|related|yorum|comment|sidebar|widget|banner|share|social|footer|header)[^"]*"[^>]*>[\s\S]{0,2000}?<\/(?:div|section)>/gi, "");
+
   // Paragrafları topla
   let paragraflar = [];
-  if (icerikHtml) {
-    const pRegex = /<p[^>]*>([\s\S]{15,600}?)<\/p>/gi;
-    let pm;
-    while ((pm = pRegex.exec(icerikHtml)) !== null) {
-      const t = htmlTemizle(pm[1]);
-      if (t.length > 15 && !/cookie|reklam|abone|paylaş|yorumlar/i.test(t)) {
-        paragraflar.push(t);
-      }
-    }
+  const kaynakHtml = icerikHtml ? temizHtml : html;
+  const pRegex = /<p[^>]*>([\s\S]{20,800}?)<\/p>/gi;
+  let pm;
+  while ((pm = pRegex.exec(kaynakHtml)) !== null) {
+    const t = htmlTemizle(pm[1]);
+    if (
+      t.length < 20 ||
+      /cookie|reklam|abone|paylaş|yorumlar|javascript|tıklayın|buraya tıkla|daha fazla|devamını oku/i.test(t) ||
+      /^[A-ZÇĞİÖŞÜ\s]{10,}$/.test(t) ||   // Tamamen büyük harf → sidebar başlığı
+      t.split(" ").length < 4               // 4 kelimeden az → başlık/etiket
+    ) continue;
+    paragraflar.push(t);
   }
 
-  // Paragraf bulunamadıysa tüm sayfadan çek
+  // Hâlâ az paragraf varsa daha geniş ara
   if (paragraflar.length < 2) {
-    const pRegex = /<p[^>]*>([\s\S]{30,600}?)<\/p>/gi;
-    let pm;
-    while ((pm = pRegex.exec(html)) !== null) {
+    const pRegex2 = /<p[^>]*>([\s\S]{30,800}?)<\/p>/gi;
+    while ((pm = pRegex2.exec(html)) !== null) {
       const t = htmlTemizle(pm[1]);
-      if (t.length > 30 && !/cookie|reklam|abone|paylaş|javascript/i.test(t)) {
+      if (t.length > 30 && t.split(" ").length >= 5 && !/cookie|reklam|javascript/i.test(t)) {
         paragraflar.push(t);
       }
     }
-    paragraflar = paragraflar.slice(0, 8);
+    paragraflar = [...new Set(paragraflar)].slice(0, 8);
   }
 
   if (paragraflar.length === 0) return null;
 
   // HTML içeriği oluştur
   const icerik = paragraflar
-    .slice(0, 10)
+    .slice(0, 8)
     .map(p => `<p>${p}</p>`)
     .join("\n");
 
