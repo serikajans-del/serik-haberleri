@@ -39,17 +39,15 @@ export default function MostReadBlock({ items }: { items: NewsItem[] }) {
               href={`/haber/${news.slug}`}
               className="flex lg:flex-col gap-3 group"
             >
-              <div className="relative flex-shrink-0 overflow-hidden rounded-sm" style={{ width: "80px", height: "60px" }}>
-                <div className="absolute inset-0 lg:hidden" />
-                <div className="lg:relative lg:w-full" style={{ paddingBottom: "0" }}>
-                  <Image
-                    src={news.image}
-                    alt={news.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 1024px) 80px, 20vw"
-                  />
-                </div>
+              {/* Resim kutusu: mobilde 80x60, masaüstünde tam genişlik 120px yüksek */}
+              <div className="relative flex-shrink-0 overflow-hidden rounded-sm w-20 h-16 lg:w-full lg:h-28">
+                <Image
+                  src={news.image}
+                  alt={news.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 1024px) 80px, 20vw"
+                />
                 {/* Sıra numarası */}
                 <div
                   className="absolute top-0 left-0 w-5 h-5 flex items-center justify-center text-white text-xs font-black z-10"
