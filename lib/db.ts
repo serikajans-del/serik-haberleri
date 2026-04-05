@@ -1,5 +1,26 @@
 import { supabaseAdmin } from "./supabase";
+import { newsData } from "./news";
 import type { NewsItem } from "./news";
+
+// İçerik kalitesi yetersizse filtrele (placeholder/boş metin tespiti)
+const PLACEHOLDER_PHRASES = [
+  "hakkında bilgi yok",
+  "detaylı bilgi bulunmamaktadır",
+  "açıklama beklenmektedir",
+  "bilgi girilmemiştir",
+  "içerik hazırlanıyor",
+  "yakında eklenecek",
+  "lorem ipsum",
+];
+
+function isQualityContent(item: NewsItem): boolean {
+  const combined = (item.title + " " + item.summary + " " + item.content).toLowerCase();
+  if (PLACEHOLDER_PHRASES.some((p) => combined.includes(p))) return false;
+  // Çok kısa içerik (200 karakterden az gövde)
+  const textContent = item.content.replace(/<[^>]+>/g, "").trim();
+  if (textContent.length < 80) return false;
+  return true;
+}
 
 function mapToNewsItem(row: Record<string, unknown>): NewsItem {
   return {
@@ -19,43 +40,64 @@ function mapToNewsItem(row: Record<string, unknown>): NewsItem {
 }
 
 export async function getLatestNewsFromDB(count = 12): Promise<NewsItem[]> {
-  const { data, error } = await supabaseAdmin
-    .from("haberler")
-    .select("*")
-    .order("published_at", { ascending: false })
-    .limit(count);
-  if (error || !data) return [];
-  return data.map(mapToNewsItem);
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("haberler")
+      .select("*")
+      .order("published_at", { ascending: false })
+      .limit(count * 2); // fazla çek, filtrelemeden sonra yeterli kalsın
+    if (!error && data && data.length > 0) {
+      return data.map(mapToNewsItem).filter(isQualityContent).slice(0, count);
+    }
+  } catch {}
+  return [...newsData]
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .filter(isQualityContent)
+    .slice(0, count);
 }
 
 export async function getNewsBySlugFromDB(slug: string): Promise<NewsItem | null> {
-  const { data, error } = await supabaseAdmin
-    .from("haberler")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-  if (error || !data) return null;
-  return mapToNewsItem(data);
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("haberler")
+      .select("*")
+      .eq("slug", slug)
+      .single();
+    if (!error && data) return mapToNewsItem(data);
+  } catch {}
+  return newsData.find((n) => n.slug === slug) ?? null;
 }
 
 export async function getNewsByCategoryFromDB(categorySlug: string, count = 12): Promise<NewsItem[]> {
-  const { data, error } = await supabaseAdmin
-    .from("haberler")
-    .select("*")
-    .eq("category_slug", categorySlug)
-    .order("published_at", { ascending: false })
-    .limit(count);
-  if (error || !data) return [];
-  return data.map(mapToNewsItem);
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("haberler")
+      .select("*")
+      .eq("category_slug", categorySlug)
+      .order("published_at", { ascending: false })
+      .limit(count * 2);
+    if (!error && data && data.length > 0) {
+      return data.map(mapToNewsItem).filter(isQualityContent).slice(0, count);
+    }
+  } catch {}
+  return newsData
+    .filter((n) => n.categorySlug === categorySlug)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .filter(isQualityContent)
+    .slice(0, count);
 }
 
 export async function getFeaturedNewsFromDB(): Promise<NewsItem[]> {
-  const { data, error } = await supabaseAdmin
-    .from("haberler")
-    .select("*")
-    .eq("featured", true)
-    .order("published_at", { ascending: false })
-    .limit(6);
-  if (error || !data) return [];
-  return data.map(mapToNewsItem);
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("haberler")
+      .select("*")
+      .eq("featured", true)
+      .order("published_at", { ascending: false })
+      .limit(12);
+    if (!error && data && data.length > 0) {
+      return data.map(mapToNewsItem).filter(isQualityContent).slice(0, 6);
+    }
+  } catch {}
+  return newsData.filter((n) => n.featured === true).filter(isQualityContent).slice(0, 6);
 }

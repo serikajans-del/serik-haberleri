@@ -15,12 +15,111 @@
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
-  background: #f0ece4;
+  background: #f2f3f5;
   color: var(--dark);
 }
 
 a { color: inherit; text-decoration: none; }
 a:hover { color: var(--red); }
+
+/* Hero Slider */
+.hero-slider { user-select: none; }
+.hero-slider img { transform-origin: center; }
+
+/* Mobil kart - Instagram/TikTok hissi */
+@media (max-width: 640px) {
+  .mobile-feed-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    background: white;
+  }
+  .mobile-feed-card img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+  }
+}
+
+/* Okuma ilerleme çubuğu */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--red);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Trending badge */
+.trending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #ff6b00;
+  color: white;
+}
+
+/* Firma rehberi kartı */
+.business-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.business-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-color: #fca5a5;
+}
+
+/* SEO sayfa hero */
+.seo-page-hero {
+  background: linear-gradient(135deg, #cc0000 0%, #8b0000 100%);
+  color: white;
+  padding: 40px 0 32px;
+}
+
+/* Haber detay okuma bar sticky */
+.article-meta-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 8px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* CTA kutusu */
+.follow-cta {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+}
+
+/* Sponsorlu içerik etiketi */
+.sponsored-label {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 1px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+  color: #9ca3af;
+}
 
 /* Gazete başlık fontu */
 .font-headline {
@@ -68,20 +167,128 @@ body, p, span, a, li, td, input, button {
   line-height: 1.3;
 }
 
-/* Bölüm başlıkları */
+/* Bölüm başlıkları — WordPress Newspaper tarzı */
 .section-heading {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--red);
-  border-bottom: 2px solid var(--red);
-  padding-bottom: 4px;
-  margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-top: 3px solid var(--red);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 9px 0 7px;
+  margin-bottom: 14px;
+  font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #111;
+}
+
+/* WordPress sidebar widget */
+.wp-widget {
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+.wp-widget-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #111;
+  padding: 9px 14px 7px;
+  border-top: 3px solid var(--red);
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* WordPress kart */
+.wp-card {
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.wp-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+/* Haber detay içeriği */
+.article-content {
+  font-size: 1rem;
+  line-height: 1.9;
+  color: #2d2d2d;
+}
+
+.article-content p {
+  margin-bottom: 1.4em;
+}
+
+.article-content p:last-child {
+  margin-bottom: 0;
+}
+
+.article-content h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  color: #111;
+  border-left: 3px solid var(--red);
+  padding-left: 10px;
+}
+
+.article-content h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+  color: #222;
+}
+
+.article-content ul,
+.article-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.2em;
+}
+
+.article-content li {
+  margin-bottom: 0.4em;
+  line-height: 1.7;
+}
+
+.article-content strong, .article-content b {
+  font-weight: 700;
+  color: #111;
+}
+
+.article-content blockquote {
+  border-left: 4px solid var(--red);
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  background: #fafafa;
+  color: #444;
+  font-style: italic;
+  border-radius: 0 4px 4px 0;
+}
+
+.article-content a {
+  color: var(--red);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 1em 0;
 }
 
 .line-clamp-2 {

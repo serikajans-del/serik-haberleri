@@ -21,7 +21,7 @@ export default function NewsCard({ news, variant = "default" }: Props) {
             sizes="(max-width: 768px) 100vw, 66vw"
             priority
           />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.25) 55%, transparent 100%)" }} />
           <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
             <span className="inline-block text-white text-xs font-bold px-2 py-0.5 mb-2 uppercase tracking-wider" style={{ backgroundColor: "#cc0000" }}>
               {news.category}
@@ -72,10 +72,10 @@ export default function NewsCard({ news, variant = "default" }: Props) {
   if (variant === "horizontal") {
     return (
       <Link href={`/haber/${news.slug}`} className="flex gap-3 group">
-        <div className="flex-shrink-0 relative w-24 h-16 overflow-hidden">
+        <div className="flex-shrink-0 relative w-24 h-16 overflow-hidden rounded">
           <Image src={news.image} alt={news.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="96px" />
         </div>
-        <div className="flex-1 min-w-0 border-b border-gray-200 pb-2">
+        <div className="flex-1 min-w-0 border-b border-gray-100 pb-2">
           <h4
             className="text-sm font-bold leading-snug line-clamp-2 group-hover:text-red-700 transition-colors"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
@@ -90,7 +90,7 @@ export default function NewsCard({ news, variant = "default" }: Props) {
 
   if (variant === "list") {
     return (
-      <Link href={`/haber/${news.slug}`} className="flex items-start gap-2 group py-2 border-b border-gray-200 last:border-0">
+      <Link href={`/haber/${news.slug}`} className="flex items-start gap-2 group py-2 border-b border-gray-100 last:border-0">
         <span className="font-black flex-shrink-0 mt-0.5 text-base leading-none" style={{ color: "#cc0000" }}>›</span>
         <div>
           <h4
@@ -107,41 +107,58 @@ export default function NewsCard({ news, variant = "default" }: Props) {
 
   if (variant === "text-only") {
     return (
-      <Link href={`/haber/${news.slug}`} className="block group py-3 border-b border-dashed border-gray-300 last:border-0">
-        <span className="text-xs font-bold uppercase tracking-wide block mb-1" style={{ color: "#cc0000" }}>{news.category}</span>
-        <h4
-          className="text-base font-bold leading-snug line-clamp-2 group-hover:text-red-700 transition-colors"
-          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-        >
-          {news.title}
-        </h4>
-        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{news.summary}</p>
-        <span className="text-xs text-gray-400 mt-1 block">{timeAgo(news.publishedAt)}</span>
+      <Link href={`/haber/${news.slug}`} className="flex gap-3 group py-3 border-b border-gray-100 last:border-0">
+        <div className="flex-shrink-0 relative w-20 h-14 rounded overflow-hidden">
+          <Image
+            src={news.image}
+            alt={news.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="80px"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="text-xs font-bold uppercase tracking-wide block mb-0.5" style={{ color: "#cc0000" }}>
+            {news.category}
+          </span>
+          <h4
+            className="text-xs font-bold leading-snug line-clamp-2 group-hover:text-red-700 transition-colors"
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+          >
+            {news.title}
+          </h4>
+          <span className="text-xs text-gray-400 mt-0.5 block">{timeAgo(news.publishedAt)}</span>
+        </div>
       </Link>
     );
   }
 
-  // default
+  // default — WordPress/Jannah kart stili
   return (
-    <Link href={`/haber/${news.slug}`} className="block group">
+    <Link href={`/haber/${news.slug}`} className="block group wp-card">
       <div className="relative overflow-hidden" style={{ paddingBottom: "60%" }}>
         <Image
           src={news.image}
           alt={news.title}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-400"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
+        <span
+          className="absolute top-2 left-2 text-white text-xs font-bold px-2 py-0.5"
+          style={{ backgroundColor: "#cc0000" }}
+        >
+          {news.category}
+        </span>
       </div>
-      <div className="pt-2 pb-3 border-b border-gray-300">
-        <span className="text-xs font-bold uppercase tracking-wide" style={{ color: "#cc0000" }}>{news.category}</span>
+      <div className="p-3">
         <h3
-          className="font-bold text-sm leading-snug line-clamp-3 mt-0.5 group-hover:text-red-700 transition-colors"
+          className="font-bold text-sm leading-snug line-clamp-3 group-hover:text-red-700 transition-colors"
           style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
         >
           {news.title}
         </h3>
-        <span className="text-xs text-gray-400 mt-1 block">{timeAgo(news.publishedAt)}</span>
+        <span className="text-xs text-gray-400 mt-2 block">{timeAgo(news.publishedAt)}</span>
       </div>
     </Link>
   );

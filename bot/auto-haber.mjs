@@ -1,10 +1,10 @@
 /**
  * Serik Haberleri - Otomatik Haber Botu
- * Haberleri direkt kaynaktan çeker, aynen yayınlar
- * Kaynak: serikpostasi.com, iha.com.tr, sondakika.com
+ * RSS + HTML kaynaklarından haber çeker, Supabase'e kaydeder
  */
 
 import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 
 const SUPABASE_URL         = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -18,6 +18,56 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
+// ── Twitter OAuth 1.0a ────────────────────────────────────────────────────────
+const TW_API_KEY    = process.env.TWITTER_API_KEY;
+const TW_API_SECRET = process.env.TWITTER_API_SECRET;
+const TW_TOKEN      = process.env.TWITTER_ACCESS_TOKEN;
+const TW_TOKEN_SEC  = process.env.TWITTER_ACCESS_TOKEN_SECRET;
+
+async function tweetGonder(text) {
+  if (!TW_API_KEY || !TW_TOKEN) return;
+  try {
+    const url    = "https://api.twitter.com/1.1/statuses/update.json";
+    const body   = { status: text };
+    const allP   = { ...buildOAuthParams(), ...body };
+    const paramStr = Object.keys(allP).sort()
+      .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(allP[k])}`).join("&");
+    const base   = `POST&${encodeURIComponent(url)}&${encodeURIComponent(paramStr)}`;
+    const key    = `${encodeURIComponent(TW_API_SECRET)}&${encodeURIComponent(TW_TOKEN_SEC)}`;
+    const oauth  = buildOAuthParams();
+    oauth.oauth_signature = crypto.createHmac("sha1", key).update(base).digest("base64");
+    const authHeader = "OAuth " + Object.keys(oauth).sort()
+      .map(k => `${encodeURIComponent(k)}="${encodeURIComponent(oauth[k])}"`)
+      .join(", ");
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: authHeader, "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(JSON.stringify(data));
+    console.log(`   🐦 Tweet gönderildi: ${data?.id_str}`);
+  } catch (err) {
+    console.error(`   🐦 Tweet hatası: ${err.message}`);
+  }
+}
+
+function buildOAuthParams() {
+  return {
+    oauth_consumer_key:     TW_API_KEY,
+    oauth_nonce:            crypto.randomBytes(16).toString("hex"),
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_timestamp:        Math.floor(Date.now() / 1000).toString(),
+    oauth_token:            TW_TOKEN,
+    oauth_version:          "1.0",
+  };
+}
+
+function serikHaberiMi(baslik, ozet = "") {
+  const metin = (baslik + " " + ozet).toLowerCase();
+  return /serik|side ilçe|boğazkent|belek|kadriye|manavgat/.test(metin);
+}
+
 // ── Kategoriler ───────────────────────────────────────────────────────────────
 const KATEGORILER = [
   { name: "Gündem",  slug: "gundem"  },
@@ -30,8 +80,20 @@ const KATEGORILER = [
   { name: "Turizm",  slug: "turizm"  },
 ];
 
-// ── Kaynaklar ─────────────────────────────────────────────────────────────────
-const KAYNAKLAR = [
+// ── RSS Kaynakları ────────────────────────────────────────────────────────────
+const RSS_KAYNAKLAR = [
+  { ad: "TRT Haber",       url: "https://www.trthaber.com/sondakika.rss" },
+  { ad: "Antalya Postası", url: "https://www.antalyapostasi.com/feed/" },
+  { ad: "Milliyet",        url: "https://www.milliyet.com.tr/rss/rssNew/sondakikaHaberleri.xml" },
+  { ad: "Sabah",           url: "https://www.sabah.com.tr/rss/anasayfa.xml" },
+  { ad: "İHA",             url: "https://www.iha.com.tr/rss/antalya-haberleri-rss.xml" },
+  { ad: "DHA",             url: "https://www.dha.com.tr/rss/antalya" },
+  { ad: "Haber7",          url: "https://www.haber7.com/rss.xml" },
+  { ad: "Yeni Şafak",      url: "https://www.yenisafak.com/Rss/Gundem" },
+];
+
+// ── HTML Kaynakları ───────────────────────────────────────────────────────────
+const HTML_KAYNAKLAR = [
   {
     ad: "Serik Postası",
     url: "https://serikpostasi.com/",
@@ -39,7 +101,7 @@ const KAYNAKLAR = [
     linkRegex: /href=['"]?(https?:\/\/serikpostasi\.com\/haber\/[^'">\s]+)|href=['"]?(\/haber\/[^'">\s]+)/g,
   },
   {
-    ad: "İHA",
+    ad: "İHA Antalya",
     url: "https://www.iha.com.tr/antalya-haberleri/",
     base: "https://www.iha.com.tr",
     linkRegex: /href="(\/antalya-haberleri\/[^"#?]+)"/g,
@@ -49,6 +111,12 @@ const KAYNAKLAR = [
     url: "https://www.sondakika.com/antalya/",
     base: "https://www.sondakika.com",
     linkRegex: /href="(\/[a-z-]+\/haber-[^"#?]+)"/g,
+  },
+  {
+    ad: "Antalya Haber",
+    url: "https://www.antalyahaber.com.tr/",
+    base: "https://www.antalyahaber.com.tr",
+    linkRegex: /href="(\/[a-z0-9-]+\/[a-z0-9-]+-\d+)"/g,
   },
 ];
 
@@ -115,31 +183,84 @@ async function sayfaCek(url) {
   }
 }
 
+// ── RSS Çekici ────────────────────────────────────────────────────────────────
+async function rssHaberlerCek(feed) {
+  console.log(`\n📡 [RSS] ${feed.ad} çekiliyor...`);
+  const xml = await sayfaCek(feed.url);
+  if (!xml) { console.warn(`   ⚠️  RSS erişilemedi`); return []; }
+
+  const items = [];
+  const CDATA = (s) => s?.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim() ?? "";
+
+  const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/gi;
+  let match;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const block = match[1];
+
+    const titleRaw = block.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "";
+    const linkRaw  = block.match(/<link[^>]*>([^<]+)<\/link>/i)?.[1]
+                  ?? block.match(/<guid[^>]*isPermaLink="true"[^>]*>([^<]+)<\/guid>/i)?.[1]
+                  ?? block.match(/<guid[^>]*>([^<]+)<\/guid>/i)?.[1]
+                  ?? "";
+    const descRaw  = block.match(/<description[^>]*>([\s\S]*?)<\/description>/i)?.[1] ?? "";
+    const pubDate  = block.match(/<pubDate[^>]*>([^<]+)<\/pubDate>/i)?.[1] ?? "";
+    const imgMatch = block.match(/<media:thumbnail[^>]+url="([^"]+)"/i)
+                  ?? block.match(/<enclosure[^>]+url="([^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i)
+                  ?? block.match(/<media:content[^>]+url="([^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i);
+
+    const baslik = htmlDecode(CDATA(titleRaw)).replace(/<[^>]+>/g, "").trim();
+    const link   = CDATA(linkRaw).trim();
+    const ozet   = htmlTemizle(CDATA(descRaw)).slice(0, 400);
+    const gorsel = imgMatch ? imgMatch[1] : "";
+
+    if (!baslik || baslik.length < 5 || !link.startsWith("http")) continue;
+
+    // Sadece son 24 saatin haberlerini al
+    if (pubDate) {
+      const pub = new Date(pubDate);
+      if (!isNaN(pub) && (Date.now() - pub.getTime()) > 24 * 60 * 60 * 1000) continue;
+    }
+
+    items.push({ url: link, baslik, ozet, gorsel, kaynak: feed.ad });
+  }
+
+  console.log(`   ✓ ${items.length} RSS haberi (son 24 saat)`);
+  return items;
+}
+
 // ── Makale Çekici ─────────────────────────────────────────────────────────────
-async function makaleCek(url) {
+async function makaleCek(url, rssOnBilgi = {}) {
   const html = await sayfaCek(url);
   if (!html) return null;
 
-  // Başlık
-  const baslikMatch =
-    html.match(/<h1[^>]*>([\s\S]{5,200}?)<\/h1>/i) ||
-    html.match(/<title>([\s\S]{5,200}?)<\/title>/i);
-  const baslik = baslikMatch ? htmlDecode(baslikMatch[1].replace(/<[^>]+>/g, "").trim()) : "";
+  // Başlık — önce RSS'den gelen bilgi, yoksa sayfadan çek
+  let baslik = rssOnBilgi.baslik || "";
+  if (!baslik) {
+    const baslikMatch =
+      html.match(/<h1[^>]*>([\s\S]{5,200}?)<\/h1>/i) ||
+      html.match(/<title>([\s\S]{5,200}?)<\/title>/i);
+    baslik = baslikMatch ? htmlDecode(baslikMatch[1].replace(/<[^>]+>/g, "").trim()) : "";
+  }
 
-  // Görsel — og:image veya ilk büyük resim
-  const ogImage = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i) ||
-                  html.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/i);
-  let gorsel = ogImage ? ogImage[1] : "";
-
+  // Görsel — önce RSS'den, yoksa og:image, son çare ilk büyük resim
+  let gorsel = rssOnBilgi.gorsel || "";
+  if (!gorsel) {
+    const ogImage = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i) ||
+                    html.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/i);
+    gorsel = ogImage ? ogImage[1] : "";
+  }
   if (!gorsel) {
     const imgMatch = html.match(/<img[^>]+src="(https?:\/\/[^"]{20,}\.(?:jpg|jpeg|png|webp)[^"]*)"/i);
     gorsel = imgMatch ? imgMatch[1] : "";
   }
 
-  // Özet — og:description
-  const descMatch = html.match(/<meta[^>]+(?:property="og:description"|name="description")[^>]+content="([^"]{10,300})"/i) ||
-                    html.match(/<meta[^>]+content="([^"]{10,300})"[^>]+(?:property="og:description"|name="description")/i);
-  const ozet = descMatch ? htmlDecode(descMatch[1].trim()) : "";
+  // Özet — önce RSS'den, yoksa og:description
+  let ozet = rssOnBilgi.ozet || "";
+  if (!ozet) {
+    const descMatch = html.match(/<meta[^>]+(?:property="og:description"|name="description")[^>]+content="([^"]{10,300})"/i) ||
+                      html.match(/<meta[^>]+content="([^"]{10,300})"[^>]+(?:property="og:description"|name="description")/i);
+    ozet = descMatch ? htmlDecode(descMatch[1].trim()) : "";
+  }
 
   // İçerik — makale gövdesi
   const icerikPatterns = [
@@ -154,13 +275,11 @@ async function makaleCek(url) {
     if (m) { icerikHtml = m[0]; break; }
   }
 
-  // Gereksiz bölümleri html'den temizle (ilgili haberler, yorumlar, sidebar)
   const temizHtml = (icerikHtml || html)
     .replace(/<!--[\s\S]*?-->/g, "")
     .replace(/<(?:div|section)[^>]*(?:ilgili|related|yorum|comment|sidebar|reklam|banner|social|share|tag|etiket)[^>]*>[\s\S]*?<\/(?:div|section)>/gi, "")
     .replace(/<(?:div|section)[^>]*(?:class|id)="[^"]*(?:ilgili|related|yorum|comment|sidebar|widget|banner|share|social|footer|header)[^"]*"[^>]*>[\s\S]{0,2000}?<\/(?:div|section)>/gi, "");
 
-  // Paragrafları topla
   let paragraflar = [];
   const kaynakHtml = icerikHtml ? temizHtml : html;
   const pRegex = /<p[^>]*>([\s\S]{20,800}?)<\/p>/gi;
@@ -170,13 +289,12 @@ async function makaleCek(url) {
     if (
       t.length < 20 ||
       /cookie|reklam|abone|paylaş|yorumlar|javascript|tıklayın|buraya tıkla|daha fazla|devamını oku/i.test(t) ||
-      /^[A-ZÇĞİÖŞÜ\s]{10,}$/.test(t) ||   // Tamamen büyük harf → sidebar başlığı
-      t.split(" ").length < 4               // 4 kelimeden az → başlık/etiket
+      /^[A-ZÇĞİÖŞÜ\s]{10,}$/.test(t) ||
+      t.split(" ").length < 4
     ) continue;
     paragraflar.push(t);
   }
 
-  // Hâlâ az paragraf varsa daha geniş ara
   if (paragraflar.length < 2) {
     const pRegex2 = /<p[^>]*>([\s\S]{30,800}?)<\/p>/gi;
     while ((pm = pRegex2.exec(html)) !== null) {
@@ -188,20 +306,24 @@ async function makaleCek(url) {
     paragraflar = [...new Set(paragraflar)].slice(0, 8);
   }
 
-  if (paragraflar.length === 0) return null;
-
-  // HTML içeriği oluştur
-  const icerik = paragraflar
-    .slice(0, 8)
-    .map(p => `<p>${p}</p>`)
-    .join("\n");
+  // İçerik yoksa özet veya başlıkla devam et
+  let icerik;
+  if (paragraflar.length === 0) {
+    if (ozet && ozet.length > 60) {
+      icerik = `<p>${ozet}</p>`;
+    } else {
+      return null;
+    }
+  } else {
+    icerik = paragraflar.slice(0, 8).map(p => `<p>${p}</p>`).join("\n");
+  }
 
   return { baslik, ozet, icerik, gorsel };
 }
 
-// ── Haber Listesi Çekici ──────────────────────────────────────────────────────
-async function haberlerCek(kaynak) {
-  console.log(`\n📡 ${kaynak.ad} çekiliyor...`);
+// ── HTML Kaynak Linkleri ──────────────────────────────────────────────────────
+async function htmlHaberlerCek(kaynak) {
+  console.log(`\n📡 [HTML] ${kaynak.ad} çekiliyor...`);
   const html = await sayfaCek(kaynak.url);
   if (!html) { console.warn(`   ⚠️  Erişilemedi`); return []; }
 
@@ -221,13 +343,14 @@ async function haberlerCek(kaynak) {
 }
 
 // ── Mevcut Haberler ───────────────────────────────────────────────────────────
-async function mevcutSluglar() {
+async function mevcutlar() {
   const { data } = await supabase
     .from("haberler")
     .select("slug, title")
     .order("published_at", { ascending: false })
     .limit(500);
-  return new Set((data || []).map(h => slugify(h.title).slice(0, 30)));
+  const set = new Set((data || []).map(h => slugify(h.title).slice(0, 40)));
+  return set;
 }
 
 // ── Supabase Kayıt ────────────────────────────────────────────────────────────
@@ -259,39 +382,79 @@ async function main() {
   console.log(`\n🤖 Serik Haber Botu — ${new Date().toLocaleString("tr-TR")}`);
   if (TEST_MODE) console.log("⚠️  TEST MODU\n");
 
-  // Tüm kaynaklardan linkleri topla
-  let tumLinkler = [];
-  for (const kaynak of KAYNAKLAR) {
-    const linkler = await haberlerCek(kaynak);
-    tumLinkler = [...tumLinkler, ...linkler];
+  // Mevcut haberleri çek (dedup için)
+  const mevcut = await mevcutlar();
+  console.log(`   📚 DB'de ${mevcut.size} haber (slug) var`);
+
+  let tumItems = [];
+
+  // 1) RSS kaynaklarından topla
+  for (const feed of RSS_KAYNAKLAR) {
+    try {
+      const items = await rssHaberlerCek(feed);
+      tumItems = [...tumItems, ...items];
+    } catch (e) {
+      console.warn(`   ⚠️  RSS hatası ${feed.ad}: ${e.message}`);
+    }
   }
 
-  // Mevcut haberleri kontrol et
-  const mevcutlar = await mevcutSluglar();
+  // 2) HTML kaynaklarından topla (RSS başarısız olursa yedek)
+  for (const kaynak of HTML_KAYNAKLAR) {
+    try {
+      const items = await htmlHaberlerCek(kaynak);
+      tumItems = [...tumItems, ...items];
+    } catch (e) {
+      console.warn(`   ⚠️  HTML hatası ${kaynak.ad}: ${e.message}`);
+    }
+  }
 
-  // Her haber için makaleyi çek
+  // URL'ye göre tekilleştir
+  const urlSet = new Set();
+  tumItems = tumItems.filter(item => {
+    if (urlSet.has(item.url)) return false;
+    urlSet.add(item.url);
+    return true;
+  });
+
+  console.log(`\n   🔗 Toplam ${tumItems.length} unique link`);
+
+  // Önce başlığı bilinen (RSS) öğeleri, bilinmeyenleri sona koy
+  tumItems.sort((a, b) => (b.baslik ? 1 : 0) - (a.baslik ? 1 : 0));
+
   let basarili = 0;
-  let denenen  = 0;
 
-  for (const item of tumLinkler) {
-    if (basarili >= 10) break; // Her çalışmada max 10 haber
+  for (const item of tumItems) {
+    if (basarili >= 20) break; // Her çalışmada max 20 haber
 
     try {
-      const makale = await makaleCek(item.url);
+      // RSS'den başlık geldiyse önce dedup kontrolü yap (sayfa çekmeden)
+      if (item.baslik) {
+        const anahtar = slugify(item.baslik).slice(0, 40);
+        if (mevcut.has(anahtar)) continue;
+      }
+
+      const makale = await makaleCek(item.url, item);
       if (!makale || !makale.baslik || makale.baslik.length < 5) continue;
-      if (makale.paragraflar?.length === 0 && !makale.icerik) continue;
 
-      // Daha önce eklendi mi?
-      const anahtar = slugify(makale.baslik).slice(0, 30);
-      if (mevcutlar.has(anahtar)) continue;
-      mevcutlar.add(anahtar);
+      const anahtar = slugify(makale.baslik).slice(0, 40);
+      if (mevcut.has(anahtar)) continue;
+      mevcut.add(anahtar);
 
-      denenen++;
       console.log(`\n✍️  [${item.kaynak}] ${makale.baslik.slice(0, 65)}`);
 
       if (!TEST_MODE) {
         const { slug, kategori } = await supabaseKaydet(makale, item.kaynak);
         console.log(`   ✅ [${kategori}] /haber/${slug}`);
+        if (serikHaberiMi(makale.baslik, makale.ozet)) {
+          const tweetMetin = [
+            `📰 ${makale.baslik}`.slice(0, 210),
+            "",
+            `https://www.serikhaberleri.com/haber/${slug}`,
+            "",
+            "#Serik #SerikHaberleri #Antalya",
+          ].join("\n");
+          await tweetGonder(tweetMetin);
+        }
       } else {
         const kat = kategoriTahmini(makale.baslik + " " + makale.ozet);
         console.log(`   🔍 [TEST] Kategori: ${kat.name} | Görsel: ${makale.gorsel ? "✓" : "✗"}`);
@@ -299,7 +462,7 @@ async function main() {
       }
 
       basarili++;
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 800));
     } catch (err) {
       console.error(`   ❌ ${err.message}`);
     }

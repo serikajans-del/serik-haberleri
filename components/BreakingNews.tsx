@@ -1,9 +1,10 @@
-import { getLatestNews } from "@/lib/news";
+import { getLatestNewsFromDB } from "@/lib/db";
 import Link from "next/link";
 
-export default function BreakingNews() {
-  const latest = getLatestNews(8);
-  const items = [...latest, ...latest]; // döngü için iki kez
+export default async function BreakingNews() {
+  // 20 farklı haber al — ticker döngüsü için 2x yapılsa bile tekrar geç fark edilir
+  const latest = await getLatestNewsFromDB(20);
+  const items = [...latest, ...latest]; // Seamless ticker loop için iki kopya gereklidir
 
   return (
     <div className="flex items-stretch overflow-hidden border-b border-gray-200 bg-white">
