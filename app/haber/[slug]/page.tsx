@@ -108,25 +108,25 @@ export default async function NewsDetailPage({ params }: Props) {
                 />
               </div>
 
-              <div className="p-4 md:p-6">
+              <div className="p-4 md:p-7">
                 <Link href={`/kategori/${news.categorySlug}`}>
-                  <span className="inline-block text-white text-xs font-bold px-2 py-0.5 mb-3 rounded-sm uppercase" style={{ backgroundColor: "#d90000" }}>
+                  <span className="inline-block text-white text-xs font-bold px-2.5 py-1 mb-4 rounded-sm uppercase tracking-wider" style={{ backgroundColor: "#d90000" }}>
                     {news.category}
                   </span>
                 </Link>
 
                 <h1
-                  className="text-2xl md:text-3xl font-black leading-tight mb-3"
-                  style={{ color: "#e8e8e8" }}
+                  className="text-2xl md:text-3xl font-black leading-snug mb-4"
+                  style={{ color: "#f0f0f0", letterSpacing: "-0.01em" }}
                 >
                   {news.title}
                 </h1>
 
-                <p className="text-sm md:text-base border-l-4 pl-4 py-2 mb-4 italic rounded-r" style={{ borderColor: "#d90000", backgroundColor: "#252525", color: "#bbb" }}>
+                <p className="text-base md:text-lg border-l-4 pl-4 py-3 mb-5 rounded-r" style={{ borderColor: "#d90000", backgroundColor: "#1e1e1e", color: "#c8c8c8", fontStyle: "normal", lineHeight: "1.7", fontWeight: 500 }}>
                   {news.summary}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-3 text-xs py-2.5 mb-5" style={{ borderTop: "1px solid #2e2e2e", borderBottom: "1px solid #2e2e2e", color: "#777" }}>
+                <div className="flex flex-wrap items-center gap-3 text-xs py-3 mb-6" style={{ borderTop: "1px solid #2a2a2a", borderBottom: "1px solid #2a2a2a", color: "#666" }}>
                   <span className="flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -161,8 +161,8 @@ export default async function NewsDetailPage({ params }: Props) {
                   </Link>
                 </div>
 
-                {/* Paylaşım Butonları — Alanya Postası tarzı */}
-                <div className="flex flex-wrap items-center gap-2 mb-5 py-3" style={{ borderTop: "1px solid #2e2e2e", borderBottom: "1px solid #2e2e2e" }}>
+                {/* Paylaşım Butonları */}
+                <div className="flex flex-wrap items-center gap-2 mb-6 py-3" style={{ borderBottom: "1px solid #2a2a2a" }}>
                   <span className="text-xs font-bold uppercase tracking-wide mr-1" style={{ color: "#888" }}>Paylaş:</span>
                   {[
                     { label: "Facebook", color: "#1877f2", href: `https://www.facebook.com/sharer/sharer.php?u=${SITE_URL}/haber/${news.slug}`, icon: "M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" },
@@ -179,7 +179,7 @@ export default async function NewsDetailPage({ params }: Props) {
                   ))}
                 </div>
 
-                <div className="article-content" dangerouslySetInnerHTML={{ __html: news.content }} />
+                <div className="article-content py-2" dangerouslySetInnerHTML={{ __html: news.content }} />
 
                 {/* Muhabir kutusu */}
                 <div className="mt-6 pt-4 flex items-center gap-3" style={{ borderTop: "1px solid #2e2e2e" }}>
