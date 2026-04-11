@@ -14,22 +14,22 @@ export default function Header() {
 
   return (
     <header>
-      {/* Üst bilgi şeridi */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between text-xs text-gray-500">
+      {/* Üst bilgi şeridi — koyu */}
+      <div style={{ backgroundColor: "#0d0d0d", borderBottom: "1px solid #2a2a2a" }}>
+        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between text-xs" style={{ color: "#888" }}>
           <span className="hidden md:block">{today}</span>
           <div className="flex items-center gap-3">
-            <Link href="/iletisim" className="hover:text-red-700 transition-colors">İletişim</Link>
-            <span className="text-gray-300">|</span>
-            <Link href="/hakkimizda" className="hover:text-red-700 transition-colors">Hakkımızda</Link>
-            <span className="text-gray-300">|</span>
-            <Link href="/reklam" className="hover:text-red-700 transition-colors">Reklam</Link>
+            <Link href="/iletisim" className="hover:text-white transition-colors">İletişim</Link>
+            <span style={{ color: "#333" }}>|</span>
+            <Link href="/hakkimizda" className="hover:text-white transition-colors">Hakkımızda</Link>
+            <span style={{ color: "#333" }}>|</span>
+            <Link href="/reklam" className="hover:text-white transition-colors">Reklam</Link>
           </div>
         </div>
       </div>
 
-      {/* MASTHEAD - Gazete başlığı */}
-      <div className="bg-white border-b-4" style={{ borderColor: "#cc0000" }}>
+      {/* MASTHEAD */}
+      <div style={{ backgroundColor: "#161616", borderBottom: "3px solid #d90000" }}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
 
@@ -44,7 +44,7 @@ export default function Header() {
                 <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
                   aria-label={s.label}
                   className="w-7 h-7 rounded flex items-center justify-center text-white transition-opacity hover:opacity-80"
-                  style={{ backgroundColor: "#cc0000" }}>
+                  style={{ backgroundColor: "#d90000" }}>
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d={s.path} />
                   </svg>
@@ -52,7 +52,7 @@ export default function Header() {
               ))}
             </div>
 
-            {/* Logo - Masthead */}
+            {/* Logo */}
             <div className="order-1 md:order-2 text-center">
               <Link href="/">
                 <div className="inline-block">
@@ -60,18 +60,17 @@ export default function Header() {
                     className="text-3xl md:text-5xl font-black tracking-tight leading-none"
                     style={{
                       fontFamily: "'Playfair Display', Georgia, serif",
-                      color: "#cc0000",
-                      textShadow: "2px 2px 0 rgba(0,0,0,0.08)",
+                      color: "#d90000",
                     }}
                   >
                     SERİK HABERLERİ
                   </div>
                   <div className="flex items-center justify-center gap-2 mt-0.5">
-                    <div className="flex-1 h-px bg-gray-300" />
-                    <span className="text-xs text-gray-400 tracking-[0.3em] uppercase font-medium px-2">
+                    <div className="flex-1 h-px" style={{ background: "#333" }} />
+                    <span className="text-xs tracking-[0.3em] uppercase font-medium px-2" style={{ color: "#666" }}>
                       Serik&apos;in Haber Portalı
                     </span>
-                    <div className="flex-1 h-px bg-gray-300" />
+                    <div className="flex-1 h-px" style={{ background: "#333" }} />
                   </div>
                 </div>
               </Link>
@@ -79,14 +78,15 @@ export default function Header() {
 
             {/* Sağ arama */}
             <div className="hidden md:flex items-center order-2 md:order-3">
-              <div className="flex border border-gray-300 rounded overflow-hidden">
+              <div className="flex overflow-hidden" style={{ border: "1px solid #333", borderRadius: "3px" }}>
                 <input
                   type="text"
                   placeholder="Haber ara..."
                   className="px-3 py-1.5 text-sm w-40 focus:outline-none focus:w-52 transition-all duration-200"
+                  style={{ backgroundColor: "#1d1d1d", color: "#ddd", border: "none" }}
                 />
                 <button
-                  style={{ backgroundColor: "#cc0000" }}
+                  style={{ backgroundColor: "#d90000" }}
                   className="px-3 text-white hover:opacity-90 transition-opacity"
                   aria-label="Ara"
                 >
@@ -98,7 +98,7 @@ export default function Header() {
             </div>
 
             {/* Mobil hamburger */}
-            <button className="md:hidden order-2 text-gray-700 p-1" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menü">
+            <button className="md:hidden order-2 p-1 transition-colors" style={{ color: "#ccc" }} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menü">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {menuOpen
                   ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -111,11 +111,11 @@ export default function Header() {
       </div>
 
       {/* Navigasyon */}
-      <nav style={{ backgroundColor: "#cc0000" }} className="hidden md:block shadow-md">
+      <nav style={{ background: "linear-gradient(90deg, #a60000 0%, #d90000 100%)" }} className="hidden md:block shadow-lg">
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center">
             <li>
-              <Link href="/" className="block px-4 py-2.5 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-800 transition-colors border-r border-red-700">
+              <Link href="/" className="block px-4 py-2.5 text-white text-xs font-bold uppercase tracking-wider transition-colors hover:bg-black hover:bg-opacity-20">
                 Ana Sayfa
               </Link>
             </li>
@@ -123,7 +123,7 @@ export default function Header() {
               <li key={cat.slug}>
                 <Link
                   href={`/kategori/${cat.slug}`}
-                  className="block px-4 py-2.5 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-800 transition-colors border-r border-red-700"
+                  className="block px-4 py-2.5 text-white text-xs font-bold uppercase tracking-wider transition-colors hover:bg-black hover:bg-opacity-20"
                 >
                   {cat.name}
                 </Link>
@@ -135,11 +135,13 @@ export default function Header() {
 
       {/* Mobil nav */}
       {menuOpen && (
-        <nav style={{ backgroundColor: "#cc0000" }} className="md:hidden shadow-md">
-          <ul className="divide-y divide-red-800">
-            <li><Link href="/" className="block px-4 py-3 text-white text-sm font-bold uppercase tracking-wide" onClick={() => setMenuOpen(false)}>Ana Sayfa</Link></li>
+        <nav style={{ backgroundColor: "#1a1a1a", borderBottom: "2px solid #d90000" }} className="md:hidden shadow-lg">
+          <ul style={{ borderTop: "none" }}>
+            <li style={{ borderBottom: "1px solid #2a2a2a" }}>
+              <Link href="/" className="block px-4 py-3 text-white text-sm font-bold uppercase tracking-wide" onClick={() => setMenuOpen(false)}>Ana Sayfa</Link>
+            </li>
             {categories.map((cat) => (
-              <li key={cat.slug}>
+              <li key={cat.slug} style={{ borderBottom: "1px solid #2a2a2a" }}>
                 <Link href={`/kategori/${cat.slug}`} className="block px-4 py-3 text-white text-sm font-bold uppercase tracking-wide" onClick={() => setMenuOpen(false)}>
                   {cat.name}
                 </Link>

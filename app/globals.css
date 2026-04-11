@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --red: #cc0000;
-  --red-dark: #8b0000;
-  --black: #111111;
-  --dark: #222222;
-  --gray: #555555;
-  --light-gray: #f4f4f4;
-  --border: #ddd;
+  --red: #d90000;
+  --red-dark: #a60000;
+  --black: #0d0d0d;
+  --dark: #1d1d1d;
+  --dark2: #252525;
+  --gray: #888;
+  --border: #2e2e2e;
+  --text: #e0e0e0;
+  --text-muted: #999;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,31 +17,16 @@
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
-  background: #f2f3f5;
-  color: var(--dark);
+  background: #121212;
+  color: var(--text);
 }
 
 a { color: inherit; text-decoration: none; }
-a:hover { color: var(--red); }
+a:hover { color: #fff; }
 
 /* Hero Slider */
 .hero-slider { user-select: none; }
 .hero-slider img { transform-origin: center; }
-
-/* Mobil kart - Instagram/TikTok hissi */
-@media (max-width: 640px) {
-  .mobile-feed-card {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    background: white;
-  }
-  .mobile-feed-card img {
-    width: 100%;
-    aspect-ratio: 16/9;
-    object-fit: cover;
-  }
-}
 
 /* Okuma ilerleme çubuğu */
 #reading-progress {
@@ -70,20 +57,20 @@ a:hover { color: var(--red); }
 
 /* Firma rehberi kartı */
 .business-card {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--dark);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
   transition: box-shadow 0.2s, border-color 0.2s;
 }
 .business-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  border-color: #fca5a5;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  border-color: #a60000;
 }
 
 /* SEO sayfa hero */
 .seo-page-hero {
-  background: linear-gradient(135deg, #cc0000 0%, #8b0000 100%);
+  background: linear-gradient(135deg, #a60000 0%, #6b0000 100%);
   color: white;
   padding: 40px 0 32px;
 }
@@ -93,10 +80,10 @@ a:hover { color: var(--red); }
   position: sticky;
   top: 0;
   z-index: 40;
-  background: white;
-  border-bottom: 1px solid #f0f0f0;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2e2e2e;
   padding: 8px 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 /* CTA kutusu */
@@ -116,9 +103,9 @@ a:hover { color: var(--red); }
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 1px 6px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #444;
   border-radius: 2px;
-  color: #9ca3af;
+  color: #777;
 }
 
 /* Gazete başlık fontu */
@@ -149,31 +136,13 @@ body, p, span, a, li, td, input, button {
 }
 .ticker-track:hover { animation-play-state: paused; }
 
-/* Gazete çizgi dekorasyon */
-.newspaper-rule {
-  border: none;
-  border-top: 3px double var(--black);
-  margin: 0;
-}
-.newspaper-rule-red {
-  border: none;
-  border-top: 3px solid var(--red);
-  margin: 0;
-}
-
-/* Haber kartları */
-.news-card-title {
-  font-family: 'Playfair Display', Georgia, serif;
-  line-height: 1.3;
-}
-
-/* Bölüm başlıkları — WordPress Newspaper tarzı */
+/* Bölüm başlıkları — HalkTV dark tarzı */
 .section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-top: 3px solid var(--red);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #2e2e2e;
   padding: 9px 0 7px;
   margin-bottom: 14px;
   font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
@@ -181,15 +150,15 @@ body, p, span, a, li, td, input, button {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #111;
+  color: #fff;
 }
 
-/* WordPress sidebar widget */
+/* Dark sidebar widget */
 .wp-widget {
-  background: white;
-  border-radius: 6px;
+  background: #1d1d1d;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  border: 1px solid #2e2e2e;
 }
 .wp-widget-title {
   display: flex;
@@ -200,30 +169,29 @@ body, p, span, a, li, td, input, button {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #111;
+  color: #fff;
   padding: 9px 14px 7px;
   border-top: 3px solid var(--red);
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #2e2e2e;
+  background: #1d1d1d;
 }
 
-/* WordPress kart */
+/* Dark haber kartı — overlay stili */
 .wp-card {
-  background: white;
-  border-radius: 6px;
+  background: #1d1d1d;
+  border-radius: 3px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  transition: box-shadow 0.25s, transform 0.25s;
+  position: relative;
 }
-.wp-card:hover {
-  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-  transform: translateY(-2px);
+.wp-card:hover img {
+  transform: scale(1.04);
 }
 
 /* Haber detay içeriği */
 .article-content {
   font-size: 1rem;
   line-height: 1.9;
-  color: #2d2d2d;
+  color: #ccc;
 }
 
 .article-content p {
@@ -239,7 +207,7 @@ body, p, span, a, li, td, input, button {
   font-weight: 700;
   margin-top: 1.8em;
   margin-bottom: 0.6em;
-  color: #111;
+  color: #fff;
   border-left: 3px solid var(--red);
   padding-left: 10px;
 }
@@ -249,7 +217,7 @@ body, p, span, a, li, td, input, button {
   font-weight: 700;
   margin-top: 1.4em;
   margin-bottom: 0.5em;
-  color: #222;
+  color: #eee;
 }
 
 .article-content ul,
@@ -265,15 +233,15 @@ body, p, span, a, li, td, input, button {
 
 .article-content strong, .article-content b {
   font-weight: 700;
-  color: #111;
+  color: #fff;
 }
 
 .article-content blockquote {
   border-left: 4px solid var(--red);
   margin: 1.5em 0;
   padding: 0.8em 1.2em;
-  background: #fafafa;
-  color: #444;
+  background: #1a1a1a;
+  color: #aaa;
   font-style: italic;
   border-radius: 0 4px 4px 0;
 }

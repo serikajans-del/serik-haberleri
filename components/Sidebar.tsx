@@ -32,11 +32,11 @@ export default function Sidebar() {
   ];
 
   const quickServices = [
-    { label: "🏥 Nöbetçi Eczane", href: "/eczane" },
-    { label: "🌤️ Hava Durumu", href: "/hava-durumu" },
-    { label: "🏨 Belek Otelleri", href: "/belek-otelleri" },
-    { label: "🏢 Firma Rehberi", href: "/firmarehberi" },
-    { label: "📍 Side Haberleri", href: "/kategori/turizm" },
+    { label: "Nöbetçi Eczane", href: "/eczane" },
+    { label: "Hava Durumu", href: "/hava-durumu" },
+    { label: "Belek Otelleri", href: "/belek-otelleri" },
+    { label: "Firma Rehberi", href: "/firmarehberi" },
+    { label: "Side Haberleri", href: "/kategori/turizm" },
   ];
 
   return (
@@ -46,33 +46,34 @@ export default function Sidebar() {
       <div className="wp-widget">
         <div className="wp-widget-title">
           <span className="flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" style={{ color: "#d90000" }}>
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
             </svg>
             En Çok Okunan
           </span>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div>
           {latest.slice(0, 5).map((news, idx) => (
             <Link
               key={news.id}
               href={`/haber/${news.slug}`}
-              className="flex gap-2 group px-3 py-2.5 hover:bg-gray-50 transition-colors"
+              className="flex gap-2 group px-3 py-2.5 transition-colors"
+              style={{ borderBottom: "1px solid #2a2a2a" }}
             >
               <span
                 className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-white text-xs font-black rounded mt-0.5"
-                style={{ backgroundColor: idx === 0 ? "#cc0000" : "#bbb" }}
+                style={{ backgroundColor: idx === 0 ? "#d90000" : "#333" }}
               >
                 {idx + 1}
               </span>
               <div className="flex-1 min-w-0">
                 <p
-                  className="text-xs font-bold leading-snug line-clamp-2 group-hover:text-red-700 transition-colors"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="text-xs font-bold leading-snug line-clamp-2 transition-colors"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ccc" }}
                 >
                   {news.title}
                 </p>
-                <span className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+                <span className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "#555" }}>
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -90,15 +91,16 @@ export default function Sidebar() {
         <div className="wp-widget-title" style={{ borderTopColor: "#1a6b3a" }}>
           Hızlı Erişim
         </div>
-        <div className="divide-y divide-gray-100">
+        <div>
           {quickServices.map((s) => (
             <Link
               key={s.href}
               href={s.href}
-              className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors group"
+              className="flex items-center justify-between px-3 py-2.5 transition-colors group"
+              style={{ borderBottom: "1px solid #2a2a2a" }}
             >
-              <span className="text-sm font-semibold text-gray-700 group-hover:text-red-700 transition-colors">{s.label}</span>
-              <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span className="text-sm font-semibold transition-colors" style={{ color: "#ccc" }}>{s.label}</span>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: "#555" }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
@@ -114,9 +116,10 @@ export default function Sidebar() {
             <Link
               key={news.id}
               href={`/haber/${news.slug}`}
-              className="flex gap-3 group py-2.5 border-b border-gray-100 last:border-0"
+              className="flex gap-3 group py-2.5 last:border-0"
+              style={{ borderBottom: "1px solid #2a2a2a" }}
             >
-              <div className="flex-shrink-0 relative w-20 h-14 overflow-hidden rounded">
+              <div className="flex-shrink-0 relative w-20 h-14 overflow-hidden" style={{ borderRadius: "2px" }}>
                 <Image
                   src={news.image}
                   alt={news.title}
@@ -127,8 +130,8 @@ export default function Sidebar() {
               </div>
               <div className="flex-1 min-w-0">
                 <p
-                  className="text-xs font-bold leading-snug line-clamp-3 group-hover:text-red-700 transition-colors"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="text-xs font-bold leading-snug line-clamp-3 transition-colors"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ccc" }}
                 >
                   {news.title}
                 </p>
@@ -144,15 +147,16 @@ export default function Sidebar() {
       {/* Kategoriler */}
       <div className="wp-widget">
         <div className="wp-widget-title">Kategoriler</div>
-        <ul className="divide-y divide-gray-100 px-3">
+        <ul className="px-3">
           {categories.map((cat) => (
-            <li key={cat.slug}>
+            <li key={cat.slug} style={{ borderBottom: "1px solid #2a2a2a" }}>
               <Link
                 href={`/kategori/${cat.slug}`}
-                className="flex items-center justify-between py-2.5 text-sm font-medium hover:text-red-700 transition-colors group"
+                className="flex items-center justify-between py-2.5 text-sm font-medium transition-colors group"
+                style={{ color: "#bbb" }}
               >
                 <span className="group-hover:translate-x-1 transition-transform duration-150">{cat.name}</span>
-                <span className="text-gray-400 text-xs">›</span>
+                <span style={{ color: "#555" }}>›</span>
               </Link>
             </li>
           ))}
@@ -160,10 +164,10 @@ export default function Sidebar() {
       </div>
 
       {/* Reklam 300x250 */}
-      <div className="wp-widget border border-dashed border-gray-300 text-center py-10">
-        <p className="text-gray-400 text-xs uppercase tracking-widest">Reklam Alanı</p>
-        <p className="text-gray-300 text-xs">300×250</p>
-        <Link href="/reklam" className="text-xs mt-2 block transition-colors" style={{ color: "#cc0000" }}>
+      <div className="wp-widget text-center py-10" style={{ borderStyle: "dashed", borderColor: "#333" }}>
+        <p className="text-xs uppercase tracking-widest" style={{ color: "#555" }}>Reklam Alanı</p>
+        <p className="text-xs" style={{ color: "#444" }}>300×250</p>
+        <Link href="/reklam" className="text-xs mt-2 block transition-colors" style={{ color: "#d90000" }}>
           Reklam ver →
         </Link>
       </div>
@@ -171,14 +175,18 @@ export default function Sidebar() {
       {/* Döviz */}
       <div className="wp-widget">
         <div className="wp-widget-title">Döviz Kurları</div>
-        <div className="px-3 divide-y divide-gray-100">
+        <div className="px-3">
           {exchangeRates.map((r) => (
-            <div key={r.name} className="flex items-center justify-between py-2.5">
-              <span className="text-sm font-medium text-gray-700">{r.name}</span>
+            <div key={r.name} className="flex items-center justify-between py-2.5" style={{ borderBottom: "1px solid #2a2a2a" }}>
+              <span className="text-sm font-medium" style={{ color: "#bbb" }}>{r.name}</span>
               <div className="flex items-center gap-2 text-right">
-                <span className="text-sm font-bold">₺{r.value}</span>
+                <span className="text-sm font-bold text-white">₺{r.value}</span>
                 <span
-                  className={`text-xs font-bold px-1.5 py-0.5 rounded ${r.up ? "text-green-700 bg-green-50" : "text-red-700 bg-red-50"}`}
+                  className="text-xs font-bold px-1.5 py-0.5 rounded"
+                  style={{
+                    color: r.up ? "#4ade80" : "#f87171",
+                    backgroundColor: r.up ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)"
+                  }}
                 >
                   {r.change}
                 </span>
@@ -186,23 +194,24 @@ export default function Sidebar() {
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-400 px-3 pb-3">* Yaklaşık değerler</p>
+        <p className="text-xs px-3 pb-3" style={{ color: "#555" }}>* Yaklaşık değerler</p>
       </div>
 
       {/* Namaz Vakitleri */}
       <div className="wp-widget">
         <div className="wp-widget-title">
           <span>Namaz Vakitleri</span>
-          <span className="text-xs text-gray-500 font-normal tracking-normal normal-case">Serik</span>
+          <span className="text-xs font-normal tracking-normal normal-case" style={{ color: "#666" }}>Serik</span>
         </div>
-        <div className="grid grid-cols-2 gap-px bg-gray-100 m-3 rounded overflow-hidden">
+        <div className="grid grid-cols-2 gap-px m-3 rounded overflow-hidden" style={{ backgroundColor: "#2a2a2a" }}>
           {prayerTimes.map((pt) => (
             <div
               key={pt.name}
-              className="flex justify-between items-center bg-white px-3 py-2 text-xs"
+              className="flex justify-between items-center px-3 py-2 text-xs"
+              style={{ backgroundColor: "#1d1d1d" }}
             >
-              <span className="text-gray-500">{pt.name}</span>
-              <span className="font-bold">{pt.time}</span>
+              <span style={{ color: "#888" }}>{pt.name}</span>
+              <span className="font-bold text-white">{pt.time}</span>
             </div>
           ))}
         </div>

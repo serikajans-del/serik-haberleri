@@ -5,52 +5,52 @@ export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer>
-      {/* Çift çizgi üst */}
-      <div className="border-t-4 border-double border-gray-800" />
+      {/* Kırmızı üst şerit */}
+      <div style={{ height: "4px", background: "linear-gradient(90deg, #a60000 0%, #d90000 100%)" }} />
 
-      <div style={{ backgroundColor: "#1a1a1a" }} className="text-gray-400 pt-8 pb-6">
+      <div style={{ backgroundColor: "#111111" }} className="pt-8 pb-6">
         <div className="max-w-7xl mx-auto px-4">
 
-          {/* Masthead */}
-          <div className="text-center mb-6 pb-6 border-b border-gray-700">
+          {/* Logo */}
+          <div className="text-center mb-6 pb-6" style={{ borderBottom: "1px solid #222" }}>
             <Link href="/">
               <span
-                className="text-3xl font-black text-white"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#cc0000" }}
+                className="text-3xl font-black"
+                style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#d90000" }}
               >
                 SERİK HABERLERİ
               </span>
             </Link>
-            <p className="text-xs text-gray-500 mt-1 tracking-widest uppercase">Serik&apos;in Haber Portalı</p>
+            <p className="text-xs mt-1 tracking-widest uppercase" style={{ color: "#444" }}>Serik&apos;in Haber Portalı</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
             <div>
-              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1 border-b border-gray-700">Kategoriler</h4>
+              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1" style={{ borderBottom: "1px solid #222" }}>Kategoriler</h4>
               <ul className="space-y-1.5">
                 {categories.slice(0, 4).map((cat) => (
                   <li key={cat.slug}>
-                    <Link href={`/kategori/${cat.slug}`} className="text-xs hover:text-white transition-colors flex items-center gap-1">
-                      <span style={{ color: "#cc0000" }}>›</span> {cat.name}
+                    <Link href={`/kategori/${cat.slug}`} className="text-xs transition-colors flex items-center gap-1" style={{ color: "#666" }}>
+                      <span style={{ color: "#d90000" }}>›</span> {cat.name}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1 border-b border-gray-700">Haberler</h4>
+              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1" style={{ borderBottom: "1px solid #222" }}>Haberler</h4>
               <ul className="space-y-1.5">
                 {categories.slice(4).map((cat) => (
                   <li key={cat.slug}>
-                    <Link href={`/kategori/${cat.slug}`} className="text-xs hover:text-white transition-colors flex items-center gap-1">
-                      <span style={{ color: "#cc0000" }}>›</span> {cat.name}
+                    <Link href={`/kategori/${cat.slug}`} className="text-xs transition-colors flex items-center gap-1" style={{ color: "#666" }}>
+                      <span style={{ color: "#d90000" }}>›</span> {cat.name}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1 border-b border-gray-700">Kurumsal</h4>
+              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1" style={{ borderBottom: "1px solid #222" }}>Kurumsal</h4>
               <ul className="space-y-1.5">
                 {[
                   { name: "Hakkımızda", href: "/hakkimizda" },
@@ -61,20 +61,20 @@ export default function Footer() {
                   { name: "KVKK", href: "/kvkk" },
                 ].map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="text-xs hover:text-white transition-colors flex items-center gap-1">
-                      <span style={{ color: "#cc0000" }}>›</span> {l.name}
+                    <Link href={l.href} className="text-xs transition-colors flex items-center gap-1" style={{ color: "#666" }}>
+                      <span style={{ color: "#d90000" }}>›</span> {l.name}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1 border-b border-gray-700">İletişim</h4>
-              <ul className="space-y-2 text-xs">
-                <li>📍 Serik, Antalya</li>
+              <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1" style={{ borderBottom: "1px solid #222" }}>İletişim</h4>
+              <ul className="space-y-2 text-xs" style={{ color: "#666" }}>
+                <li>Serik, Antalya</li>
                 <li>
-                  <a href="mailto:info@serikhaberleri.com" className="hover:text-white transition-colors">
-                    ✉ info@serikhaberleri.com
+                  <a href="mailto:info@serikhaberleri.com" className="transition-colors hover:text-white">
+                    info@serikhaberleri.com
                   </a>
                 </li>
               </ul>
@@ -87,7 +87,7 @@ export default function Footer() {
                 ].map((s) => (
                   <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
                     className="w-7 h-7 flex items-center justify-center rounded text-white hover:opacity-80 transition-opacity"
-                    style={{ backgroundColor: "#cc0000" }}>
+                    style={{ backgroundColor: "#d90000" }}>
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                       <path d={s.path} />
                     </svg>
@@ -97,7 +97,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-4 flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-gray-600">
+          <div className="pt-4 flex flex-col md:flex-row justify-between items-center gap-2 text-xs" style={{ borderTop: "1px solid #1e1e1e", color: "#444" }}>
             <p>© {year} Serik Haberleri — Tüm hakları saklıdır.</p>
             <p>Serik Haberleri&apos;nde yayımlanan içerikler izinsiz kullanılamaz.</p>
           </div>
