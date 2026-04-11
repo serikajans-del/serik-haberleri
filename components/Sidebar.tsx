@@ -31,7 +31,6 @@ export default function Sidebar() {
     { label: "Hava Durumu", href: "/hava-durumu" },
     { label: "Belek Otelleri", href: "/belek-otelleri" },
     { label: "Firma Rehberi", href: "/firmarehberi" },
-    { label: "Side Haberleri", href: "/kategori/turizm" },
   ];
 
   return (
