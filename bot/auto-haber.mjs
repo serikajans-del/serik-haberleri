@@ -421,8 +421,13 @@ async function mevcutlar() {
     .from("haberler")
     .select("slug, title")
     .order("published_at", { ascending: false })
-    .limit(500);
-  return new Set((data || []).map(h => slugify(h.title).slice(0, 40)));
+    .limit(1000);
+  const set = new Set();
+  for (const h of (data || [])) {
+    set.add(slugify(h.title).slice(0, 50));
+    set.add(h.slug?.split("-").slice(0, -1).join("-").slice(0, 50)); // slug'ın timestamp kısmını çıkar
+  }
+  return set;
 }
 
 // ── Supabase Kayıt ────────────────────────────────────────────────────────────
@@ -441,11 +446,19 @@ async function supabaseKaydet(haber, kaynak, kategori) {
     published_at:  new Date().toISOString(),
     featured:      false,
     tags:          [],
-    views:         0,
   };
 
   const { error } = await supabase.from("haberler").insert([kayit]);
-  if (error) throw error;
+  if (error) {
+    // Duplicate slug hatası — slug'a random suffix ekleyip tekrar dene
+    if (error.code === "23505") {
+      const kayit2 = { ...kayit, slug: slug + "-" + Math.random().toString(36).slice(2, 6) };
+      const { error: err2 } = await supabase.from("haberler").insert([kayit2]);
+      if (err2) throw new Error(err2.message);
+      return { slug: kayit2.slug, kategori: kategori.name };
+    }
+    throw new Error(error.message);
+  }
   return { slug, kategori: kategori.name };
 }
 
@@ -543,7 +556,7 @@ async function main() {
   }
 
   console.log(`\n🎉 ${basarili} haber eklendi`);
-  console.log(`⏰ Sonraki: ${new Date(Date.now() + 3 * 60 * 60 * 1000).toLocaleString("tr-TR")}\n`);
+  console.log(`⏰ Sonraki: ${new Date(Date.now() + 30 * 60 * 1000).toLocaleString("tr-TR")}\n`);
 }
 
 if (DAEMON_MODE) {
