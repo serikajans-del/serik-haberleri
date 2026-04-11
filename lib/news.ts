@@ -11,6 +11,7 @@ export type NewsItem = {
   publishedAt: string;
   featured?: boolean;
   tags?: string[];
+  views?: number;
 };
 
 export const categories = [

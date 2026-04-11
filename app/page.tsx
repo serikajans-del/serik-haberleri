@@ -5,14 +5,14 @@ import MostReadBlock from "@/components/MostReadBlock";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
 import { categories } from "@/lib/news";
-import { getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
+import { getLatestNewsFromDB, getNewsByCategoryFromDB, getMostReadFromDB } from "@/lib/db";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
   const latest = await getLatestNewsFromDB(20);
   const sliderItems = latest.slice(0, 5);
-  const mostRead = latest.slice(0, 10);
+  const mostRead = await getMostReadFromDB(10); // Gerçek views sıralaması
   const gridNews = latest.slice(5, 11);
 
   return (

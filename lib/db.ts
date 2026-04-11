@@ -36,7 +36,24 @@ function mapToNewsItem(row: Record<string, unknown>): NewsItem {
     publishedAt: row.published_at as string,
     featured: row.featured as boolean,
     tags: (row.tags as string[]) || [],
+    views: (row.views as number) || 0,
   };
+}
+
+// En çok okunan haberler (gerçek views sıralamasıyla)
+export async function getMostReadFromDB(count = 10): Promise<NewsItem[]> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("haberler")
+      .select("*")
+      .order("views", { ascending: false })
+      .limit(count * 2);
+    if (!error && data && data.length > 0) {
+      return data.map(mapToNewsItem).filter(isQualityContent).slice(0, count);
+    }
+  } catch {}
+  // Fallback: son haberler
+  return [...newsData].filter(isQualityContent).slice(0, count);
 }
 
 export async function getLatestNewsFromDB(count = 12): Promise<NewsItem[]> {

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Sidebar from "@/components/Sidebar";
 import NewsCard from "@/components/NewsCard";
 import ReadingProgress from "@/components/ReadingProgress";
+import ViewTracker from "@/components/ViewTracker";
 import { formatDate } from "@/lib/news";
 import { getNewsBySlugFromDB, getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
@@ -81,6 +82,7 @@ export default async function NewsDetailPage({ params }: Props) {
   return (
     <>
       <ReadingProgress />
+      <ViewTracker slug={slug} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-4">
