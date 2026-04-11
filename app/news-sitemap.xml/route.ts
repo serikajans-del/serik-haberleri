@@ -1,14 +1,15 @@
-import { newsData } from "@/lib/news";
+import { getLatestNewsFromDB } from "@/lib/db";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
 
 export async function GET() {
-  // Google News Sitemap - Son 2 günün haberleri
-  const twoDaysAgo = new Date();
-  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  // Google News Sitemap - Son 30 günün haberleri (DB'den)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const recentNews = newsData.filter(
-    (news) => new Date(news.publishedAt) >= twoDaysAgo
+  const allNews = await getLatestNewsFromDB(200);
+  const recentNews = allNews.filter(
+    (news) => new Date(news.publishedAt) >= thirtyDaysAgo
   );
 
   const newsEntries = recentNews
