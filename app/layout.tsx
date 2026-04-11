@@ -20,6 +20,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  verification: {
+    google: "Zbc0szRmiRECdtx5WBiYTphkbwPYtO1blkNf8B73BP0",
+  },
   title: {
     default: "Serik Haberleri - Serik Son Dakika Haberleri",
     template: "%s | Serik Haberleri",
