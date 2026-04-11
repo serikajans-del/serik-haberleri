@@ -69,7 +69,7 @@ export default function Sidebar() {
               <div className="flex-1 min-w-0">
                 <p
                   className="text-xs font-bold leading-snug line-clamp-2 transition-colors"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ccc" }}
+                  style={{ color: "#ccc" }}
                 >
                   {news.title}
                 </p>
@@ -131,7 +131,7 @@ export default function Sidebar() {
               <div className="flex-1 min-w-0">
                 <p
                   className="text-xs font-bold leading-snug line-clamp-3 transition-colors"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ccc" }}
+                  style={{ color: "#ccc" }}
                 >
                   {news.title}
                 </p>

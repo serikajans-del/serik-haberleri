@@ -59,7 +59,7 @@ export default function Header() {
                   <div
                     className="text-3xl md:text-5xl font-black tracking-tight leading-none"
                     style={{
-                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontFamily: "'Roboto', -apple-system, BlinkMacSystemFont, sans-serif",
                       color: "#d90000",
                     }}
                   >

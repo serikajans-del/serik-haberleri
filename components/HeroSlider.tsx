@@ -53,7 +53,7 @@ export default function HeroSlider({ items }: { items: NewsItem[] }) {
 
               <Link href={`/haber/${item.slug}`}>
                 <h2 className="text-white text-2xl md:text-4xl font-black leading-tight mb-3 hover:text-red-200 transition-colors cursor-pointer line-clamp-3 md:line-clamp-2"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif", textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
+                  style={{ textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
                   {item.title}
                 </h2>
               </Link>

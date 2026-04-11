@@ -28,7 +28,7 @@ export default function NewsCard({ news, variant = "default" }: Props) {
             </span>
             <h2
               className="text-white text-xl md:text-3xl font-black leading-tight line-clamp-3 transition-colors"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif", textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}
+              style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}
             >
               {news.title}
             </h2>
@@ -78,7 +78,7 @@ export default function NewsCard({ news, variant = "default" }: Props) {
         <div className="flex-1 min-w-0 pb-2" style={{ borderBottom: "1px solid #2e2e2e" }}>
           <h4
             className="text-sm font-bold leading-snug line-clamp-2 transition-colors"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ddd" }}
+            style={{ color: "#ddd" }}
           >
             {news.title}
           </h4>
@@ -95,7 +95,7 @@ export default function NewsCard({ news, variant = "default" }: Props) {
         <div>
           <h4
             className="text-sm font-semibold leading-snug line-clamp-2 transition-colors"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ddd" }}
+            style={{ color: "#ddd" }}
           >
             {news.title}
           </h4>
@@ -123,7 +123,7 @@ export default function NewsCard({ news, variant = "default" }: Props) {
           </span>
           <h4
             className="text-xs font-bold leading-snug line-clamp-2 transition-colors"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ddd" }}
+            style={{ color: "#ddd" }}
           >
             {news.title}
           </h4>

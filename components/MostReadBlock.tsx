@@ -57,7 +57,7 @@ export default function MostReadBlock({ items }: { items: NewsItem[] }) {
               <div className="flex-1 min-w-0 lg:mt-1">
                 <h4
                   className="text-xs font-bold leading-snug line-clamp-3 transition-colors"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#ddd" }}
+                  style={{ color: "#ddd" }}
                 >
                   {news.title}
                 </h4>

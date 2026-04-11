@@ -16,7 +16,7 @@ export default function Footer() {
             <Link href="/">
               <span
                 className="text-3xl font-black"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#d90000" }}
+                style={{ color: "#d90000" }}
               >
                 SERİK HABERLERİ
               </span>

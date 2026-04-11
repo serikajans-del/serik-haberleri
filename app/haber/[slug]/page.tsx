@@ -94,7 +94,7 @@ export default async function NewsDetailPage({ params }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <article className="lg:col-span-3">
-            <div className="bg-white rounded-sm shadow-sm overflow-hidden">
+            <div className="rounded-sm overflow-hidden" style={{ backgroundColor: "#1d1d1d", border: "1px solid #2e2e2e" }}>
               <div className="relative w-full" style={{ paddingBottom: "58.6%" }}>
                 <Image
                   src={news.image}
@@ -108,23 +108,23 @@ export default async function NewsDetailPage({ params }: Props) {
 
               <div className="p-4 md:p-6">
                 <Link href={`/kategori/${news.categorySlug}`}>
-                  <span className="inline-block text-white text-xs font-bold px-2 py-0.5 mb-3 rounded-sm uppercase" style={{ backgroundColor: "#cc0000" }}>
+                  <span className="inline-block text-white text-xs font-bold px-2 py-0.5 mb-3 rounded-sm uppercase" style={{ backgroundColor: "#d90000" }}>
                     {news.category}
                   </span>
                 </Link>
 
                 <h1
                   className="text-2xl md:text-3xl font-black leading-tight mb-3"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#111" }}
+                  style={{ color: "#e8e8e8" }}
                 >
                   {news.title}
                 </h1>
 
-                <p className="text-gray-600 text-sm md:text-base border-l-4 pl-4 py-2 mb-4 bg-gray-50 italic rounded-r" style={{ borderColor: "#cc0000" }}>
+                <p className="text-sm md:text-base border-l-4 pl-4 py-2 mb-4 italic rounded-r" style={{ borderColor: "#d90000", backgroundColor: "#252525", color: "#bbb" }}>
                   {news.summary}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 border-b border-t border-gray-100 py-2.5 mb-5">
+                <div className="flex flex-wrap items-center gap-3 text-xs py-2.5 mb-5" style={{ borderTop: "1px solid #2e2e2e", borderBottom: "1px solid #2e2e2e", color: "#777" }}>
                   <span className="flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -160,8 +160,8 @@ export default async function NewsDetailPage({ params }: Props) {
                 </div>
 
                 {/* Paylaşım Butonları — Alanya Postası tarzı */}
-                <div className="flex flex-wrap items-center gap-2 mb-5 py-3 border-t border-b border-gray-100">
-                  <span className="text-xs font-bold text-gray-600 uppercase tracking-wide mr-1">Paylaş:</span>
+                <div className="flex flex-wrap items-center gap-2 mb-5 py-3" style={{ borderTop: "1px solid #2e2e2e", borderBottom: "1px solid #2e2e2e" }}>
+                  <span className="text-xs font-bold uppercase tracking-wide mr-1" style={{ color: "#888" }}>Paylaş:</span>
                   {[
                     { label: "Facebook", color: "#1877f2", href: `https://www.facebook.com/sharer/sharer.php?u=${SITE_URL}/haber/${news.slug}`, icon: "M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" },
                     { label: "X", color: "#000", href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(news.title)}&url=${encodeURIComponent(SITE_URL + "/haber/" + news.slug)}`, icon: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" },
@@ -180,19 +180,19 @@ export default async function NewsDetailPage({ params }: Props) {
                 <div className="article-content" dangerouslySetInnerHTML={{ __html: news.content }} />
 
                 {/* Muhabir kutusu */}
-                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 text-lg">✍️</div>
+                <div className="mt-6 pt-4 flex items-center gap-3" style={{ borderTop: "1px solid #2e2e2e" }}>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-lg" style={{ backgroundColor: "#2a2a2a" }}>✍️</div>
                   <div>
-                    <div className="text-xs text-gray-400 uppercase tracking-wide">Muhabir</div>
-                    <div className="text-sm font-bold text-gray-800">{news.author}</div>
+                    <div className="text-xs uppercase tracking-wide" style={{ color: "#666" }}>Muhabir</div>
+                    <div className="text-sm font-bold text-white">{news.author}</div>
                   </div>
                 </div>
 
                 {/* Etiketler — Alanya Postası pill tarzı */}
                 {news.tags && news.tags.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                  <div className="mt-4 pt-4 flex flex-wrap gap-2" style={{ borderTop: "1px solid #2e2e2e" }}>
                     {news.tags.map((tag) => (
-                      <span key={tag} className="inline-block text-xs font-semibold px-3 py-1 rounded-full border border-gray-300 text-gray-600 hover:border-red-400 hover:text-red-700 cursor-pointer transition-colors">
+                      <span key={tag} className="inline-block text-xs font-semibold px-3 py-1 rounded-full cursor-pointer transition-colors" style={{ border: "1px solid #333", color: "#888", backgroundColor: "#252525" }}>
                         #{tag}
                       </span>
                     ))}
@@ -232,9 +232,9 @@ export default async function NewsDetailPage({ params }: Props) {
 
             {related.length > 0 && (
               <div className="mt-5">
-                <div className="flex items-center gap-2 border-b-2 pb-1 mb-3" style={{ borderColor: "#cc0000" }}>
-                  <span className="w-1 h-5 rounded-sm" style={{ backgroundColor: "#cc0000" }} />
-                  <h2 className="font-bold text-sm uppercase tracking-wide">İlgili Haberler</h2>
+                <div className="flex items-center gap-2 border-b-2 pb-1 mb-3" style={{ borderColor: "#d90000" }}>
+                  <span className="w-1 h-5 rounded-sm" style={{ backgroundColor: "#d90000" }} />
+                  <h2 className="font-bold text-sm uppercase tracking-wide text-white">İlgili Haberler</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {related.map((item) => (
