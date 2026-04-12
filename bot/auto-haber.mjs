@@ -330,89 +330,131 @@ async function rssHaberlerCek(feed) {
   return items;
 }
 
+// ── Site'ye özel içerik seçiciler ────────────────────────────────────────────
+const SITE_SECICILER = [
+  // TRT Haber
+  { test: /trthaber\.com/, regex: /<div[^>]+class="[^"]*news-detail[^"]*"[^>]*>([\s\S]*?)<\/div>/i },
+  // Sabah
+  { test: /sabah\.com\.tr/, regex: /<div[^>]+class="[^"]*news-detail-text[^"]*"[^>]*>([\s\S]*?)<\/div>/i },
+  // Milliyet
+  { test: /milliyet\.com\.tr/, regex: /<div[^>]+class="[^"]*content-text[^"]*"[^>]*>([\s\S]*?)<\/div>/i },
+  // Haber7
+  { test: /haber7\.com/, regex: /<div[^>]+class="[^"]*article-body[^"]*"[^>]*>([\s\S]*?)<\/div>/i },
+  // Yeni Şafak
+  { test: /yenisafak\.com/, regex: /<div[^>]+class="[^"]*news-detail[^"]*"[^>]*>([\s\S]*?)<\/div>/i },
+  // İHA
+  { test: /iha\.com\.tr/, regex: /<div[^>]+class="[^"]*haberDetay[^"]*"[^>]*>([\s\S]*?)<\/div>/i },
+  // DHA
+  { test: /dha\.com\.tr/, regex: /<div[^>]+class="[^"]*news-detail[^"]*"[^>]*>([\s\S]*?)<\/div>/i },
+  // Genel article etiketi
+  { test: /.*/, regex: /<article[^>]*>([\s\S]*?)<\/article>/i },
+];
+
 // ── Makale Çekici ─────────────────────────────────────────────────────────────
 async function makaleCek(url, rssOnBilgi = {}) {
   const html = await sayfaCek(url);
   if (!html) return null;
 
+  // Başlık
   let baslik = rssOnBilgi.baslik || "";
   if (!baslik) {
-    const m = html.match(/<h1[^>]*>([\s\S]{5,200}?)<\/h1>/i) || html.match(/<title>([\s\S]{5,200}?)<\/title>/i);
+    const m = html.match(/<h1[^>]*>([\s\S]{5,200}?)<\/h1>/i)
+           || html.match(/<title>([\s\S]{5,200}?)<\/title>/i);
     baslik = m ? htmlDecode(m[1].replace(/<[^>]+>/g, "").trim()) : "";
   }
 
+  // Orijinal fotoğraf — og:image öncelikli
   let gorsel = rssOnBilgi.gorsel || "";
   if (!gorsel) {
     const og = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i)
              || html.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/i);
-    gorsel = og ? og[1] : "";
+    if (og) gorsel = og[1];
   }
+  // Yoksa sayfa içinden büyük bir img bul
   if (!gorsel) {
-    const im = html.match(/<img[^>]+src="(https?:\/\/[^"]{20,}\.(?:jpg|jpeg|png|webp)[^"]*)"/i);
-    gorsel = im ? im[1] : "";
+    const imgMatches = [...html.matchAll(/<img[^>]+src="(https?:\/\/[^"]{20,}\.(?:jpg|jpeg|png|webp)[^"]*)"/gi)];
+    for (const m of imgMatches) {
+      const src = m[1];
+      if (!/logo|avatar|icon|sprite|banner|ad|pixel|tracking/i.test(src)) {
+        gorsel = src;
+        break;
+      }
+    }
   }
 
+  // Özet
   let ozet = rssOnBilgi.ozet || "";
   if (!ozet) {
-    const dm = html.match(/<meta[^>]+(?:property="og:description"|name="description")[^>]+content="([^"]{10,300})"/i)
-             || html.match(/<meta[^>]+content="([^"]{10,300})"[^>]+(?:property="og:description"|name="description")/i);
+    const dm = html.match(/<meta[^>]+(?:property="og:description"|name="description")[^>]+content="([^"]{10,400})"/i)
+             || html.match(/<meta[^>]+content="([^"]{10,400})"[^>]+(?:property="og:description"|name="description")/i);
     ozet = dm ? htmlDecode(dm[1].trim()) : "";
   }
 
-  const icerikPatterns = [
-    /<article[^>]*>([\s\S]*?)<\/article>/i,
-    /<div[^>]+class="[^"]*(?:haber-detay|haberDetay|haber_detay|haber-icerik|habericerik|news-detail|news-body|article-body|entry-content|post-content|icerik-alani)[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i,
-    /<div[^>]+id="[^"]*(?:habericerik|haber-icerik|icerik|content|article-content)[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
-  ];
-
+  // İçerik alanını bul — önce site'ye özel, sonra genel
   let icerikHtml = "";
-  for (const pat of icerikPatterns) {
-    const m = html.match(pat);
-    if (m) { icerikHtml = m[0]; break; }
+  for (const secici of SITE_SECICILER) {
+    if (secici.test.test(url)) {
+      const m = html.match(secici.regex);
+      if (m && m[0].length > 200) { icerikHtml = m[0]; break; }
+    }
+  }
+  // Genel fallback'ler
+  if (!icerikHtml) {
+    const genelPatterns = [
+      /<div[^>]+class="[^"]*(?:haber-detay|haberDetay|haber_detay|haber-icerik|habericerik|detay-icerik|detail-content|news-content|news-body|article-body|entry-content|post-content|icerik-alani|the-content|single-content)[^"]*"[^>]*>([\s\S]{200,}?)<\/div>/i,
+      /<div[^>]+id="[^"]*(?:habericerik|haber-icerik|haberIcerik|icerik|content|article-content|newsContent)[^"]*"[^>]*>([\s\S]{200,}?)<\/div>/i,
+      /<main[^>]*>([\s\S]*?)<\/main>/i,
+    ];
+    for (const pat of genelPatterns) {
+      const m = html.match(pat);
+      if (m && m[0].length > 200) { icerikHtml = m[0]; break; }
+    }
   }
 
+  // Temizle
   const temizHtml = (icerikHtml || html)
     .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<(?:div|section)[^>]*(?:ilgili|related|yorum|comment|sidebar|reklam|banner|social|share|tag|etiket)[^>]*>[\s\S]*?<\/(?:div|section)>/gi, "");
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<(?:div|section|aside)[^>]*(?:ilgili|related|yorum|comment|sidebar|reklam|banner|social|share|etiket|tag|widget|cookie|popup)[^>]*>[\s\S]*?<\/(?:div|section|aside)>/gi, "");
 
+  // <p> etiketlerinden paragraflar
   let paragraflar = [];
-  const pRegex = /<p[^>]*>([\s\S]{20,800}?)<\/p>/gi;
+  const pRegex = /<p[^>]*>([\s\S]{15,1200}?)<\/p>/gi;
   let pm;
   while ((pm = pRegex.exec(temizHtml)) !== null) {
     const t = htmlTemizle(pm[1]);
     if (
-      t.length < 20 ||
-      /cookie|reklam|abone|paylaş|yorumlar|javascript|tıklayın|buraya tıkla|daha fazla|devamını oku/i.test(t) ||
-      t.split(" ").length < 4
+      t.length < 15 ||
+      /cookie|reklam|abone ol|paylaş|yorumlar|javascript|tıklayın|buraya tıkla|daha fazla|devamını oku|tüm hakları saklı|©/i.test(t) ||
+      t.split(" ").length < 3
     ) continue;
     paragraflar.push(t);
   }
 
-  // Paragraf bulunamadıysa düz metin blokları dene
-  if (paragraflar.length === 0) {
-    // Tüm sayfadan anlamlı cümleler çıkar
+  // <p> bulunamadıysa span/div içi metin dene
+  if (paragraflar.length < 2) {
     const duzMetin = htmlTemizle(temizHtml);
     const cumleler = duzMetin.split(/\n+/).map(s => s.trim()).filter(s =>
-      s.length > 40 && s.split(" ").length >= 6 &&
-      !/cookie|reklam|javascript|©|tüm hakları|telif/i.test(s)
+      s.length > 30 && s.split(" ").length >= 5 &&
+      !/cookie|reklam|javascript|©|tüm hakları|telif|abone/i.test(s)
     );
     if (cumleler.length >= 2) {
-      // Her 3 cümleyi bir paragraf yap
       const gruplar = [];
-      for (let i = 0; i < Math.min(cumleler.length, 18); i += 3) {
-        gruplar.push(cumleler.slice(i, i + 3).join(" "));
+      for (let i = 0; i < Math.min(cumleler.length, 24); i += 3) {
+        const grup = cumleler.slice(i, i + 3).join(" ");
+        if (grup.length > 40) gruplar.push(grup);
       }
-      paragraflar = gruplar.filter(g => g.length > 60);
-    }
-    if (paragraflar.length === 0) {
-      if (ozet && ozet.length > 60) {
-        return { baslik, ozet, icerik: `<p>${ozet}</p>`, gorsel };
-      }
-      return null;
+      if (gruplar.length > paragraflar.length) paragraflar = gruplar;
     }
   }
 
-  const hammadde = paragraflar.slice(0, 12).map(p => `<p>${p}</p>`).join("\n");
+  if (paragraflar.length === 0) {
+    if (ozet && ozet.length > 60) return { baslik, ozet, icerik: `<p>${ozet}</p>`, gorsel };
+    return null;
+  }
+
+  const hammadde = paragraflar.slice(0, 15).map(p => `<p>${p}</p>`).join("\n");
   return { baslik, ozet, icerik: hammadde, gorsel };
 }
 
@@ -546,11 +588,14 @@ async function main() {
       // 1. Claude ile yeniden yaz
       const yazilmis = await haberYazdir(makale.baslik, makale.ozet, makale.icerik);
 
-      // 2. Unsplash'tan fotoğraf bul (orijinal yoksa veya her zaman)
+      // 2. Fotoğraf: orijinal öncelikli, yoksa Unsplash
       let gorsel = makale.gorsel;
-      if (UNSPLASH_ACCESS_KEY) {
+      if (!gorsel && UNSPLASH_ACCESS_KEY) {
         const unsplashGorsel = await gorselBul(yazilmis.baslik, kategori.slug);
         if (unsplashGorsel) gorsel = unsplashGorsel;
+        console.log(`   🖼️  Orijinal foto yok — Unsplash kullanıldı`);
+      } else if (gorsel) {
+        console.log(`   🖼️  Orijinal fotoğraf kullanıldı`);
       }
       if (!gorsel) gorsel = `https://picsum.photos/seed/${Date.now()}/860/504`;
 
