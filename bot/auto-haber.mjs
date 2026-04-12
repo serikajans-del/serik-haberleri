@@ -92,13 +92,18 @@ const RSS_KAYNAKLAR = [];
 const HTML_KAYNAKLAR = [];
 
 // ── Haberler.com Kaynakları ───────────────────────────────────────────────────
-// JSON-LD yapısı sayesinde içerik çok temiz çekilir
+// Güncel haber sayfaları — eski içerik JSON-LD tarih filtresiyle elenecek
 const HABERLERCOM_KAYNAKLAR = [
-  { ad: "Haberler.com / Serik",    url: "https://www.haberler.com/serik/" },
-  { ad: "Haberler.com / Antalya",  url: "https://www.haberler.com/antalya/" },
-  { ad: "Haberler.com / Manavgat", url: "https://www.haberler.com/manavgat/" },
-  { ad: "Haberler.com / Belek",    url: "https://www.haberler.com/belek/" },
+  { ad: "Haberler.com / Son Dakika", url: "https://www.haberler.com/son-dakika/" },
+  { ad: "Haberler.com / Güncel",     url: "https://www.haberler.com/guncel/" },
+  { ad: "Haberler.com / Antalya",    url: "https://www.haberler.com/antalya/" },
+  { ad: "Haberler.com / Serik",      url: "https://www.haberler.com/serik/" },
+  { ad: "Haberler.com / Manavgat",   url: "https://www.haberler.com/manavgat/" },
+  { ad: "Haberler.com / Belek",      url: "https://www.haberler.com/belek/" },
 ];
+
+// Kaç saatlik haberleri kabul et (bu süreden eski haberler atlanır)
+const MAX_HABER_YASI_SAAT = 24;
 
 // ── Yardımcı ─────────────────────────────────────────────────────────────────
 function slugify(text) {
@@ -479,6 +484,19 @@ async function haberlerComMakaleCek(url) {
   } catch { return null; }
 
   if (!article) return null;
+
+  // ── Tarih filtresi: MAX_HABER_YASI_SAAT saatten eski haberleri atla ──────
+  const dateStr = article.datePublished || article.dateCreated || "";
+  if (dateStr) {
+    const pub = new Date(dateStr);
+    if (!isNaN(pub.getTime())) {
+      const saatFarki = (Date.now() - pub.getTime()) / (1000 * 60 * 60);
+      if (saatFarki > MAX_HABER_YASI_SAAT) {
+        console.log(`   ⏭️  Eski haber atlandı (${Math.round(saatFarki)}sa): ${(article.headline || "").slice(0, 50)}`);
+        return null;
+      }
+    }
+  }
 
   const baslik  = htmlDecode((article.headline || article.name || "").trim());
   const ozet    = htmlDecode((article.description || "").trim());
