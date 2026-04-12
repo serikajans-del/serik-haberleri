@@ -62,7 +62,7 @@ export async function getLatestNewsFromDB(count = 12): Promise<NewsItem[]> {
       .from("haberler")
       .select("*")
       .order("published_at", { ascending: false })
-      .limit(count * 2); // fazla çek, filtrelemeden sonra yeterli kalsın
+      .limit(count * 4); // fazla çek, filtrelemeden sonra yeterli kalsın
     if (!error && data && data.length > 0) {
       return data.map(mapToNewsItem).filter(isQualityContent).slice(0, count);
     }

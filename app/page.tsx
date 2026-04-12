@@ -8,7 +8,7 @@ import ExchangeTicker from "@/components/ExchangeTicker";
 import { categories } from "@/lib/news";
 import { getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 export default async function HomePage() {
   const latest = await getLatestNewsFromDB(25);
