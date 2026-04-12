@@ -5,6 +5,27 @@ import { getLatestNewsFromDB } from "@/lib/db";
 import TweetButonu from "@/components/TweetButonu";
 import Sidebar from "@/components/Sidebar";
 
+function AdBanner({ slot, size = "leaderboard" }: { slot: string; size?: "leaderboard" | "rectangle" | "small" }) {
+  const sizes: Record<string, { label: string; h: string }> = {
+    leaderboard: { label: "728×90 — Reklam Alanı", h: "h-20" },
+    rectangle:   { label: "300×250 — Reklam Alanı", h: "h-40" },
+    small:       { label: "468×60 — Reklam Alanı",  h: "h-14" },
+  };
+  const { label, h } = sizes[size];
+  return (
+    <div
+      className={`relative w-full ${h} flex flex-col items-center justify-center rounded overflow-hidden`}
+      style={{ backgroundColor: "#fafafa", border: "1px dashed #ddd" }}
+    >
+      <span className="absolute top-1 left-2 text-xs" style={{ color: "#ccc" }}>Reklam</span>
+      <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "#ccc" }}>{label}</p>
+      <Link href="/reklam" className="text-xs mt-1 transition-colors hover:text-red-700" style={{ color: "#d90000" }}>
+        Reklam vermek için tıklayın →
+      </Link>
+    </div>
+  );
+}
+
 export const revalidate = 30;
 
 export const metadata: Metadata = {
@@ -18,6 +39,55 @@ const KATEGORI_AGIRLIK: Record<string, number> = {
   gundem: 10, antalya: 9, asayis: 8, ekonomi: 7,
   spor: 6, saglik: 5, turizm: 5, egitim: 4, yasam: 3,
 };
+
+import type { NewsItem } from "@/lib/news";
+
+function TrendItem({ haber, rank, siteUrl }: { haber: NewsItem; rank: number; siteUrl: string }) {
+  return (
+    <div
+      className="flex gap-3 rounded-lg overflow-hidden group"
+      style={{ backgroundColor: "#fff", border: "1px solid #e0e0e0" }}
+    >
+      <div
+        className="flex-shrink-0 w-9 flex items-center justify-center text-base font-black"
+        style={{
+          backgroundColor: rank === 0 ? "#d90000" : rank < 3 ? "#7a0000" : "#f5f5f5",
+          color: rank < 3 ? "#fff" : "#bbb",
+          minHeight: "80px",
+        }}
+      >
+        {rank + 1}
+      </div>
+      <div className="relative flex-shrink-0 w-24 overflow-hidden" style={{ minHeight: "80px" }}>
+        {haber.image && (
+          <Image
+            src={haber.image}
+            alt={haber.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="96px"
+          />
+        )}
+      </div>
+      <div className="flex-1 min-w-0 py-2.5 pr-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Link href={`/kategori/${haber.categorySlug}`}>
+            <span className="text-white text-xs font-bold px-1.5 py-0.5 rounded-sm" style={{ backgroundColor: "#d90000", fontSize: "10px" }}>
+              {haber.category}
+            </span>
+          </Link>
+          <span className="text-xs" style={{ color: "#999" }}>🔥 {zaman(haber.publishedAt)}</span>
+        </div>
+        <Link href={`/haber/${haber.slug}`}>
+          <h3 className="text-sm font-bold leading-snug mb-1.5 group-hover:text-red-600 transition-colors line-clamp-2" style={{ color: "#1a1a1a" }}>
+            {haber.title}
+          </h3>
+        </Link>
+        <TweetButonu baslik={haber.title} ozet={haber.summary} kategori={haber.categorySlug} haberUrl={`${siteUrl}/haber/${haber.slug}`} />
+      </div>
+    </div>
+  );
+}
 
 function zaman(iso: string) {
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -171,6 +241,9 @@ export default async function TrendPage() {
             </div>
           </section>
 
+          {/* ── REKLAM — Bölümler arası leaderboard ──────────── */}
+          <AdBanner slot="trend-mid" size="leaderboard" />
+
           {/* ── TREND LİSTESİ ─────────────────────────────────── */}
           <section>
             <div className="flex items-center gap-3 mb-4">
@@ -187,64 +260,19 @@ export default async function TrendPage() {
             </div>
 
             <div className="space-y-2">
-              {skorlu.map((haber, idx) => (
-                <div
-                  key={haber.id}
-                  className="flex gap-3 rounded-lg overflow-hidden group"
-                  style={{ backgroundColor: "#fff", border: "1px solid #e0e0e0" }}
-                >
-                  {/* Sıra */}
-                  <div
-                    className="flex-shrink-0 w-9 flex items-center justify-center text-base font-black"
-                    style={{
-                      backgroundColor: idx === 0 ? "#d90000" : idx < 3 ? "#7a0000" : "#f5f5f5",
-                      color: idx < 3 ? "#fff" : "#bbb",
-                      minHeight: "80px",
-                    }}
-                  >
-                    {idx + 1}
-                  </div>
+              {/* İlk 10 haber */}
+              {skorlu.slice(0, 10).map((haber, rank) => (
+                <TrendItem key={haber.id} haber={haber} rank={rank} siteUrl={SITE_URL} />
+              ))}
 
-                  {/* Görsel */}
-                  <div className="relative flex-shrink-0 w-24 overflow-hidden" style={{ minHeight: "80px" }}>
-                    <Image
-                      src={haber.image}
-                      alt={haber.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="96px"
-                    />
-                  </div>
+              {/* Inline reklam */}
+              <div className="py-1">
+                <AdBanner slot="trend-inline" size="small" />
+              </div>
 
-                  {/* İçerik */}
-                  <div className="flex-1 min-w-0 py-2.5 pr-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Link href={`/kategori/${haber.categorySlug}`}>
-                        <span
-                          className="text-white text-xs font-bold px-1.5 py-0.5 rounded-sm"
-                          style={{ backgroundColor: "#d90000", fontSize: "10px" }}
-                        >
-                          {haber.category}
-                        </span>
-                      </Link>
-                      <span className="text-xs" style={{ color: "#999" }}>🔥 {zaman(haber.publishedAt)}</span>
-                    </div>
-                    <Link href={`/haber/${haber.slug}`}>
-                      <h3
-                        className="text-sm font-bold leading-snug mb-1.5 group-hover:text-red-600 transition-colors line-clamp-2"
-                        style={{ color: "#1a1a1a" }}
-                      >
-                        {haber.title}
-                      </h3>
-                    </Link>
-                    <TweetButonu
-                      baslik={haber.title}
-                      ozet={haber.summary}
-                      kategori={haber.categorySlug}
-                      haberUrl={`${SITE_URL}/haber/${haber.slug}`}
-                    />
-                  </div>
-                </div>
+              {/* Kalan haberler */}
+              {skorlu.slice(10).map((haber, i) => (
+                <TrendItem key={haber.id} haber={haber} rank={10 + i} siteUrl={SITE_URL} />
               ))}
             </div>
           </section>
@@ -283,6 +311,11 @@ export default async function TrendPage() {
               ))}
             </ol>
           </div>
+          {/* Sidebar reklam alanı */}
+          <div className="my-4">
+            <AdBanner slot="trend-sidebar" size="rectangle" />
+          </div>
+
           <Sidebar />
         </div>
       </div>

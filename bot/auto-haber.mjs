@@ -468,20 +468,21 @@ async function haberlerComMakaleCek(url) {
   const html = await sayfaCek(url);
   if (!html) return null;
 
-  // JSON-LD bloğunu çek
-  const ldMatch = html.match(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i);
-  if (!ldMatch) return null;
-
+  // Tüm JSON-LD bloklarını çek, NewsArticle olanı bul
+  const ldRegex = /<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
   let article = null;
-  try {
-    const ld = JSON.parse(ldMatch[1]);
-    // @graph dizisinde NewsArticle ara
-    if (ld["@graph"]) {
-      article = ld["@graph"].find(g => g["@type"] === "NewsArticle");
-    } else if (ld["@type"] === "NewsArticle") {
-      article = ld;
-    }
-  } catch { return null; }
+  let ldMatch;
+  while ((ldMatch = ldRegex.exec(html)) !== null) {
+    try {
+      const ld = JSON.parse(ldMatch[1]);
+      if (ld["@graph"]) {
+        const found = ld["@graph"].find(g => g["@type"] === "NewsArticle");
+        if (found) { article = found; break; }
+      } else if (ld["@type"] === "NewsArticle") {
+        article = ld; break;
+      }
+    } catch { continue; }
+  }
 
   if (!article) return null;
 
@@ -500,10 +501,24 @@ async function haberlerComMakaleCek(url) {
 
   const baslik  = htmlDecode((article.headline || article.name || "").trim());
   const ozet    = htmlDecode((article.description || "").trim());
-  const gorsel  = article.thumbnailUrl
-               || article.image?.contentUrl
-               || article.image?.url
-               || "";
+  // Görseli JSON-LD'den çek — birden fazla alan dene
+  let gorsel = "";
+  if (article.thumbnailUrl) gorsel = article.thumbnailUrl;
+  else if (typeof article.image === "string") gorsel = article.image;
+  else if (article.image?.contentUrl) gorsel = article.image.contentUrl;
+  else if (article.image?.url) gorsel = article.image.url;
+  else if (Array.isArray(article.image) && article.image[0]?.url) gorsel = article.image[0].url;
+  // JSON-LD'de yoksa og:image HTML'den çek
+  if (!gorsel) {
+    const og = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i)
+             || html.match(/<meta[^>]+content="([^"]+)"[^>]+property="og:image"/i);
+    if (og) gorsel = og[1];
+  }
+  // Hâlâ yoksa sayfanın ilk büyük görseli dene
+  if (!gorsel) {
+    const imgM = html.match(/<img[^>]+src="(https?:\/\/[^"]+\.(?:jpg|jpeg|webp|png)[^"]*)"/i);
+    if (imgM) gorsel = imgM[1];
+  }
   const body    = htmlDecode((article.articleBody || "").trim());
 
   if (!baslik || baslik.length < 5) return null;
