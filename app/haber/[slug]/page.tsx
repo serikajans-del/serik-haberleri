@@ -96,7 +96,7 @@ export default async function NewsDetailPage({ params }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <article className="lg:col-span-3">
-            <div className="rounded-sm overflow-hidden" style={{ backgroundColor: "#1d1d1d", border: "1px solid #2e2e2e" }}>
+            <div className="rounded-sm overflow-hidden" style={{ backgroundColor: "#ffffff", border: "1px solid #e0e0e0" }}>
               <div className="relative w-full" style={{ paddingBottom: "58.6%" }}>
                 <Image
                   src={news.image}
@@ -117,16 +117,16 @@ export default async function NewsDetailPage({ params }: Props) {
 
                 <h1
                   className="text-2xl md:text-3xl font-black leading-snug mb-4"
-                  style={{ color: "#f0f0f0", letterSpacing: "-0.01em" }}
+                  style={{ color: "#1a1a1a", letterSpacing: "-0.01em" }}
                 >
                   {news.title}
                 </h1>
 
-                <p className="text-base md:text-lg border-l-4 pl-4 py-3 mb-5 rounded-r" style={{ borderColor: "#d90000", backgroundColor: "#1e1e1e", color: "#c8c8c8", fontStyle: "normal", lineHeight: "1.7", fontWeight: 500 }}>
+                <p className="text-base md:text-lg border-l-4 pl-4 py-3 mb-5 rounded-r" style={{ borderColor: "#d90000", backgroundColor: "#fff8f8", color: "#333", fontStyle: "normal", lineHeight: "1.7", fontWeight: 500 }}>
                   {news.summary}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-3 text-xs py-3 mb-6" style={{ borderTop: "1px solid #2a2a2a", borderBottom: "1px solid #2a2a2a", color: "#666" }}>
+                <div className="flex flex-wrap items-center gap-3 text-xs py-3 mb-6" style={{ borderTop: "1px solid #eee", borderBottom: "1px solid #eee", color: "#777" }}>
                   <span className="flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -170,7 +170,7 @@ export default async function NewsDetailPage({ params }: Props) {
                 </div>
 
                 {/* Paylaşım Butonları */}
-                <div className="flex flex-wrap items-center gap-2 mb-6 py-3" style={{ borderBottom: "1px solid #2a2a2a" }}>
+                <div className="flex flex-wrap items-center gap-2 mb-6 py-3" style={{ borderBottom: "1px solid #eee" }}>
                   <span className="text-xs font-bold uppercase tracking-wide mr-1" style={{ color: "#888" }}>Paylaş:</span>
                   {[
                     { label: "Facebook", color: "#1877f2", href: `https://www.facebook.com/sharer/sharer.php?u=${SITE_URL}/haber/${news.slug}`, icon: "M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" },
@@ -197,28 +197,28 @@ export default async function NewsDetailPage({ params }: Props) {
                 />
 
                 {/* Kaynak kutusu */}
-                <div className="mt-6 pt-4 flex items-center justify-between flex-wrap gap-3" style={{ borderTop: "1px solid #2e2e2e" }}>
+                <div className="mt-6 pt-4 flex items-center justify-between flex-wrap gap-3" style={{ borderTop: "1px solid #eee" }}>
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-base" style={{ backgroundColor: "#2a2a2a" }}>📰</div>
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-base" style={{ backgroundColor: "#f5f5f5", border: "1px solid #e0e0e0" }}>📰</div>
                     <div>
-                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#555" }}>Kaynak</div>
-                      <div className="text-sm font-bold" style={{ color: "#e0e0e0" }}>{news.author}</div>
+                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#999" }}>Kaynak</div>
+                      <div className="text-sm font-bold" style={{ color: "#1a1a1a" }}>{news.author}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-base" style={{ backgroundColor: "#2a2a2a" }}>✍️</div>
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-base" style={{ backgroundColor: "#f5f5f5", border: "1px solid #e0e0e0" }}>✍️</div>
                     <div>
-                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#555" }}>Yayımlayan</div>
-                      <div className="text-sm font-bold" style={{ color: "#e0e0e0" }}>Serik Haberleri</div>
+                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#999" }}>Yayımlayan</div>
+                      <div className="text-sm font-bold" style={{ color: "#1a1a1a" }}>Serik Haberleri</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Etiketler — Alanya Postası pill tarzı */}
+                {/* Etiketler */}
                 {news.tags && news.tags.length > 0 && (
-                  <div className="mt-4 pt-4 flex flex-wrap gap-2" style={{ borderTop: "1px solid #2e2e2e" }}>
+                  <div className="mt-4 pt-4 flex flex-wrap gap-2" style={{ borderTop: "1px solid #eee" }}>
                     {news.tags.map((tag) => (
-                      <span key={tag} className="inline-block text-xs font-semibold px-3 py-1 rounded-full cursor-pointer transition-colors" style={{ border: "1px solid #333", color: "#888", backgroundColor: "#252525" }}>
+                      <span key={tag} className="inline-block text-xs font-semibold px-3 py-1 rounded-full cursor-pointer transition-colors hover:bg-red-50" style={{ border: "1px solid #ddd", color: "#666", backgroundColor: "#f9f9f9" }}>
                         #{tag}
                       </span>
                     ))}
@@ -229,7 +229,7 @@ export default async function NewsDetailPage({ params }: Props) {
 
             {/* Sosyal Medya Takip CTA */}
             <div className="mt-5 follow-cta">
-              <p className="text-sm text-gray-300 mb-3">Bu haberi beğendiyseniz bizi takip edin:</p>
+              <p className="text-sm mb-3" style={{ color: "#555" }}>Bu haberi beğendiyseniz bizi takip edin:</p>
               <div className="flex flex-wrap justify-center gap-3">
                 {[
                   { name: "Facebook", color: "#1877f2", href: "https://facebook.com/serikhaberleri", icon: "M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" },
@@ -251,7 +251,7 @@ export default async function NewsDetailPage({ params }: Props) {
                   </a>
                 ))}
               </div>
-              <p className="text-xs text-gray-500 mt-3">
+              <p className="text-xs mt-3" style={{ color: "#999" }}>
                 Serik&apos;ten anlık haberler için sosyal medyamızı takip edin
               </p>
             </div>
@@ -260,7 +260,7 @@ export default async function NewsDetailPage({ params }: Props) {
               <div className="mt-5">
                 <div className="flex items-center gap-2 border-b-2 pb-1 mb-3" style={{ borderColor: "#d90000" }}>
                   <span className="w-1 h-5 rounded-sm" style={{ backgroundColor: "#d90000" }} />
-                  <h2 className="font-bold text-sm uppercase tracking-wide text-white">İlgili Haberler</h2>
+                  <h2 className="font-bold text-sm uppercase tracking-wide" style={{ color: "#1a1a1a" }}>İlgili Haberler</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {related.map((item) => (
