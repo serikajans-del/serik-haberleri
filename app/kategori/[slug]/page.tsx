@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
+import AdBanner from "@/components/AdBanner";
 import { categories, getCategoryBySlug } from "@/lib/news";
 import { getNewsByCategoryFromDB } from "@/lib/db";
 
@@ -44,6 +45,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         <h1 className="text-xl font-bold uppercase tracking-wide">{category.name} Haberleri</h1>
       </div>
 
+      {/* Kategori başlığı altı reklam */}
+      <AdBanner size="leaderboard" className="mb-4" />
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
           {news.length === 0 ? (
@@ -51,14 +55,27 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               Bu kategoride henüz haber bulunmuyor.
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {news.map((item) => (
-                <NewsCard key={item.id} news={item} variant="default" />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {news.slice(0, 6).map((item) => (
+                  <NewsCard key={item.id} news={item} variant="default" />
+                ))}
+              </div>
+              {news.length > 6 && (
+                <>
+                  <AdBanner size="small" className="my-4" />
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {news.slice(6).map((item) => (
+                      <NewsCard key={item.id} news={item} variant="default" />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
           )}
         </div>
         <div className="lg:col-span-1">
+          <AdBanner size="rectangle" className="mb-4" />
           <Sidebar />
         </div>
       </div>

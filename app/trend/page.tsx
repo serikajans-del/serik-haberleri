@@ -4,27 +4,7 @@ import Link from "next/link";
 import { getLatestNewsFromDB } from "@/lib/db";
 import TweetButonu from "@/components/TweetButonu";
 import Sidebar from "@/components/Sidebar";
-
-function AdBanner({ slot, size = "leaderboard" }: { slot: string; size?: "leaderboard" | "rectangle" | "small" }) {
-  const sizes: Record<string, { label: string; h: string }> = {
-    leaderboard: { label: "728×90 — Reklam Alanı", h: "h-20" },
-    rectangle:   { label: "300×250 — Reklam Alanı", h: "h-40" },
-    small:       { label: "468×60 — Reklam Alanı",  h: "h-14" },
-  };
-  const { label, h } = sizes[size];
-  return (
-    <div
-      className={`relative w-full ${h} flex flex-col items-center justify-center rounded overflow-hidden`}
-      style={{ backgroundColor: "#fafafa", border: "1px dashed #ddd" }}
-    >
-      <span className="absolute top-1 left-2 text-xs" style={{ color: "#ccc" }}>Reklam</span>
-      <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "#ccc" }}>{label}</p>
-      <Link href="/reklam" className="text-xs mt-1 transition-colors hover:text-red-700" style={{ color: "#d90000" }}>
-        Reklam vermek için tıklayın →
-      </Link>
-    </div>
-  );
-}
+import AdBanner from "@/components/AdBanner";
 
 export const revalidate = 30;
 
@@ -242,7 +222,7 @@ export default async function TrendPage() {
           </section>
 
           {/* ── REKLAM — Bölümler arası leaderboard ──────────── */}
-          <AdBanner slot="trend-mid" size="leaderboard" />
+          <AdBanner size="leaderboard" />
 
           {/* ── TREND LİSTESİ ─────────────────────────────────── */}
           <section>
@@ -267,7 +247,7 @@ export default async function TrendPage() {
 
               {/* Inline reklam */}
               <div className="py-1">
-                <AdBanner slot="trend-inline" size="small" />
+                <AdBanner size="small" />
               </div>
 
               {/* Kalan haberler */}
@@ -313,7 +293,7 @@ export default async function TrendPage() {
           </div>
           {/* Sidebar reklam alanı */}
           <div className="my-4">
-            <AdBanner slot="trend-sidebar" size="rectangle" />
+            <AdBanner size="rectangle" />
           </div>
 
           <Sidebar />

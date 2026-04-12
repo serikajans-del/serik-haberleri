@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Sidebar from "@/components/Sidebar";
 import NewsCard from "@/components/NewsCard";
+import AdBanner from "@/components/AdBanner";
 import ReadingProgress from "@/components/ReadingProgress";
 import ViewTracker from "@/components/ViewTracker";
 import { formatDate } from "@/lib/news";
@@ -187,6 +188,9 @@ export default async function NewsDetailPage({ params }: Props) {
                   ))}
                 </div>
 
+                {/* Makale üstü reklam */}
+                <AdBanner size="leaderboard" className="mb-5" />
+
                 <div
                   className="article-content py-2"
                   dangerouslySetInnerHTML={{
@@ -226,6 +230,9 @@ export default async function NewsDetailPage({ params }: Props) {
                 )}
               </div>
             </div>
+
+            {/* Makale altı reklam */}
+            <AdBanner size="leaderboard" className="mt-5" />
 
             {/* Sosyal Medya Takip CTA */}
             <div className="mt-5 follow-cta">
@@ -272,6 +279,7 @@ export default async function NewsDetailPage({ params }: Props) {
           </article>
 
           <div className="lg:col-span-1">
+            <AdBanner size="rectangle" className="mb-4" />
             <Sidebar />
           </div>
         </div>

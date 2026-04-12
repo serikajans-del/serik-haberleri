@@ -7,6 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import ExchangeTicker from "@/components/ExchangeTicker";
 import { categories } from "@/lib/news";
 import { getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
+import AdBanner from "@/components/AdBanner";
 
 export const revalidate = 30;
 
@@ -47,16 +48,7 @@ export default async function HomePage() {
             </section>
 
             {/* Reklam banner */}
-            <div
-              className="relative overflow-hidden text-center py-5"
-              style={{ border: "1px dashed #ddd", borderRadius: "3px", backgroundColor: "#fff" }}
-            >
-              <div className="absolute top-1 left-2 text-xs" style={{ color: "#bbb" }}>Reklam</div>
-              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "#bbb" }}>728×90 — Reklam Alanı</p>
-              <Link href="/reklam" className="text-xs mt-1 block transition-colors hover:text-red-700" style={{ color: "#d90000" }}>
-                Reklam vermek için tıklayın →
-              </Link>
-            </div>
+            <AdBanner size="leaderboard" />
 
             {/* Kategori blokları */}
             {await Promise.all(categories.slice(0, 6).map(async (cat, idx) => {
@@ -98,6 +90,7 @@ export default async function HomePage() {
                     </div>
                   )}
 
+                  {idx === 2 && <AdBanner size="leaderboard" className="mt-4" />}
                   <div className="mt-4" style={{ borderTop: "1px dashed #e0e0e0" }} />
                 </section>
               );
@@ -125,32 +118,18 @@ export default async function HomePage() {
             </section>
 
             {/* Sponsorlu alan */}
-            <div style={{ backgroundColor: "#fff", border: "1px solid #e0e0e0", borderRadius: "3px" }} className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs border px-1.5 py-0.5 rounded uppercase tracking-wide" style={{ color: "#bbb", borderColor: "#ddd" }}>Sponsorlu</span>
-                <div className="flex-1 h-px" style={{ backgroundColor: "#eee" }} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="border rounded p-4 text-center" style={{ borderColor: "#ddd", borderStyle: "dashed" }}>
-                  <p className="text-xs uppercase tracking-widest" style={{ color: "#bbb" }}>Sponsor İçerik</p>
-                  <Link href="/reklam" className="text-xs mt-2 block hover:text-red-700" style={{ color: "#d90000" }}>
-                    Bu alan için reklam ver →
-                  </Link>
-                </div>
-                <div className="border rounded p-4 text-center" style={{ borderColor: "#ddd", borderStyle: "dashed" }}>
-                  <p className="text-xs uppercase tracking-widest" style={{ color: "#bbb" }}>Sponsor İçerik</p>
-                  <Link href="/reklam" className="text-xs mt-2 block hover:text-red-700" style={{ color: "#d90000" }}>
-                    Bu alan için reklam ver →
-                  </Link>
-                </div>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <AdBanner size="rectangle" />
+              <AdBanner size="rectangle" />
             </div>
 
           </div>
 
           {/* Sağ — Sidebar */}
           <div className="lg:col-span-1">
+            <AdBanner size="rectangle" className="mb-4" />
             <Sidebar />
+            <AdBanner size="rectangle" className="mt-4" />
           </div>
         </div>
       </div>
