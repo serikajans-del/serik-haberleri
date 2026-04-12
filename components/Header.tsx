@@ -124,14 +124,25 @@ export default function Header() {
             </li>
             {categories.map((cat) => (
               <li key={cat.slug}>
-                <Link
-                  href={`/kategori/${cat.slug}`}
-                  className="nav-btn"
-                >
+                <Link href={`/kategori/${cat.slug}`} className="nav-btn">
                   {cat.name}
                 </Link>
               </li>
             ))}
+
+            {/* Trend — özel buton */}
+            <li>
+              <Link
+                href="/trend"
+                className="nav-btn flex items-center gap-1.5"
+                style={{ backgroundColor: "#000", borderColor: "#333", color: "#fff" }}
+              >
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Trend
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>
@@ -163,6 +174,19 @@ export default function Header() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                href="/trend"
+                className="flex items-center gap-3 px-5 py-3.5 text-white text-sm font-bold transition-colors hover:bg-white/5"
+                style={{ borderBottom: "1px solid #252525" }}
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Trend
+              </Link>
+            </li>
           </ul>
         </nav>
       )}
