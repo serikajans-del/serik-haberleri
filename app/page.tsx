@@ -4,6 +4,8 @@ import HeroSlider from "@/components/HeroSlider";
 import MostReadBlock from "@/components/MostReadBlock";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
+import AuthorsSection from "@/components/AuthorsSection";
+import ExchangeTicker from "@/components/ExchangeTicker";
 import { categories } from "@/lib/news";
 import { getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
@@ -16,8 +18,9 @@ export default async function HomePage() {
   const gridNews = latest.slice(5, 11);
 
   return (
-    <div style={{ backgroundColor: "#121212" }}>
+    <div style={{ backgroundColor: "#f4f4f4" }}>
       <BreakingNews />
+      <ExchangeTicker />
       <HeroSlider items={sliderItems} />
       <MostReadBlock items={sonHaberler} />
 
@@ -33,7 +36,7 @@ export default async function HomePage() {
             <section>
               <div className="section-heading">
                 <span>Son Haberler</span>
-                <Link href="/kategori/gundem" className="text-xs font-normal normal-case tracking-normal transition-colors" style={{ color: "#666", fontFamily: "inherit" }}>
+                <Link href="/kategori/gundem" className="text-xs font-normal normal-case tracking-normal transition-colors hover:text-red-600" style={{ color: "#999", fontFamily: "inherit" }}>
                   Tümünü Gör »
                 </Link>
               </div>
@@ -44,11 +47,17 @@ export default async function HomePage() {
               </div>
             </section>
 
+            {/* Yazarlar bölümü */}
+            <AuthorsSection />
+
             {/* Reklam banner */}
-            <div className="relative overflow-hidden text-center py-5" style={{ border: "1px dashed #2e2e2e", borderRadius: "3px", backgroundColor: "#1a1a1a" }}>
-              <div className="absolute top-1 left-2 text-xs" style={{ color: "#444" }}>Reklam</div>
-              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "#444" }}>728×90 — Reklam Alanı</p>
-              <Link href="/reklam" className="text-xs mt-1 block transition-colors" style={{ color: "#d90000" }}>
+            <div
+              className="relative overflow-hidden text-center py-5"
+              style={{ border: "1px dashed #ddd", borderRadius: "3px", backgroundColor: "#fff" }}
+            >
+              <div className="absolute top-1 left-2 text-xs" style={{ color: "#bbb" }}>Reklam</div>
+              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "#bbb" }}>728×90 — Reklam Alanı</p>
+              <Link href="/reklam" className="text-xs mt-1 block transition-colors hover:text-red-700" style={{ color: "#d90000" }}>
                 Reklam vermek için tıklayın →
               </Link>
             </div>
@@ -65,8 +74,8 @@ export default async function HomePage() {
                     <span>{cat.name}</span>
                     <Link
                       href={`/kategori/${cat.slug}`}
-                      className="text-xs font-normal normal-case tracking-normal transition-colors"
-                      style={{ color: "#666", fontFamily: "inherit" }}
+                      className="text-xs font-normal normal-case tracking-normal transition-colors hover:text-red-600"
+                      style={{ color: "#999", fontFamily: "inherit" }}
                     >
                       Tümünü Gör »
                     </Link>
@@ -93,7 +102,7 @@ export default async function HomePage() {
                     </div>
                   )}
 
-                  <div className="mt-4" style={{ borderTop: "1px dashed #2a2a2a" }} />
+                  <div className="mt-4" style={{ borderTop: "1px dashed #e0e0e0" }} />
                 </section>
               );
             }))}
@@ -109,10 +118,10 @@ export default async function HomePage() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="flex flex-col items-center gap-2 py-4 px-3 text-center transition-all group"
-                  style={{ backgroundColor: "#1d1d1d", border: "1px solid #2e2e2e", borderRadius: "3px" }}
+                  className="flex flex-col items-center gap-2 py-4 px-3 text-center transition-all group hover:border-red-300"
+                  style={{ backgroundColor: "#fff", border: "1px solid #e0e0e0", borderRadius: "3px" }}
                 >
-                  <div className="text-xs font-bold transition-colors group-hover:text-white" style={{ color: "#bbb" }}>
+                  <div className="text-xs font-bold transition-colors group-hover:text-red-600" style={{ color: "#333" }}>
                     {l.label}
                   </div>
                 </Link>
@@ -120,21 +129,21 @@ export default async function HomePage() {
             </section>
 
             {/* Sponsorlu alan */}
-            <div style={{ backgroundColor: "#1a1a1a", border: "1px solid #2e2e2e", borderRadius: "3px" }} className="p-4">
+            <div style={{ backgroundColor: "#fff", border: "1px solid #e0e0e0", borderRadius: "3px" }} className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs border px-1.5 py-0.5 rounded uppercase tracking-wide" style={{ color: "#555", borderColor: "#333" }}>Sponsorlu</span>
-                <div className="flex-1 h-px" style={{ backgroundColor: "#2a2a2a" }} />
+                <span className="text-xs border px-1.5 py-0.5 rounded uppercase tracking-wide" style={{ color: "#bbb", borderColor: "#ddd" }}>Sponsorlu</span>
+                <div className="flex-1 h-px" style={{ backgroundColor: "#eee" }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="border rounded p-4 text-center" style={{ borderColor: "#2e2e2e", borderStyle: "dashed" }}>
-                  <p className="text-xs uppercase tracking-widest" style={{ color: "#444" }}>Sponsor İçerik</p>
-                  <Link href="/reklam" className="text-xs mt-2 block" style={{ color: "#d90000" }}>
+                <div className="border rounded p-4 text-center" style={{ borderColor: "#ddd", borderStyle: "dashed" }}>
+                  <p className="text-xs uppercase tracking-widest" style={{ color: "#bbb" }}>Sponsor İçerik</p>
+                  <Link href="/reklam" className="text-xs mt-2 block hover:text-red-700" style={{ color: "#d90000" }}>
                     Bu alan için reklam ver →
                   </Link>
                 </div>
-                <div className="border rounded p-4 text-center" style={{ borderColor: "#2e2e2e", borderStyle: "dashed" }}>
-                  <p className="text-xs uppercase tracking-widest" style={{ color: "#444" }}>Sponsor İçerik</p>
-                  <Link href="/reklam" className="text-xs mt-2 block" style={{ color: "#d90000" }}>
+                <div className="border rounded p-4 text-center" style={{ borderColor: "#ddd", borderStyle: "dashed" }}>
+                  <p className="text-xs uppercase tracking-widest" style={{ color: "#bbb" }}>Sponsor İçerik</p>
+                  <Link href="/reklam" className="text-xs mt-2 block hover:text-red-700" style={{ color: "#d90000" }}>
                     Bu alan için reklam ver →
                   </Link>
                 </div>

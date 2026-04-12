@@ -11,7 +11,7 @@ export default function MostReadBlock({ items }: { items: NewsItem[] }) {
   if (!items.length) return null;
 
   return (
-    <div style={{ backgroundColor: "#161616", borderBottom: "1px solid #252525" }} className="py-3">
+    <div style={{ backgroundColor: "#f9f9f9", borderBottom: "1px solid #e0e0e0" }} className="py-3">
       <div className="max-w-7xl mx-auto px-3 md:px-4">
 
         {/* Başlık */}
@@ -24,8 +24,8 @@ export default function MostReadBlock({ items }: { items: NewsItem[] }) {
               Son Haberler
             </span>
           </div>
-          <div className="flex-1 h-px" style={{ backgroundColor: "#2a2a2a" }} />
-          <Link href="/kategori/gundem" className="text-xs" style={{ color: "#555" }}>
+          <div className="flex-1 h-px" style={{ backgroundColor: "#e0e0e0" }} />
+          <Link href="/kategori/gundem" className="text-xs" style={{ color: "#999" }}>
             Tümü »
           </Link>
         </div>
@@ -47,7 +47,6 @@ export default function MostReadBlock({ items }: { items: NewsItem[] }) {
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 1024px) 80px, 20vw"
                 />
-                {/* Kategori etiketi */}
                 <span
                   className="absolute bottom-0 left-0 text-white text-xs font-bold px-1.5 py-0.5"
                   style={{ backgroundColor: "rgba(217,0,0,0.9)", fontSize: "10px" }}
@@ -59,12 +58,12 @@ export default function MostReadBlock({ items }: { items: NewsItem[] }) {
               {/* Başlık + okuma sayısı */}
               <div className="flex-1 min-w-0 lg:mt-1">
                 <h4
-                  className="text-xs font-bold leading-snug line-clamp-3 group-hover:text-red-400 transition-colors"
-                  style={{ color: "#ddd" }}
+                  className="text-xs font-bold leading-snug line-clamp-3 group-hover:text-red-600 transition-colors"
+                  style={{ color: "#1a1a1a" }}
                 >
                   {news.title}
                 </h4>
-                <span className="text-xs mt-1.5 flex items-center gap-1" style={{ color: "#555" }}>
+                <span className="text-xs mt-1.5 flex items-center gap-1" style={{ color: "#999" }}>
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

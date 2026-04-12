@@ -3,33 +3,58 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { categories } from "@/lib/news";
 
+type WeatherData = {
+  temp: number;
+  desc: string;
+  icon: string;
+} | null;
+
 export default function Header() {
   const [today, setToday] = useState("");
+  const [weather, setWeather] = useState<WeatherData>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     setToday(new Date().toLocaleDateString("tr-TR", {
       weekday: "long", year: "numeric", month: "long", day: "numeric",
     }));
+    fetch("/api/hava")
+      .then((r) => r.json())
+      .then((d) => { if (d.temp !== undefined) setWeather(d); })
+      .catch(() => {});
   }, []);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header>
-      {/* Üst bilgi şeridi — koyu */}
-      <div style={{ backgroundColor: "#0d0d0d", borderBottom: "1px solid #2a2a2a" }}>
-        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between text-xs" style={{ color: "#888" }}>
-          <span className="hidden md:block">{today}</span>
+    <header style={{ position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
+      {/* Üst bilgi şeridi — açık */}
+      <div style={{ backgroundColor: "#f2f2f2", borderBottom: "1px solid #e0e0e0" }}>
+        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between text-xs" style={{ color: "#666" }}>
           <div className="flex items-center gap-3">
-            <Link href="/iletisim" className="hover:text-white transition-colors">İletişim</Link>
-            <span style={{ color: "#333" }}>|</span>
-            <Link href="/hakkimizda" className="hover:text-white transition-colors">Hakkımızda</Link>
-            <span style={{ color: "#333" }}>|</span>
-            <Link href="/reklam" className="hover:text-white transition-colors">Reklam</Link>
+            <span className="hidden md:block">{today}</span>
+            {weather && (
+              <>
+                <span style={{ color: "#ccc" }}>|</span>
+                <span className="hidden md:flex items-center gap-1.5">
+                  <span className="text-base leading-none">{weather.icon}</span>
+                  <span style={{ color: "#555" }}>
+                    Serik {weather.temp}°C — {weather.desc}
+                  </span>
+                </span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/iletisim" className="hover:text-red-600 transition-colors">İletişim</Link>
+            <span style={{ color: "#ccc" }}>|</span>
+            <Link href="/hakkimizda" className="hover:text-red-600 transition-colors">Hakkımızda</Link>
+            <span style={{ color: "#ccc" }}>|</span>
+            <Link href="/reklam" className="hover:text-red-600 transition-colors">Reklam</Link>
           </div>
         </div>
       </div>
 
       {/* MASTHEAD */}
-      <div style={{ backgroundColor: "#161616", borderBottom: "3px solid #d90000" }}>
+      <div style={{ backgroundColor: "#ffffff", borderBottom: "3px solid #d90000" }}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
 
@@ -58,19 +83,16 @@ export default function Header() {
                 <div className="inline-block">
                   <div
                     className="text-3xl md:text-5xl font-black tracking-tight leading-none"
-                    style={{
-                      fontFamily: "'Roboto', -apple-system, BlinkMacSystemFont, sans-serif",
-                      color: "#d90000",
-                    }}
+                    style={{ fontFamily: "'Roboto', -apple-system, BlinkMacSystemFont, sans-serif", color: "#d90000" }}
                   >
                     SERİK HABERLERİ
                   </div>
                   <div className="flex items-center justify-center gap-2 mt-0.5">
-                    <div className="flex-1 h-px" style={{ background: "#333" }} />
-                    <span className="text-xs tracking-[0.3em] uppercase font-medium px-2" style={{ color: "#666" }}>
+                    <div className="flex-1 h-px" style={{ background: "#e0e0e0" }} />
+                    <span className="text-xs tracking-[0.3em] uppercase font-medium px-2" style={{ color: "#999" }}>
                       Serik&apos;in Haber Portalı
                     </span>
-                    <div className="flex-1 h-px" style={{ background: "#333" }} />
+                    <div className="flex-1 h-px" style={{ background: "#e0e0e0" }} />
                   </div>
                 </div>
               </Link>
@@ -78,12 +100,12 @@ export default function Header() {
 
             {/* Sağ arama */}
             <div className="hidden md:flex items-center order-2 md:order-3">
-              <div className="flex overflow-hidden" style={{ border: "1px solid #333", borderRadius: "3px" }}>
+              <div className="flex overflow-hidden" style={{ border: "1px solid #ddd", borderRadius: "3px" }}>
                 <input
                   type="text"
                   placeholder="Haber ara..."
                   className="px-3 py-1.5 text-sm w-40 focus:outline-none focus:w-52 transition-all duration-200"
-                  style={{ backgroundColor: "#1d1d1d", color: "#ddd", border: "none" }}
+                  style={{ backgroundColor: "#f5f5f5", color: "#333", border: "none" }}
                 />
                 <button
                   style={{ backgroundColor: "#d90000" }}
@@ -98,7 +120,7 @@ export default function Header() {
             </div>
 
             {/* Mobil hamburger */}
-            <button className="md:hidden order-2 p-1 transition-colors" style={{ color: "#ccc" }} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menü">
+            <button className="md:hidden order-2 p-1 transition-colors" style={{ color: "#333" }} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menü">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {menuOpen
                   ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -111,16 +133,11 @@ export default function Header() {
       </div>
 
       {/* Navigasyon */}
-      <nav style={{ backgroundColor: "#111", borderTop: "3px solid #d90000" }} className="hidden md:block">
+      <nav style={{ backgroundColor: "#fff", borderBottom: "1px solid #e0e0e0", borderTop: "1px solid #eee" }} className="hidden md:block">
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center gap-1 py-2">
             <li>
-              <Link
-                href="/"
-                className="nav-btn"
-              >
-                Ana Sayfa
-              </Link>
+              <Link href="/" className="nav-btn">Ana Sayfa</Link>
             </li>
             {categories.map((cat) => (
               <li key={cat.slug}>
@@ -129,13 +146,11 @@ export default function Header() {
                 </Link>
               </li>
             ))}
-
-            {/* Trend — özel buton */}
             <li>
               <Link
                 href="/trend"
                 className="nav-btn flex items-center gap-1.5"
-                style={{ backgroundColor: "#000", borderColor: "#333", color: "#fff" }}
+                style={{ backgroundColor: "#fff5f5", borderColor: "#ffcccc", color: "#d90000" }}
               >
                 <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -149,13 +164,13 @@ export default function Header() {
 
       {/* Mobil nav */}
       {menuOpen && (
-        <nav style={{ backgroundColor: "#1a1a1a", borderBottom: "3px solid #d90000" }} className="md:hidden shadow-xl">
+        <nav style={{ backgroundColor: "#fff", borderBottom: "3px solid #d90000" }} className="md:hidden shadow-xl">
           <ul>
             <li>
               <Link
                 href="/"
-                className="flex items-center gap-3 px-5 py-3.5 text-white text-sm font-bold transition-colors hover:bg-white/5"
-                style={{ borderBottom: "1px solid #252525" }}
+                className="flex items-center gap-3 px-5 py-3.5 text-sm font-bold transition-colors hover:bg-red-50"
+                style={{ borderBottom: "1px solid #eee", color: "#1a1a1a" }}
                 onClick={() => setMenuOpen(false)}
               >
                 🏠 Ana Sayfa
@@ -165,8 +180,8 @@ export default function Header() {
               <li key={cat.slug}>
                 <Link
                   href={`/kategori/${cat.slug}`}
-                  className="flex items-center gap-3 px-5 py-3.5 text-white text-sm font-bold transition-colors hover:bg-white/5"
-                  style={{ borderBottom: "1px solid #252525" }}
+                  className="flex items-center gap-3 px-5 py-3.5 text-sm font-bold transition-colors hover:bg-red-50"
+                  style={{ borderBottom: "1px solid #eee", color: "#1a1a1a" }}
                   onClick={() => setMenuOpen(false)}
                 >
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: "#d90000" }} />
@@ -177,8 +192,8 @@ export default function Header() {
             <li>
               <Link
                 href="/trend"
-                className="flex items-center gap-3 px-5 py-3.5 text-white text-sm font-bold transition-colors hover:bg-white/5"
-                style={{ borderBottom: "1px solid #252525" }}
+                className="flex items-center gap-3 px-5 py-3.5 text-sm font-bold transition-colors hover:bg-red-50"
+                style={{ borderBottom: "1px solid #eee", color: "#d90000" }}
                 onClick={() => setMenuOpen(false)}
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

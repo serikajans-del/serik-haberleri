@@ -8,7 +8,7 @@ export default function Footer() {
       {/* Kırmızı üst şerit */}
       <div style={{ height: "4px", background: "linear-gradient(90deg, #a60000 0%, #d90000 100%)" }} />
 
-      <div style={{ backgroundColor: "#111111" }} className="pt-8 pb-6">
+      <div style={{ backgroundColor: "#1a1a1a" }} className="pt-8 pb-6">
         <div className="max-w-7xl mx-auto px-4">
 
           {/* Logo */}

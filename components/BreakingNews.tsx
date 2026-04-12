@@ -6,7 +6,7 @@ export default async function BreakingNews() {
   const items = [...latest, ...latest];
 
   return (
-    <div className="flex items-stretch overflow-hidden" style={{ backgroundColor: "#0d0d0d", borderBottom: "1px solid #2a2a2a" }}>
+    <div className="flex items-stretch overflow-hidden" style={{ backgroundColor: "#fff", borderBottom: "1px solid #e0e0e0" }}>
       <div
         className="flex-shrink-0 px-4 py-2 flex items-center gap-2 text-white text-xs font-black uppercase tracking-widest"
         style={{ backgroundColor: "#d90000" }}
@@ -20,8 +20,8 @@ export default async function BreakingNews() {
             <span key={`${news.id}-${i}`} className="inline-flex items-center gap-3 pr-10">
               <Link
                 href={`/haber/${news.slug}`}
-                className="text-xs font-semibold whitespace-nowrap transition-colors"
-                style={{ color: "#ccc" }}
+                className="text-xs font-semibold whitespace-nowrap transition-colors hover:text-red-600"
+                style={{ color: "#333" }}
               >
                 {news.title}
               </Link>
