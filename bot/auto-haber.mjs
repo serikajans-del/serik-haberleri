@@ -85,39 +85,11 @@ const KATEGORILER = [
   { name: "Turizm",  slug: "turizm"  },
 ];
 
-// ── RSS Kaynakları ────────────────────────────────────────────────────────────
-const RSS_KAYNAKLAR = [
-  { ad: "TRT Haber",       url: "https://www.trthaber.com/sondakika.rss" },
-  { ad: "Antalya Postası", url: "https://www.antalyapostasi.com/feed/" },
-  { ad: "Milliyet",        url: "https://www.milliyet.com.tr/rss/rssNew/sondakikaHaberleri.xml" },
-  { ad: "Sabah",           url: "https://www.sabah.com.tr/rss/anasayfa.xml" },
-  { ad: "İHA",             url: "https://www.iha.com.tr/rss/antalya-haberleri-rss.xml" },
-  { ad: "DHA",             url: "https://www.dha.com.tr/rss/antalya" },
-  { ad: "Haber7",          url: "https://www.haber7.com/rss.xml" },
-  { ad: "Yeni Şafak",      url: "https://www.yenisafak.com/Rss/Gundem" },
-];
+// ── RSS Kaynakları — devre dışı ───────────────────────────────────────────────
+const RSS_KAYNAKLAR = [];
 
-// ── HTML Kaynakları ───────────────────────────────────────────────────────────
-const HTML_KAYNAKLAR = [
-  {
-    ad: "Serik Postası",
-    url: "https://serikpostasi.com/",
-    base: "https://serikpostasi.com",
-    linkRegex: /href=['"]?(https?:\/\/serikpostasi\.com\/haber\/[^'">\s]+)|href=['"]?(\/haber\/[^'">\s]+)/g,
-  },
-  {
-    ad: "İHA Antalya",
-    url: "https://www.iha.com.tr/antalya-haberleri/",
-    base: "https://www.iha.com.tr",
-    linkRegex: /href="(\/antalya-haberleri\/[^"#?]+)"/g,
-  },
-  {
-    ad: "Son Dakika",
-    url: "https://www.sondakika.com/antalya/",
-    base: "https://www.sondakika.com",
-    linkRegex: /href="(\/[a-z-]+\/haber-[^"#?]+)"/g,
-  },
-];
+// ── HTML Kaynakları — devre dışı ─────────────────────────────────────────────
+const HTML_KAYNAKLAR = [];
 
 // ── Haberler.com Kaynakları ───────────────────────────────────────────────────
 // JSON-LD yapısı sayesinde içerik çok temiz çekilir
