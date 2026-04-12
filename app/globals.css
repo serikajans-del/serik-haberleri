@@ -212,6 +212,12 @@ body, p, span, a, li, td, input, button {
   line-height: 1.9;
 }
 
+/* Boş veya --> ile başlayan paragrafları gizle */
+.article-content p:empty,
+.article-content p:has(> br:only-child) {
+  display: none;
+}
+
 .article-content h2 {
   font-size: 1.3rem;
   font-weight: 700;

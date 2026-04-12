@@ -187,14 +187,30 @@ export default async function NewsDetailPage({ params }: Props) {
                   ))}
                 </div>
 
-                <div className="article-content py-2" dangerouslySetInnerHTML={{ __html: news.content }} />
+                <div
+                  className="article-content py-2"
+                  dangerouslySetInnerHTML={{
+                    __html: news.content
+                      .replace(/^[\s\n]*-->[\s\n]*/g, "")
+                      .replace(/^(<p[^>]*>\s*-->\s*<\/p>\s*)+/g, "")
+                  }}
+                />
 
-                {/* Muhabir kutusu */}
-                <div className="mt-6 pt-4 flex items-center gap-3" style={{ borderTop: "1px solid #2e2e2e" }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-lg" style={{ backgroundColor: "#2a2a2a" }}>✍️</div>
-                  <div>
-                    <div className="text-xs uppercase tracking-wide" style={{ color: "#666" }}>Muhabir</div>
-                    <div className="text-sm font-bold text-white">{news.author}</div>
+                {/* Kaynak kutusu */}
+                <div className="mt-6 pt-4 flex items-center justify-between flex-wrap gap-3" style={{ borderTop: "1px solid #2e2e2e" }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-base" style={{ backgroundColor: "#2a2a2a" }}>📰</div>
+                    <div>
+                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#555" }}>Kaynak</div>
+                      <div className="text-sm font-bold" style={{ color: "#e0e0e0" }}>{news.author}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-base" style={{ backgroundColor: "#2a2a2a" }}>✍️</div>
+                    <div>
+                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#555" }}>Yayımlayan</div>
+                      <div className="text-sm font-bold" style={{ color: "#e0e0e0" }}>Serik Haberleri</div>
+                    </div>
                   </div>
                 </div>
 

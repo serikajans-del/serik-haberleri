@@ -140,12 +140,14 @@ function htmlDecode(str = "") {
 
 function htmlTemizle(html = "") {
   return htmlDecode(html
+    .replace(/<!--[\s\S]*?-->/g, "")        // HTML yorumları sil (-->)
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/<\/?(?:div|section|aside|nav|header|footer|figure|figcaption|form|button|iframe|noscript)[^>]*>/gi, "")
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/p>/gi, "\n")
     .replace(/<[^>]+>/g, "")
+    .replace(/-->/g, "")                    // Kalan --> kalıntıları temizle
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]+/g, " ")
     .trim());
@@ -186,7 +188,7 @@ async function haberYazdir(baslik, ozet, hammadde) {
     console.log(`   🤖 Claude ile yeniden yazılıyor...`);
     const response = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 1200,
+      max_tokens: 2000,
       messages: [{
         role: "user",
         content: `Sen Türk bir haber ajansı editörüsün. Aşağıdaki haberi ajans diliyle, özgün ve akıcı Türkçeyle yeniden yaz.
@@ -196,7 +198,8 @@ KURALLAR:
 - Orijinal içeriği KOPYALAMA — kelimeleri, cümle yapısını değiştir
 - Başlığı kısa ve dikkat çekici yap (max 12 kelime)
 - Özeti tek cümleyle özetle (max 2 satır)
-- Haber gövdesini 4-6 paragraf yaz, her paragraf 2-4 cümle
+- Haber gövdesini MUTLAKA 5-7 paragraf yaz, her paragraf 3-4 cümle olsun
+- Bilgi azsa yorumla ve bağlam ekle, haberi tam ve okunabilir yap
 - Gereksiz kelime, tekrar ve klişeden kaçın
 - Sonuna kaynak belirtme
 
@@ -383,14 +386,31 @@ async function makaleCek(url, rssOnBilgi = {}) {
     paragraflar.push(t);
   }
 
+  // Paragraf bulunamadıysa düz metin blokları dene
   if (paragraflar.length === 0) {
-    if (ozet && ozet.length > 60) {
-      return { baslik, ozet, icerik: `<p>${ozet}</p>`, gorsel };
+    // Tüm sayfadan anlamlı cümleler çıkar
+    const duzMetin = htmlTemizle(temizHtml);
+    const cumleler = duzMetin.split(/\n+/).map(s => s.trim()).filter(s =>
+      s.length > 40 && s.split(" ").length >= 6 &&
+      !/cookie|reklam|javascript|©|tüm hakları|telif/i.test(s)
+    );
+    if (cumleler.length >= 2) {
+      // Her 3 cümleyi bir paragraf yap
+      const gruplar = [];
+      for (let i = 0; i < Math.min(cumleler.length, 18); i += 3) {
+        gruplar.push(cumleler.slice(i, i + 3).join(" "));
+      }
+      paragraflar = gruplar.filter(g => g.length > 60);
     }
-    return null;
+    if (paragraflar.length === 0) {
+      if (ozet && ozet.length > 60) {
+        return { baslik, ozet, icerik: `<p>${ozet}</p>`, gorsel };
+      }
+      return null;
+    }
   }
 
-  const hammadde = paragraflar.slice(0, 8).map(p => `<p>${p}</p>`).join("\n");
+  const hammadde = paragraflar.slice(0, 12).map(p => `<p>${p}</p>`).join("\n");
   return { baslik, ozet, icerik: hammadde, gorsel };
 }
 
@@ -434,15 +454,21 @@ async function mevcutlar() {
 async function supabaseKaydet(haber, kaynak, kategori) {
   const slug  = slugify(haber.baslik) + "-" + Date.now().toString(36);
 
+  // İçeriği temizle: başındaki --> ve boşlukları sil
+  const temizIcerik = (haber.icerik || "")
+    .replace(/^[\s\n]*-->[\s\n]*/g, "")
+    .replace(/^(<p>\s*-->[\s\S]*?<\/p>\s*)/g, "")
+    .trim();
+
   const kayit = {
     title:         haber.baslik,
     slug,
     summary:       haber.ozet || haber.baslik,
-    content:       haber.icerik,
+    content:       temizIcerik || haber.icerik,
     category:      kategori.name,
     category_slug: kategori.slug,
     image:         haber.gorsel,
-    author:        "Serik Haberleri",
+    author:        kaynak,          // Gerçek kaynak: "TRT Haber", "Sabah" vb.
     published_at:  new Date().toISOString(),
     featured:      false,
     tags:          [],
