@@ -111,19 +111,33 @@ export default function Header() {
       </div>
 
       {/* Navigasyon */}
-      <nav style={{ background: "linear-gradient(90deg, #a60000 0%, #d90000 100%)" }} className="hidden md:block shadow-lg">
+      <nav style={{ backgroundColor: "#c00000", borderBottom: "1px solid #a00000" }} className="hidden md:block">
         <div className="max-w-7xl mx-auto px-4">
-          <ul className="flex items-center">
-            <li>
-              <Link href="/" className="block px-4 py-2.5 text-white text-xs font-bold uppercase tracking-wider transition-colors hover:bg-black hover:bg-opacity-20">
-                Ana Sayfa
+          <ul className="flex items-stretch">
+            {/* Ana Sayfa */}
+            <li className="flex items-stretch">
+              <Link
+                href="/"
+                className="flex items-center px-5 py-3.5 text-white text-sm font-bold transition-all duration-150"
+                style={{ letterSpacing: "0.03em", borderRight: "1px solid rgba(255,255,255,0.12)" }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.22)")}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                🏠 Ana Sayfa
               </Link>
             </li>
-            {categories.map((cat) => (
-              <li key={cat.slug}>
+
+            {categories.map((cat, i) => (
+              <li key={cat.slug} className="flex items-stretch">
                 <Link
                   href={`/kategori/${cat.slug}`}
-                  className="block px-4 py-2.5 text-white text-xs font-bold uppercase tracking-wider transition-colors hover:bg-black hover:bg-opacity-20"
+                  className="flex items-center px-5 py-3.5 text-white text-sm font-bold transition-all duration-150 whitespace-nowrap"
+                  style={{
+                    letterSpacing: "0.03em",
+                    borderRight: i < categories.length - 1 ? "1px solid rgba(255,255,255,0.12)" : "none",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.22)")}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
                 >
                   {cat.name}
                 </Link>
@@ -135,14 +149,27 @@ export default function Header() {
 
       {/* Mobil nav */}
       {menuOpen && (
-        <nav style={{ backgroundColor: "#1a1a1a", borderBottom: "2px solid #d90000" }} className="md:hidden shadow-lg">
-          <ul style={{ borderTop: "none" }}>
-            <li style={{ borderBottom: "1px solid #2a2a2a" }}>
-              <Link href="/" className="block px-4 py-3 text-white text-sm font-bold uppercase tracking-wide" onClick={() => setMenuOpen(false)}>Ana Sayfa</Link>
+        <nav style={{ backgroundColor: "#1a1a1a", borderBottom: "3px solid #d90000" }} className="md:hidden shadow-xl">
+          <ul>
+            <li>
+              <Link
+                href="/"
+                className="flex items-center gap-3 px-5 py-3.5 text-white text-sm font-bold transition-colors hover:bg-white/5"
+                style={{ borderBottom: "1px solid #252525" }}
+                onClick={() => setMenuOpen(false)}
+              >
+                🏠 Ana Sayfa
+              </Link>
             </li>
             {categories.map((cat) => (
-              <li key={cat.slug} style={{ borderBottom: "1px solid #2a2a2a" }}>
-                <Link href={`/kategori/${cat.slug}`} className="block px-4 py-3 text-white text-sm font-bold uppercase tracking-wide" onClick={() => setMenuOpen(false)}>
+              <li key={cat.slug}>
+                <Link
+                  href={`/kategori/${cat.slug}`}
+                  className="flex items-center gap-3 px-5 py-3.5 text-white text-sm font-bold transition-colors hover:bg-white/5"
+                  style={{ borderBottom: "1px solid #252525" }}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: "#d90000" }} />
                   {cat.name}
                 </Link>
               </li>
