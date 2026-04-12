@@ -119,6 +119,15 @@ const HTML_KAYNAKLAR = [
   },
 ];
 
+// ── Haberler.com Kaynakları ───────────────────────────────────────────────────
+// JSON-LD yapısı sayesinde içerik çok temiz çekilir
+const HABERLERCOM_KAYNAKLAR = [
+  { ad: "Haberler.com / Serik",    url: "https://www.haberler.com/serik/" },
+  { ad: "Haberler.com / Antalya",  url: "https://www.haberler.com/antalya/" },
+  { ad: "Haberler.com / Manavgat", url: "https://www.haberler.com/manavgat/" },
+  { ad: "Haberler.com / Belek",    url: "https://www.haberler.com/belek/" },
+];
+
 // ── Yardımcı ─────────────────────────────────────────────────────────────────
 function slugify(text) {
   return text.toLowerCase()
@@ -458,6 +467,75 @@ async function makaleCek(url, rssOnBilgi = {}) {
   return { baslik, ozet, icerik: hammadde, gorsel };
 }
 
+// ── Haberler.com JSON-LD Çekici ───────────────────────────────────────────────
+async function haberlerComHaberlerCek(kaynak) {
+  console.log(`\n📡 [Haberler.com] ${kaynak.ad} çekiliyor...`);
+  const html = await sayfaCek(kaynak.url);
+  if (!html) { console.warn(`   ⚠️  Erişilemedi`); return []; }
+
+  // Haber linkleri: /kategori/slug-XXXXXX-haberi/ formatı
+  const linkSet = new Set();
+  const linkRegex = /href="(\/[^"]*-\d{7,}-haberi\/)"/g;
+  let m;
+  while ((m = linkRegex.exec(html)) !== null) {
+    const path = m[1];
+    if (path && path.length > 10) linkSet.add("https://www.haberler.com" + path);
+  }
+
+  const urls = [...linkSet].slice(0, 25);
+  console.log(`   ✓ ${urls.length} haber linki`);
+  return urls.map(url => ({ url, kaynak: kaynak.ad }));
+}
+
+async function haberlerComMakaleCek(url) {
+  const html = await sayfaCek(url);
+  if (!html) return null;
+
+  // JSON-LD bloğunu çek
+  const ldMatch = html.match(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i);
+  if (!ldMatch) return null;
+
+  let article = null;
+  try {
+    const ld = JSON.parse(ldMatch[1]);
+    // @graph dizisinde NewsArticle ara
+    if (ld["@graph"]) {
+      article = ld["@graph"].find(g => g["@type"] === "NewsArticle");
+    } else if (ld["@type"] === "NewsArticle") {
+      article = ld;
+    }
+  } catch { return null; }
+
+  if (!article) return null;
+
+  const baslik  = htmlDecode((article.headline || article.name || "").trim());
+  const ozet    = htmlDecode((article.description || "").trim());
+  const gorsel  = article.thumbnailUrl
+               || article.image?.contentUrl
+               || article.image?.url
+               || "";
+  const body    = htmlDecode((article.articleBody || "").trim());
+
+  if (!baslik || baslik.length < 5) return null;
+
+  // articleBody'yi paragraflara böl (nokta/ünlem/soru ile biten cümleler 3'erli grup)
+  let icerik = "";
+  if (body && body.length > 50) {
+    const cumleler = body.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
+    const gruplar = [];
+    for (let i = 0; i < cumleler.length; i += 3) {
+      const grup = cumleler.slice(i, i + 3).join(" ").trim();
+      if (grup.length > 20) gruplar.push(grup);
+    }
+    icerik = gruplar.map(p => `<p>${p}</p>`).join("\n");
+  } else if (ozet) {
+    icerik = `<p>${ozet}</p>`;
+  }
+
+  if (!icerik) return null;
+  return { baslik, ozet, icerik, gorsel };
+}
+
 // ── HTML Kaynak Linkleri ──────────────────────────────────────────────────────
 async function htmlHaberlerCek(kaynak) {
   console.log(`\n📡 [HTML] ${kaynak.ad} çekiliyor...`);
@@ -553,6 +631,10 @@ async function main() {
     try { tumItems = [...tumItems, ...await htmlHaberlerCek(kaynak)]; }
     catch (e) { console.warn(`   ⚠️  HTML hatası ${kaynak.ad}: ${e.message}`); }
   }
+  for (const kaynak of HABERLERCOM_KAYNAKLAR) {
+    try { tumItems = [...tumItems, ...await haberlerComHaberlerCek(kaynak)]; }
+    catch (e) { console.warn(`   ⚠️  Haberler.com hatası ${kaynak.ad}: ${e.message}`); }
+  }
 
   const urlSet = new Set();
   tumItems = tumItems.filter(item => {
@@ -575,7 +657,13 @@ async function main() {
         if (mevcut.has(anahtar)) continue;
       }
 
-      const makale = await makaleCek(item.url, item);
+      // Haberler.com için özel JSON-LD çekici
+      let makale;
+      if (/haberler\.com/.test(item.url)) {
+        makale = await haberlerComMakaleCek(item.url);
+      } else {
+        makale = await makaleCek(item.url, item);
+      }
       if (!makale || !makale.baslik || makale.baslik.length < 5) continue;
 
       const anahtar = slugify(makale.baslik).slice(0, 40);
