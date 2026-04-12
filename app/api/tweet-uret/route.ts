@@ -37,14 +37,12 @@ KURALLAR:
       }],
     });
 
-    const tweet = response.content[0].text.trim();
+    const block = response.content[0];
+    const tweet = (block.type === "text" ? block.text : "").trim();
     return NextResponse.json({ tweet });
 
-  } catch (err: unknown) {
-    // Claude kredisi bitmişse basit format
-    const body = await req.json().catch(() => ({})) as { baslik?: string; ozet?: string; kategori?: string };
-    const basitTweet = formatBasitTweet(body.baslik || "", body.ozet || "", body.kategori || "");
-    return NextResponse.json({ tweet: basitTweet, fallback: true });
+  } catch {
+    return NextResponse.json({ tweet: "", fallback: true });
   }
 }
 
