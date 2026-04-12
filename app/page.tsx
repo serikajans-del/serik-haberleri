@@ -5,21 +5,21 @@ import MostReadBlock from "@/components/MostReadBlock";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
 import { categories } from "@/lib/news";
-import { getLatestNewsFromDB, getNewsByCategoryFromDB, getMostReadFromDB } from "@/lib/db";
+import { getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const latest = await getLatestNewsFromDB(20);
+  const latest = await getLatestNewsFromDB(25);
   const sliderItems = latest.slice(0, 5);
-  const mostRead = await getMostReadFromDB(10); // Gerçek views sıralaması
+  const sonHaberler = latest.slice(5, 15);
   const gridNews = latest.slice(5, 11);
 
   return (
     <div style={{ backgroundColor: "#121212" }}>
       <BreakingNews />
       <HeroSlider items={sliderItems} />
-      <MostReadBlock items={mostRead} />
+      <MostReadBlock items={sonHaberler} />
 
       {/* Ana içerik */}
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-5">
