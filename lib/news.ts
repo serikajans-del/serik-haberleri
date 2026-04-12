@@ -16,6 +16,7 @@ export type NewsItem = {
 
 export const categories = [
   { name: "Gündem", slug: "gundem" },
+  { name: "Antalya", slug: "antalya" },
   { name: "Asayiş", slug: "asayis" },
   { name: "Ekonomi", slug: "ekonomi" },
   { name: "Spor", slug: "spor" },

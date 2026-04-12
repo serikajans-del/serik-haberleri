@@ -75,6 +75,7 @@ function serikHaberiMi(baslik, ozet = "") {
 // ── Kategoriler ───────────────────────────────────────────────────────────────
 const KATEGORILER = [
   { name: "Gündem",  slug: "gundem"  },
+  { name: "Antalya", slug: "antalya" },
   { name: "Asayiş",  slug: "asayis"  },
   { name: "Ekonomi", slug: "ekonomi" },
   { name: "Spor",    slug: "spor"    },
@@ -155,14 +156,15 @@ function htmlTemizle(html = "") {
 
 function kategoriTahmini(metin) {
   const m = metin.toLowerCase();
-  if (/polis|jandarma|kaza|yangın|suç|gözaltı|yaralı|öldü|hayatını|hırsız|uyuşturucu|tutuklama|cinayet|soygun/.test(m)) return KATEGORILER[1];
-  if (/ekonomi|enflasyon|fiyat|market|esnaf|vergi|ticaret|ihale|bütçe|kredi|faiz/.test(m))                               return KATEGORILER[2];
-  if (/futbol|maç|lig|gol|spor|serikspor|şampiyona|basketbol|voleybol|turnuva/.test(m))                                  return KATEGORILER[3];
-  if (/sağlık|hastane|doktor|ameliyat|aşı|hastalık|tedavi|ilaç|ambulans/.test(m))                                        return KATEGORILER[4];
-  if (/okul|öğrenci|eğitim|üniversite|sınav|mezun|öğretmen|burs|lise/.test(m))                                           return KATEGORILER[5];
-  if (/turizm|tatil|plaj|otel|kültür|festival|tarihi|antik|side|boğazkent|manavgat/.test(m))                             return KATEGORILER[7];
-  if (/yemek|yaşam|doğa|hava|çevre|etkinlik|konser|sergi/.test(m))                                                       return KATEGORILER[6];
-  return KATEGORILER[0];
+  if (/polis|jandarma|kaza|yangın|suç|gözaltı|yaralı|öldü|hayatını|hırsız|uyuşturucu|tutuklama|cinayet|soygun/.test(m)) return KATEGORILER[2]; // Asayiş
+  if (/antalya|kepez|konyaaltı|muratpaşa|alanya|manavgat|serik|kaş|finike|akseki/.test(m))                               return KATEGORILER[1]; // Antalya
+  if (/ekonomi|enflasyon|fiyat|market|esnaf|vergi|ticaret|ihale|bütçe|kredi|faiz/.test(m))                               return KATEGORILER[3]; // Ekonomi
+  if (/futbol|maç|lig|gol|spor|serikspor|şampiyona|basketbol|voleybol|turnuva/.test(m))                                  return KATEGORILER[4]; // Spor
+  if (/sağlık|hastane|doktor|ameliyat|aşı|hastalık|tedavi|ilaç|ambulans/.test(m))                                        return KATEGORILER[5]; // Sağlık
+  if (/okul|öğrenci|eğitim|üniversite|sınav|mezun|öğretmen|burs|lise/.test(m))                                           return KATEGORILER[6]; // Eğitim
+  if (/turizm|tatil|plaj|otel|kültür|festival|tarihi|antik|side|boğazkent/.test(m))                                      return KATEGORILER[8]; // Turizm
+  if (/yemek|yaşam|doğa|hava|çevre|etkinlik|konser|sergi/.test(m))                                                       return KATEGORILER[7]; // Yaşam
+  return KATEGORILER[0]; // Gündem
 }
 
 async function sayfaCek(url) {
