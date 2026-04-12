@@ -111,33 +111,22 @@ export default function Header() {
       </div>
 
       {/* Navigasyon */}
-      <nav style={{ backgroundColor: "#c00000", borderBottom: "1px solid #a00000" }} className="hidden md:block">
+      <nav style={{ backgroundColor: "#111", borderTop: "3px solid #d90000" }} className="hidden md:block">
         <div className="max-w-7xl mx-auto px-4">
-          <ul className="flex items-stretch">
-            {/* Ana Sayfa */}
-            <li className="flex items-stretch">
+          <ul className="flex items-center gap-1 py-2">
+            <li>
               <Link
                 href="/"
-                className="flex items-center px-5 py-3.5 text-white text-sm font-bold transition-all duration-150"
-                style={{ letterSpacing: "0.03em", borderRight: "1px solid rgba(255,255,255,0.12)" }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.22)")}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+                className="nav-btn"
               >
-                🏠 Ana Sayfa
+                Ana Sayfa
               </Link>
             </li>
-
-            {categories.map((cat, i) => (
-              <li key={cat.slug} className="flex items-stretch">
+            {categories.map((cat) => (
+              <li key={cat.slug}>
                 <Link
                   href={`/kategori/${cat.slug}`}
-                  className="flex items-center px-5 py-3.5 text-white text-sm font-bold transition-all duration-150 whitespace-nowrap"
-                  style={{
-                    letterSpacing: "0.03em",
-                    borderRight: i < categories.length - 1 ? "1px solid rgba(255,255,255,0.12)" : "none",
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.22)")}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+                  className="nav-btn"
                 >
                   {cat.name}
                 </Link>
