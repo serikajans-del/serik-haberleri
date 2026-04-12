@@ -4,7 +4,6 @@ import HeroSlider from "@/components/HeroSlider";
 import MostReadBlock from "@/components/MostReadBlock";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
-import AuthorsSection from "@/components/AuthorsSection";
 import ExchangeTicker from "@/components/ExchangeTicker";
 import { categories } from "@/lib/news";
 import { getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
@@ -46,9 +45,6 @@ export default async function HomePage() {
                 ))}
               </div>
             </section>
-
-            {/* Yazarlar bölümü */}
-            <AuthorsSection />
 
             {/* Reklam banner */}
             <div
