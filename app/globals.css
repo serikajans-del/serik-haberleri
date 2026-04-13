@@ -219,31 +219,27 @@ body, p, span, a, li, td, input, button {
 
 /* Haber detay içeriği */
 .article-content {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  font-size: 1.1rem;
-  line-height: 1.85;
-  color: #333;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+  line-height: 2;
+  color: #1a1a1a;
   font-weight: 400;
 }
 
 .article-content p {
   margin-top: 0;
-  margin-bottom: 1.6em;
-  padding-bottom: 1.6em;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 1.8em;
 }
 
 .article-content p:last-child {
   margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
 }
 
 .article-content p:first-child {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 500;
-  color: #222;
-  line-height: 1.9;
+  color: #111;
+  line-height: 2;
 }
 
 /* Boş veya --> ile başlayan paragrafları gizle */
@@ -253,51 +249,54 @@ body, p, span, a, li, td, input, button {
 }
 
 .article-content h2 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-top: 2em;
-  margin-bottom: 0.8em;
-  color: #1a1a1a;
-  border-left: 3px solid var(--red);
-  padding-left: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  margin-top: 2.2em;
+  margin-bottom: 0.7em;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .article-content h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-top: 1.6em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  margin-top: 1.8em;
   margin-bottom: 0.6em;
-  color: #222;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .article-content ul,
 .article-content ol {
   margin-left: 1.6rem;
-  margin-bottom: 1.4em;
-  border-bottom: none;
-  padding-bottom: 0;
+  margin-bottom: 1.6em;
 }
 
 .article-content li {
-  margin-bottom: 0.5em;
-  line-height: 1.8;
-  color: #333;
+  margin-bottom: 0.6em;
+  line-height: 1.9;
+  color: #1a1a1a;
 }
 
 .article-content strong,
 .article-content b {
   font-weight: 700;
-  color: #1a1a1a;
+  color: #111;
 }
 
 .article-content blockquote {
   border-left: 4px solid var(--red);
-  margin: 1.8em 0;
-  padding: 1em 1.4em;
+  margin: 2em 0;
+  padding: 0.8em 1.4em;
   background: #f9f9f9;
-  color: #555;
+  color: #444;
   font-style: italic;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
+  line-height: 1.9;
   border-radius: 0 4px 4px 0;
 }
 
@@ -311,7 +310,7 @@ body, p, span, a, li, td, input, button {
   max-width: 100%;
   height: auto;
   border-radius: 4px;
-  margin: 1.2em 0;
+  margin: 1.4em 0;
   display: block;
 }
 
