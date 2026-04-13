@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { categories } from "@/lib/news";
+import AnlikZiyaretci from "@/components/AnlikZiyaretci";
 
 type WeatherData = {
   temp: number;
@@ -44,9 +45,9 @@ export default function Header() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/iletisim" className="hover:text-red-600 transition-colors">İletişim</Link>
+            <AnlikZiyaretci />
             <span style={{ color: "#ccc" }}>|</span>
-            <Link href="/hakkimizda" className="hover:text-red-600 transition-colors">Hakkımızda</Link>
+            <Link href="/iletisim" className="hover:text-red-600 transition-colors">İletişim</Link>
             <span style={{ color: "#ccc" }}>|</span>
             <Link href="/reklam" className="hover:text-red-600 transition-colors">Reklam</Link>
           </div>
