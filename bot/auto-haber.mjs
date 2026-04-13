@@ -88,22 +88,22 @@ const KATEGORILER = [
 // ── Haber Kaynakları ──────────────────────────────────────────────────────────
 // linkRegex: listing sayfasından makale URL'lerini çıkarır
 const KAYNAKLAR = [
-  // NTV — JSON-LD mevcut, haber fotoğrafları yüksek kalite
-  { ad: "NTV",              base: "https://www.ntv.com.tr", url: "https://www.ntv.com.tr/son-dakika",    linkRegex: /href="(\/[a-z][a-z-]*\/[a-z0-9][a-z0-9-]*,[0-9a-zA-Z_-]{6,})"/g },
-  { ad: "NTV Ekonomi",      base: "https://www.ntv.com.tr", url: "https://www.ntv.com.tr/ekonomi",       linkRegex: /href="(\/[a-z][a-z-]*\/[a-z0-9][a-z0-9-]*,[0-9a-zA-Z_-]{6,})"/g },
-  { ad: "NTV Spor",         base: "https://www.ntv.com.tr", url: "https://www.ntv.com.tr/spor",          linkRegex: /href="(\/[a-z][a-z-]*\/[a-z0-9][a-z0-9-]*,[0-9a-zA-Z_-]{6,})"/g },
-  { ad: "NTV Sağlık",       base: "https://www.ntv.com.tr", url: "https://www.ntv.com.tr/saglik",        linkRegex: /href="(\/[a-z][a-z-]*\/[a-z0-9][a-z0-9-]*,[0-9a-zA-Z_-]{6,})"/g },
-  // Antalya Haber — yerel haberler, JSON-LD mevcut
-  { ad: "Antalya Haber",    base: "https://www.antalyahaber.net", url: "https://www.antalyahaber.net/", linkRegex: /href="(https?:\/\/www\.antalyahaber\.net\/[a-z0-9-]{15,}\/?)"/g },
-  { ad: "Antalya Haber Son Dakika", base: "https://www.antalyahaber.net", url: "https://www.antalyahaber.net/son-dakika/", linkRegex: /href="(https?:\/\/www\.antalyahaber\.net\/[a-z0-9-]{15,}\/?)"/g },
-  // Gün Haber
-  { ad: "Gün Haber",        base: "https://www.gunhaber.com.tr", url: "https://www.gunhaber.com.tr/",    linkRegex: /href="(\/haber\/[a-zA-Z0-9-]+\/\d{4,})"/g },
+  // NTV — JSON-LD mevcut
+  { ad: "NTV",              base: "https://www.ntv.com.tr", url: "https://www.ntv.com.tr/son-dakika",    linkRegex: /href="(\/[a-z][a-z-]+\/[a-z0-9][a-z0-9-]+,[A-Za-z0-9_-]{6,})"/g },
+  { ad: "NTV Ekonomi",      base: "https://www.ntv.com.tr", url: "https://www.ntv.com.tr/ekonomi",       linkRegex: /href="(\/[a-z][a-z-]+\/[a-z0-9][a-z0-9-]+,[A-Za-z0-9_-]{6,})"/g },
+  { ad: "NTV Spor",         base: "https://www.ntv.com.tr", url: "https://www.ntv.com.tr/spor",          linkRegex: /href="(\/[a-z][a-z-]+\/[a-z0-9][a-z0-9-]+,[A-Za-z0-9_-]{6,})"/g },
+  // Antalya Haber — yerel haberler, JSON-LD mevcut (hava-durumu sayfalarını filtrele)
+  { ad: "Antalya Haber",    base: "https://www.antalyahaber.net", url: "https://www.antalyahaber.net/son-dakika/", linkRegex: /href="(https?:\/\/www\.antalyahaber\.net\/(?!hava-durumu|namaz|takvim|nöbetci)[a-z0-9-]{15,}\/?)"/g },
+  { ad: "Antalya Haber Güncel", base: "https://www.antalyahaber.net", url: "https://www.antalyahaber.net/guncel/", linkRegex: /href="(https?:\/\/www\.antalyahaber\.net\/(?!hava-durumu|namaz|takvim|nöbetci)[a-z0-9-]{15,}\/?)"/g },
+  // Gün Haber — full URL'ler liste sayfasında
+  { ad: "Gün Haber",        base: "https://www.gunhaber.com.tr", url: "https://www.gunhaber.com.tr/son-dakika",    linkRegex: /href="(https?:\/\/www\.gunhaber\.com\.tr\/haber\/[a-z0-9-]+\/\d{4,})"/g },
   // Ekonomim
-  { ad: "Ekonomim",         base: "https://www.ekonomim.com",    url: "https://www.ekonomim.com/",       linkRegex: /href="(\/[a-z-]+\/[a-z0-9-]+-\d{4,}\/)"/g },
+  { ad: "Ekonomim",         base: "https://www.ekonomim.com",    url: "https://www.ekonomim.com/son-dakika/",      linkRegex: /href="(https?:\/\/www\.ekonomim\.com\/[a-z-]+\/[a-z0-9-]+-\d{4,}\/)"/g },
   // Sondakika — JSON-LD mevcut
-  { ad: "Sondakika",        base: "https://www.sondakika.com",   url: "https://www.sondakika.com/",       linkRegex: /href="(\/[a-z][a-z-]*\/haber-[a-z0-9-]+-\d{6,}\/)"/g },
-  { ad: "Sondakika Güncel", base: "https://www.sondakika.com",   url: "https://www.sondakika.com/guncel/",linkRegex: /href="(\/[a-z][a-z-]*\/haber-[a-z0-9-]+-\d{6,}\/)"/g },
-  { ad: "Sondakika Ekonomi",base: "https://www.sondakika.com",   url: "https://www.sondakika.com/ekonomi/",linkRegex: /href="(\/[a-z][a-z-]*\/haber-[a-z0-9-]+-\d{6,}\/)"/g },
+  { ad: "Sondakika",        base: "https://www.sondakika.com",   url: "https://www.sondakika.com/",                linkRegex: /href="(\/[a-z][a-z-]*\/haber-[a-z0-9-]+-\d{6,}\/)"/g },
+  { ad: "Sondakika Güncel", base: "https://www.sondakika.com",   url: "https://www.sondakika.com/guncel/",         linkRegex: /href="(\/[a-z][a-z-]*\/haber-[a-z0-9-]+-\d{6,}\/)"/g },
+  { ad: "Sondakika Spor",   base: "https://www.sondakika.com",   url: "https://www.sondakika.com/spor/",           linkRegex: /href="(\/[a-z][a-z-]*\/haber-[a-z0-9-]+-\d{6,}\/)"/g },
+  { ad: "Sondakika Ekonomi",base: "https://www.sondakika.com",   url: "https://www.sondakika.com/ekonomi/",        linkRegex: /href="(\/[a-z][a-z-]*\/haber-[a-z0-9-]+-\d{6,}\/)"/g },
 ];
 
 // Kaç saatlik haberleri kabul et
