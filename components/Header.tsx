@@ -159,6 +159,18 @@ export default function Header() {
                 Trend
               </Link>
             </li>
+            <li>
+              <Link
+                href="/sikayet"
+                className="nav-btn flex items-center gap-1.5"
+                style={{ backgroundColor: "#fff5f5", borderColor: "#ffcccc", color: "#d90000", fontWeight: 700 }}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                Şikayet / İhbar
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>
@@ -201,6 +213,19 @@ export default function Header() {
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
                 Trend
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/sikayet"
+                className="flex items-center gap-3 px-5 py-3.5 text-sm font-bold transition-colors hover:bg-red-50"
+                style={{ borderBottom: "1px solid #eee", color: "#d90000" }}
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                Şikayet / İhbar
               </Link>
             </li>
           </ul>

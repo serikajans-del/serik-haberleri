@@ -5,13 +5,13 @@ import Image from "next/image";
 import Sidebar from "@/components/Sidebar";
 import NewsCard from "@/components/NewsCard";
 import AdBanner from "@/components/AdBanner";
+import PrintButton from "@/components/PrintButton";
 import ReadingProgress from "@/components/ReadingProgress";
 import ViewTracker from "@/components/ViewTracker";
 import { formatDate } from "@/lib/news";
 import { getNewsBySlugFromDB, getLatestNewsFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
 export const revalidate = 60;
-export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -36,9 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: [news.author],
       section: news.category,
       tags: news.tags,
-      images: [{ url: news.image, width: 860, height: 504, alt: news.title }],
     },
-    twitter: { card: "summary_large_image", title: news.title, description: news.summary, images: [news.image] },
+    twitter: { card: "summary_large_image", title: news.title, description: news.summary },
     alternates: { canonical: url },
   };
 }
@@ -59,32 +58,49 @@ export default async function NewsDetailPage({ params }: Props) {
   ].slice(0, 3);
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
 
-  const jsonLd = {
+  const wordCount = news.content.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
+
+  const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: news.title,
     description: news.summary,
-    image: [news.image],
+    image: [{ "@type": "ImageObject", url: news.image, width: 860, height: 504 }],
+    url: `${SITE_URL}/haber/${slug}`,
     datePublished: news.publishedAt,
     dateModified: news.publishedAt,
     author: { "@type": "Organization", name: news.author, url: SITE_URL },
     publisher: {
-      "@type": "Organization",
+      "@type": "NewsMediaOrganization",
       name: "Serik Haberleri",
       url: SITE_URL,
-      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` },
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png`, width: 600, height: 60 },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/haber/${slug}` },
     articleSection: news.category,
     keywords: news.tags?.join(", "),
     inLanguage: "tr",
+    wordCount,
+    thumbnailUrl: news.image,
+    isAccessibleForFree: true,
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana Sayfa", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: news.category, item: `${SITE_URL}/kategori/${news.categorySlug}` },
+      { "@type": "ListItem", position: 3, name: news.title, item: `${SITE_URL}/haber/${slug}` },
+    ],
   };
 
   return (
     <>
       <ReadingProgress />
       <ViewTracker slug={slug} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-4">
         <nav className="text-xs text-gray-500 mb-3 flex items-center gap-1 flex-wrap">
@@ -205,16 +221,7 @@ export default async function NewsDetailPage({ params }: Props) {
                   </div>
 
                   {/* Sağ: yazdır */}
-                  <button
-                    onClick={() => typeof window !== "undefined" && window.print()}
-                    title="Yazdır"
-                    className="w-8 h-8 flex items-center justify-center rounded transition-colors hover:bg-gray-200 flex-shrink-0"
-                    style={{ backgroundColor: "#e8e8e8", color: "#555" }}
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                  </button>
+                  <PrintButton />
                 </div>
 
                 {/* Makale üstü reklam */}
