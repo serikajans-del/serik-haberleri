@@ -6,6 +6,7 @@ import { NewsItem, timeAgo } from "@/lib/news";
 
 export default function HeroSlider({ items }: { items: NewsItem[] }) {
   const [current, setCurrent] = useState(0);
+  const [times, setTimes] = useState<string[]>([]);
 
   const goTo = useCallback((idx: number) => {
     setCurrent(((idx % items.length) + items.length) % items.length);
@@ -17,6 +18,10 @@ export default function HeroSlider({ items }: { items: NewsItem[] }) {
     }, 6000);
     return () => clearInterval(timer);
   }, [items.length]);
+
+  useEffect(() => {
+    setTimes(items.map((item) => timeAgo(item.publishedAt)));
+  }, [items]);
 
   if (!items.length) return null;
 
@@ -48,7 +53,7 @@ export default function HeroSlider({ items }: { items: NewsItem[] }) {
                 <span className="text-white text-xs font-bold px-2 py-1 uppercase tracking-wider bg-white bg-opacity-15 backdrop-blur-sm rounded-sm">
                   {item.category}
                 </span>
-                <span className="text-gray-300 text-xs ml-1">{timeAgo(item.publishedAt)}</span>
+                {times[i] && <span className="text-gray-300 text-xs ml-1">{times[i]}</span>}
               </div>
 
               <Link href={`/haber/${item.slug}`}>
@@ -124,7 +129,7 @@ export default function HeroSlider({ items }: { items: NewsItem[] }) {
             <div className="flex-1 min-w-0">
               <span className="text-red-400 text-xs font-bold uppercase block mb-0.5">{item.category}</span>
               <p className="text-white text-xs font-semibold line-clamp-2 leading-snug">{item.title}</p>
-              <span className="text-gray-400 text-xs mt-1 block">{timeAgo(item.publishedAt)}</span>
+              {times[i] && <span className="text-gray-400 text-xs mt-1 block">{times[i]}</span>}
             </div>
           </Link>
         ))}
