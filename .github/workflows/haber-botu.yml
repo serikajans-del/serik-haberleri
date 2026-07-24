@@ -1,10 +1,7 @@
 name: Haber Botu
 
 on:
-  schedule:
-    # Her 30 dakikada bir çalışır
-    - cron: "*/30 * * * *"
-  workflow_dispatch: # Manuel tetikleme (GitHub'dan elle çalıştırma)
+  workflow_dispatch: # Geçici olarak yalnızca GitHub'dan elle çalıştırılabilir
 
 jobs:
   haber-cek:
