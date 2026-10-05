@@ -50,7 +50,7 @@ export default function HeroSlider({ items }: { items: NewsItem[] }) {
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                   Son Dakika
                 </span>
-                <span className="text-white text-xs font-bold px-2 py-1 uppercase tracking-wider bg-white bg-opacity-15 backdrop-blur-sm rounded-sm">
+                <span className="text-white text-xs font-bold px-2 py-1 uppercase tracking-wider bg-white/15 backdrop-blur-sm rounded-sm">
                   {item.category}
                 </span>
                 {times[i] && <span className="text-gray-300 text-xs ml-1">{times[i]}</span>}
@@ -78,12 +78,12 @@ export default function HeroSlider({ items }: { items: NewsItem[] }) {
 
       {/* Sol ok */}
       <button onClick={() => goTo(current - 1)}
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black bg-opacity-40 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all text-xl font-bold"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all text-xl font-bold"
         style={{ zIndex: 30 }} aria-label="Önceki haber">‹</button>
 
       {/* Sağ ok */}
       <button onClick={() => goTo(current + 1)}
-        className="absolute right-3 lg:right-80 top-1/2 -translate-y-1/2 w-10 h-10 bg-black bg-opacity-40 hover:bg-opacity-70 text-white rounded-full flex items-center justify-center transition-all text-xl font-bold"
+        className="absolute right-3 lg:right-80 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all text-xl font-bold"
         style={{ zIndex: 30 }} aria-label="Sonraki haber">›</button>
 
       {/* Numaralı sayfa navigasyon — Alanya Postası tarzı */}
@@ -116,13 +116,13 @@ export default function HeroSlider({ items }: { items: NewsItem[] }) {
       </div>
 
       {/* Sağ küçük haber listesi */}
-      <div className="absolute bottom-0 right-0 top-0 hidden lg:flex flex-col w-72 bg-black bg-opacity-75 backdrop-blur-sm" style={{ zIndex: 30 }}>
-        <div className="px-3 py-2 border-b border-white border-opacity-10" style={{ backgroundColor: "#cc0000" }}>
+      <div className="absolute bottom-0 right-0 top-0 hidden lg:flex flex-col w-72 bg-black/75 backdrop-blur-sm" style={{ zIndex: 30 }}>
+        <div className="px-3 py-2 border-b border-white/10" style={{ backgroundColor: "#cc0000" }}>
           <span className="text-white text-xs font-black uppercase tracking-widest">Son Haberler</span>
         </div>
         {items.slice(0, 4).map((item, i) => (
           <Link key={item.id} href={`/haber/${item.slug}`} onClick={() => goTo(i)}
-            className={`flex items-start gap-2.5 px-3 py-3 border-b border-white border-opacity-10 hover:bg-white hover:bg-opacity-10 transition-colors flex-1 ${i === current ? "bg-white bg-opacity-10 border-l-2 border-l-red-500" : ""}`}>
+            className={`flex items-start gap-2.5 px-3 py-3 border-b border-white/10 hover:bg-white/10 transition-colors flex-1 ${i === current ? "bg-white/10 border-l-2 border-l-red-500" : ""}`}>
             <div className="flex-shrink-0 relative w-16 h-12 overflow-hidden rounded-sm">
               <Image src={item.image} alt={item.title} fill className="object-cover" sizes="64px" />
             </div>

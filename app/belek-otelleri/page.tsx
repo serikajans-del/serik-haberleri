@@ -98,7 +98,7 @@ export default function BelekOtellerPage() {
           </p>
           <div className="flex flex-wrap gap-2 mt-4">
             {["All Inclusive", "Golf Resort", "Spa", "Plaj", "Çocuk Kulübü"].map((tag) => (
-              <span key={tag} className="text-xs bg-white bg-opacity-20 px-2.5 py-1 rounded-full font-semibold">
+              <span key={tag} className="text-xs bg-white/20 px-2.5 py-1 rounded-full font-semibold">
                 {tag}
               </span>
             ))}

@@ -144,7 +144,7 @@ export default function ReklamPage() {
         <div className="follow-cta max-w-2xl mx-auto text-center">
           <div className="text-3xl mb-3">✉️</div>
           <h3 className="text-xl font-black mb-2">Özel Teklif Alın</h3>
-          <p className="text-gray-300 text-sm mb-4">
+          <p className="text-gray-600 text-sm mb-4">
             İhtiyacınıza özel reklam çözümleri için bizimle iletişime geçin. 24 saat içinde yanıt veriyoruz.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -156,7 +156,7 @@ export default function ReklamPage() {
             </a>
             <a
               href="tel:+905395449861"
-              className="inline-flex items-center gap-2 bg-white bg-opacity-15 hover:bg-opacity-25 text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors"
+              className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 font-bold px-6 py-3 rounded-lg text-sm transition-colors"
             >
               📞 0539 544 98 61
             </a>

@@ -43,7 +43,7 @@ export default function HavaDurumuPage() {
               <h1 className="text-2xl md:text-3xl font-black mb-1">🌤️ Serik Hava Durumu</h1>
               <p className="text-blue-100 text-sm">Serik, Side, Belek ve çevresi — 5 günlük tahmin</p>
             </div>
-            <div className="flex items-center gap-4 bg-white bg-opacity-15 rounded-2xl px-6 py-4">
+            <div className="flex items-center gap-4 bg-white/15 rounded-2xl px-6 py-4">
               <span className="text-6xl">{forecast[0].icon}</span>
               <div>
                 <div className="text-5xl font-black">{forecast[0].high}°</div>
