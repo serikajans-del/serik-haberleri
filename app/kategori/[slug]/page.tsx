@@ -19,7 +19,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const category = getCategoryBySlug(slug);
   if (!category) return {};
+  const hasNews = (await getNewsByCategoryFromDB(slug, 1)).length > 0;
   return {
+    // Haberi olmayan kategori sayfası dizine girmesin (ince içerik)
+    ...(hasNews ? {} : { robots: { index: false, follow: true } }),
     title: `${category.name} Haberleri — Serik'ten Son Dakika`,
     description: `Serik'ten en güncel ${category.name.toLowerCase()} haberleri. Antalya Serik ${category.name.toLowerCase()} alanındaki son gelişmeler ve son dakika haberler.`,
     keywords: [

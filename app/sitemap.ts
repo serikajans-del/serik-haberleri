@@ -22,16 +22,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/reklam`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.2 },
   ];
 
-  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
-    url: `${SITE_URL}/kategori/${cat.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "hourly",
-    priority: 0.8,
-  }));
-
+  let categoryPages: MetadataRoute.Sitemap = [];
   let newsPages: MetadataRoute.Sitemap = [];
   try {
     const dbNews = await getLatestNewsFromDB(500);
+    // Yalnızca haberi olan kategoriler listelenir
+    categoryPages = categories
+      .filter((cat) => dbNews.some((n) => n.categorySlug === cat.slug))
+      .map((cat) => ({
+        url: `${SITE_URL}/kategori/${cat.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "hourly" as const,
+        priority: 0.8,
+      }));
     newsPages = dbNews.map((news) => ({
       url: `${SITE_URL}/haber/${news.slug}`,
       lastModified: new Date(news.updatedAt ?? news.publishedAt),

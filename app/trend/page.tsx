@@ -9,7 +9,7 @@ import AdBanner from "@/components/AdBanner";
 export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: "Trend Haberler & Sosyal Medya | Serik Haberleri",
+  title: "Trend Haberler & Sosyal Medya",
   description: "Günümüzün en çok konuşulan haberleri ve viral konular. Tek tıkla tweet'e dönüştür.",
 };
 

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Hakkımızda | Serik Haberleri",
+  title: "Hakkımızda",
   description: "Serik Haberleri hakkında. Serik'in dijital haber portalı — ekibimiz, misyonumuz ve künyemiz.",
 };
 

@@ -37,6 +37,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <h1 className="sr-only">Serik Haberleri: Serik, Belek, Kadriye ve Boğazkent&apos;ten güncel haberler</h1>
       <BreakingNews />
 
       {/* Manşet alanı */}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "KVKK Aydınlatma Metni | Serik Haberleri",
+  title: "KVKK Aydınlatma Metni",
   description: "Serik Haberleri KVKK (Kişisel Verilerin Korunması Kanunu) kapsamında kişisel veri işleme aydınlatma metni.",
 };
 
