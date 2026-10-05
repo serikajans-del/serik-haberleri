@@ -8,7 +8,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/_next/", "/admin/"],
+        // /_next/ engellenmez: CSS, JS ve haber görselleri oradan sunulur; Google sayfayı işlemek için bunlara erişmeli
+        disallow: ["/api/", "/admin/"],
       },
     ],
     sitemap: [
