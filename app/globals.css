@@ -398,3 +398,15 @@ body, p, span, a, li, td, input, button {
   transition: background-color 0.15s;
 }
 .main-nav-link:hover { background: rgba(0,0,0,0.18); color: #fff; }
+
+/* Haber içi fotoğraf ve altyazısı */
+.article-content figure { margin: 2em auto; max-width: 560px; }
+.article-content figure img { margin: 0 auto; }
+.article-content figcaption {
+  font-family: var(--font-dm), Arial, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 0.6em;
+}
