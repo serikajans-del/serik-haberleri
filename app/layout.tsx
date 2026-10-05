@@ -117,9 +117,11 @@ const organizationJsonLd = {
   image: DEFAULT_OG_IMAGE,
   description: "Antalya Serik ilçesinin dijital haber portalı.",
   foundingDate: "2024",
+  founder: { "@type": "Person", name: "Atakan Şimşir" },
   inLanguage: "tr",
   address: {
     "@type": "PostalAddress",
+    streetAddress: "Merkez Mahallesi, Azmi Akman Caddesi No:15",
     addressLocality: "Serik",
     addressRegion: "Antalya",
     addressCountry: "TR",
@@ -127,6 +129,7 @@ const organizationJsonLd = {
   contactPoint: {
     "@type": "ContactPoint",
     email: "info@serikhaberleri.com",
+    telephone: "+905395449861",
     contactType: "editorial",
   },
   sameAs: [

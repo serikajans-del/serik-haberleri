@@ -71,7 +71,8 @@ export default function Footer() {
             <div>
               <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1" style={{ borderBottom: "1px solid #222" }}>İletişim</h4>
               <ul className="space-y-2 text-xs" style={{ color: "#666" }}>
-                <li>Serik, Antalya</li>
+                <li>Merkez Mahallesi, Azmi Akman Caddesi No:15, Serik / Antalya</li>
+                <li><a href="tel:+905395449861" className="transition-colors hover:text-white">0539 544 98 61</a></li>
                 <li>
                   <a href="mailto:info@serikhaberleri.com" className="transition-colors hover:text-white">
                     info@serikhaberleri.com

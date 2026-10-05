@@ -34,7 +34,7 @@ export default function KvkkPage() {
             </p>
             <div className="rounded p-4 space-y-1" style={{ backgroundColor: "#252525" }}>
               <p><span style={{ color: "#888" }}>Ticaret Unvanı:</span> <span className="text-white">Serik Haberleri</span></p>
-              <p><span style={{ color: "#888" }}>Adres:</span> <span className="text-white">Serik, Antalya</span></p>
+              <p><span style={{ color: "#888" }}>Adres:</span> <span className="text-white">Merkez Mahallesi, Azmi Akman Caddesi No:15, Serik / Antalya</span></p>
               <p><span style={{ color: "#888" }}>E-posta:</span> <a href="mailto:info@serikhaberleri.com" style={{ color: "#d90000" }}>info@serikhaberleri.com</a></p>
               <p><span style={{ color: "#888" }}>Web:</span> <span className="text-white">www.serikhaberleri.com</span></p>
             </div>

@@ -14,7 +14,9 @@ export default function IletisimPage() {
           <h2 className="font-bold text-lg mb-2">İletişim Bilgileri</h2>
           <ul className="space-y-2 text-gray-700">
             <li><strong>E-posta:</strong> info@serikhaberleri.com</li>
-            <li><strong>Adres:</strong> Serik, Antalya</li>
+            <li><strong>Telefon:</strong> <a href="tel:+905395449861">0539 544 98 61</a></li>
+            <li><strong>Adres:</strong> Merkez Mahallesi, Azmi Akman Caddesi No:15, Serik / Antalya</li>
+            <li><strong>Sorumlu Yazı İşleri Müdürü:</strong> Atakan Şimşir</li>
             <li><strong>Reklam:</strong> reklam@serikhaberleri.com</li>
           </ul>
         </div>

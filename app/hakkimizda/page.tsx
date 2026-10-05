@@ -7,10 +7,7 @@ export const metadata: Metadata = {
 };
 
 const team = [
-  { title: "Genel Yayın Yönetmeni", note: "15 yıl yerel basın deneyimi" },
-  { title: "Sorumlu Müdür", note: "Hukuki yayın sorumluluğu" },
-  { title: "Haber Editörü", note: "Gündem, Asayiş, Yerel Haberler" },
-  { title: "Dijital İçerik Editörü", note: "SEO, sosyal medya, video içerik" },
+  { title: "Atakan Şimşir", note: "İmtiyaz Sahibi ve Sorumlu Yazı İşleri Müdürü" },
 ];
 
 export default function HakkimizdaPage() {
@@ -65,7 +62,7 @@ export default function HakkimizdaPage() {
 
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
-            <h2 className="font-black text-base text-gray-800">👥 Ekibimiz</h2>
+            <h2 className="font-black text-base text-gray-800">👥 Yayın Sorumlusu</h2>
           </div>
           <div className="divide-y divide-gray-100">
             {team.map((m) => (
@@ -87,12 +84,15 @@ export default function HakkimizdaPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-xs">
             {([
               ["Yayın Adı", "Serik Haberleri"],
+              ["İmtiyaz Sahibi", "Atakan Şimşir"],
+              ["Sorumlu Yazı İşleri Müdürü", "Atakan Şimşir"],
               ["Yayın Türü", "İnternet Haber Portalı"],
               ["Yayın Dili", "Türkçe"],
               ["Yayın Bölgesi", "Serik / Antalya"],
               ["Yayın Periyodu", "7/24 Sürekli"],
               ["Kuruluş Yılı", "2024"],
-              ["Adres", "Serik, Antalya"],
+              ["Adres", "Merkez Mahallesi, Azmi Akman Caddesi No:15, Serik / Antalya"],
+              ["Telefon", "0539 544 98 61"],
               ["E-posta", "info@serikhaberleri.com"],
               ["Reklam", "reklam@serikhaberleri.com"],
               ["Şikayet/Düzeltme", "editor@serikhaberleri.com"],
