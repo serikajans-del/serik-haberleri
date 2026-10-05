@@ -172,10 +172,10 @@ export default function ReklamPage() {
               ✉️ reklam@serikhaberleri.com
             </a>
             <a
-              href="tel:+902427531000"
+              href="tel:+905395449861"
               className="inline-flex items-center gap-2 bg-white bg-opacity-15 hover:bg-opacity-25 text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors"
             >
-              📞 0242 753 10 00
+              📞 0539 544 98 61
             </a>
           </div>
         </div>
