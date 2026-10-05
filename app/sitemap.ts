@@ -35,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const dbNews = await getLatestNewsFromDB(500);
     newsPages = dbNews.map((news) => ({
       url: `${SITE_URL}/haber/${news.slug}`,
-      lastModified: new Date(news.publishedAt),
+      lastModified: new Date(news.updatedAt ?? news.publishedAt),
       changeFrequency: "never",
       priority: 0.9,
     }));

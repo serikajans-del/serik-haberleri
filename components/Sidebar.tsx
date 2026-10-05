@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { categories } from "@/lib/news";
-import { getLatestNewsFromDB } from "@/lib/db";
-import SocialFollowBox from "./SocialFollowBox";
+import { getMostReadFromDB } from "@/lib/db";
 import LiveExchangeRates from "./LiveExchangeRates";
 
 function formatViews(n: number): string {
@@ -10,16 +9,8 @@ function formatViews(n: number): string {
 }
 
 export default async function Sidebar() {
-  const latest = await getLatestNewsFromDB(12);
+  const latest = await getMostReadFromDB(7);
 
-  const prayerTimes = [
-    { name: "İmsak", time: "05:12" },
-    { name: "Güneş", time: "06:42" },
-    { name: "Öğle", time: "13:05" },
-    { name: "İkindi", time: "16:28" },
-    { name: "Akşam", time: "19:22" },
-    { name: "Yatsı", time: "20:48" },
-  ];
 
   const quickServices = [
     { label: "Nöbetçi Eczane", href: "/eczane" },
@@ -31,14 +22,15 @@ export default async function Sidebar() {
   return (
     <aside className="space-y-4 lg:sticky lg:top-4">
 
-      {/* Son Haberler */}
+      {/* Çok Okunanlar */}
+      {latest.length > 0 && (
       <div className="wp-widget">
         <div className="wp-widget-title">
           <span className="flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" style={{ color: "#d90000" }}>
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />
             </svg>
-            Son Haberler
+            Çok Okunanlar
           </span>
         </div>
         <div>
@@ -74,6 +66,7 @@ export default async function Sidebar() {
           ))}
         </div>
       </div>
+      )}
 
       {/* Hızlı Servisler */}
       <div className="wp-widget">
@@ -96,9 +89,6 @@ export default async function Sidebar() {
           ))}
         </div>
       </div>
-
-      {/* Sosyal Medya Takip */}
-      <SocialFollowBox />
 
       {/* Kategoriler */}
       <div className="wp-widget">
@@ -130,26 +120,6 @@ export default async function Sidebar() {
 
       {/* Canlı Döviz Kurları */}
       <LiveExchangeRates />
-
-      {/* Namaz Vakitleri */}
-      <div className="wp-widget">
-        <div className="wp-widget-title">
-          <span>Namaz Vakitleri</span>
-          <span className="text-xs font-normal tracking-normal normal-case" style={{ color: "#999" }}>Serik</span>
-        </div>
-        <div className="grid grid-cols-2 gap-px m-3 rounded overflow-hidden" style={{ backgroundColor: "#e8e8e8" }}>
-          {prayerTimes.map((pt) => (
-            <div
-              key={pt.name}
-              className="flex justify-between items-center px-3 py-2 text-xs"
-              style={{ backgroundColor: "#fff" }}
-            >
-              <span style={{ color: "#888" }}>{pt.name}</span>
-              <span className="font-bold" style={{ color: "#1a1a1a" }}>{pt.time}</span>
-            </div>
-          ))}
-        </div>
-      </div>
 
     </aside>
   );

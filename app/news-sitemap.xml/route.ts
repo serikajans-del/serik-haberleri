@@ -3,13 +3,12 @@ import { getLatestNewsFromDB } from "@/lib/db";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
 
 export async function GET() {
-  // Google News Sitemap - Son 30 günün haberleri (DB'den)
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  // Google News Sitemap: yalnızca son 2 günün haberleri (Google kuralı), en fazla 1000 URL
+  const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
   const allNews = await getLatestNewsFromDB(200);
   const recentNews = allNews.filter(
-    (news) => new Date(news.publishedAt) >= thirtyDaysAgo
+    (news) => new Date(news.publishedAt) >= twoDaysAgo
   );
 
   const newsEntries = recentNews
@@ -17,7 +16,7 @@ export async function GET() {
       (news) => `
   <url>
     <loc>${SITE_URL}/haber/${news.slug}</loc>
-    <lastmod>${new Date(news.publishedAt).toISOString()}</lastmod>
+    <lastmod>${new Date(news.updatedAt ?? news.publishedAt).toISOString()}</lastmod>
     <news:news>
       <news:publication>
         <news:name>Serik Haberleri</news:name>
@@ -25,7 +24,6 @@ export async function GET() {
       </news:publication>
       <news:publication_date>${new Date(news.publishedAt).toISOString()}</news:publication_date>
       <news:title>${escapeXml(news.title)}</news:title>
-      <news:keywords>${news.tags ? escapeXml(news.tags.join(", ")) : ""}</news:keywords>
     </news:news>
   </url>`
     )

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import BreakingNews from "@/components/BreakingNews";
-import HeroSlider from "@/components/HeroSlider";
-import MostReadBlock from "@/components/MostReadBlock";
+import Manset from "@/components/Manset";
+import HaberAkisi from "@/components/HaberAkisi";
 import NewsCard from "@/components/NewsCard";
 import Sidebar from "@/components/Sidebar";
 import ExchangeTicker from "@/components/ExchangeTicker";
@@ -13,16 +13,27 @@ export const revalidate = 30;
 
 export default async function HomePage() {
   const latest = await getLatestNewsFromDB(25);
-  const sliderItems = latest.slice(0, 5);
-  const sonHaberler = latest.slice(5, 15);
-  const gridNews = latest.slice(5, 11);
+  const mansetItems = latest.slice(0, 5);
+  const akis = latest.slice(5, 17);
+
+  if (latest.length === 0) {
+    return (
+      <div style={{ backgroundColor: "#f4f4f4" }}>
+        <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+          <h1 className="text-2xl font-black mb-3" style={{ color: "#1a1a1a" }}>Serik Haberleri</h1>
+          <p className="text-sm" style={{ color: "#666" }}>
+            Yayın hazırlıklarımız sürüyor. Serik, Belek, Boğazkent ve Kadriye&apos;den haberler çok yakında burada olacak.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: "#f4f4f4" }}>
       <BreakingNews />
       <ExchangeTicker />
-      <HeroSlider items={sliderItems} />
-      <MostReadBlock items={sonHaberler} />
+      <Manset items={mansetItems} />
 
       {/* Ana içerik */}
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-5">
@@ -32,20 +43,15 @@ export default async function HomePage() {
           {/* Sol — haber içeriği */}
           <div className="lg:col-span-3 space-y-6">
 
-            {/* Son Haberler grid */}
-            <section>
-              <div className="section-heading">
-                <span>Son Haberler</span>
-                <Link href="/kategori/gundem" className="text-xs font-normal normal-case tracking-normal transition-colors hover:text-red-600" style={{ color: "#999", fontFamily: "inherit" }}>
-                  Tümünü Gör »
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {gridNews.map((news) => (
-                  <NewsCard key={news.id} news={news} variant="default" />
-                ))}
-              </div>
-            </section>
+            {/* Son haberler akışı */}
+            {akis.length > 0 && (
+              <section>
+                <div className="section-heading">
+                  <span>Son Haberler</span>
+                </div>
+                <HaberAkisi items={akis} />
+              </section>
+            )}
 
             {/* Reklam banner */}
             <AdBanner size="leaderboard" />

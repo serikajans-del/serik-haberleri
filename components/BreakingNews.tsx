@@ -3,6 +3,7 @@ import Link from "next/link";
 
 export default async function BreakingNews() {
   const latest = await getLatestNewsFromDB(20);
+  if (latest.length === 0) return null;
   const items = [...latest, ...latest];
 
   return (
@@ -12,7 +13,7 @@ export default async function BreakingNews() {
         style={{ backgroundColor: "#d90000" }}
       >
         <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-        Son Dakika
+        Son Haberler
       </div>
       <div className="flex-1 overflow-hidden relative py-2">
         <div className="ticker-track">

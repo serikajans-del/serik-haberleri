@@ -33,11 +33,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: news.summary,
       url,
       publishedTime: news.publishedAt,
+      modifiedTime: news.updatedAt ?? news.publishedAt,
+      images: [{ url: news.image, alt: news.title }],
       authors: [news.author],
       section: news.category,
       tags: news.tags,
     },
-    twitter: { card: "summary_large_image", title: news.title, description: news.summary },
+    twitter: { card: "summary_large_image", title: news.title, description: news.summary, images: [news.image] },
     alternates: { canonical: url },
   };
 }
@@ -60,16 +62,21 @@ export default async function NewsDetailPage({ params }: Props) {
 
   const wordCount = news.content.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
 
+  const isStaffByline = !news.author || news.author === "Serik Haberleri";
+  const updated = news.updatedAt && new Date(news.updatedAt).getTime() - new Date(news.publishedAt).getTime() > 60_000 ? news.updatedAt : null;
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: news.title,
     description: news.summary,
-    image: [{ "@type": "ImageObject", url: news.image, width: 860, height: 504 }],
+    image: [news.image],
     url: `${SITE_URL}/haber/${slug}`,
     datePublished: news.publishedAt,
-    dateModified: news.publishedAt,
-    author: { "@type": "Organization", name: news.author, url: SITE_URL },
+    dateModified: news.updatedAt ?? news.publishedAt,
+    author: isStaffByline
+      ? { "@type": "Organization", name: "Serik Haberleri", url: `${SITE_URL}/hakkimizda` }
+      : { "@type": "Person", name: news.author, url: `${SITE_URL}/hakkimizda` },
     publisher: {
       "@type": "NewsMediaOrganization",
       name: "Serik Haberleri",
@@ -151,9 +158,14 @@ export default async function NewsDetailPage({ params }: Props) {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <time dateTime={news.publishedAt} style={{ color: "#555" }}>
-                      Yayınlanma: {new Date(news.publishedAt).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", weekday: "long", hour: "2-digit", minute: "2-digit" })}
+                      Yayınlanma: {new Date(news.publishedAt).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", weekday: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" })}
                     </time>
                   </span>
+                  {updated && (
+                    <time dateTime={updated} style={{ color: "#555" }}>
+                      Güncelleme: {formatDate(updated)}
+                    </time>
+                  )}
                   {/* Kaynak */}
                   <span className="flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>

@@ -34,6 +34,7 @@ function mapToNewsItem(row: Record<string, unknown>): NewsItem {
     image: row.image as string,
     author: row.author as string,
     publishedAt: row.published_at as string,
+    updatedAt: (row.updated_at as string) || (row.published_at as string),
     featured: row.featured as boolean,
     tags: (row.tags as string[]) || [],
     views: (row.views as number) || 0,
@@ -100,6 +101,27 @@ export async function getNewsByCategoryFromDB(categorySlug: string, count = 12):
   return newsData
     .filter((n) => n.categorySlug === categorySlug)
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .filter(isQualityContent)
+    .slice(0, count);
+}
+
+export async function searchNewsFromDB(query: string, count = 24): Promise<NewsItem[]> {
+  const q = query.trim();
+  if (!q) return [];
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("haberler")
+      .select("*")
+      .or(`title.ilike.%${q}%,summary.ilike.%${q}%`)
+      .order("published_at", { ascending: false })
+      .limit(count * 2);
+    if (!error && data && data.length > 0) {
+      return data.map(mapToNewsItem).filter(isQualityContent).slice(0, count);
+    }
+  } catch {}
+  const lower = q.toLocaleLowerCase("tr-TR");
+  return newsData
+    .filter((n) => n.title.toLocaleLowerCase("tr-TR").includes(lower) || n.summary.toLocaleLowerCase("tr-TR").includes(lower))
     .filter(isQualityContent)
     .slice(0, count);
 }
