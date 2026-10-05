@@ -2,6 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { NewsItem, timeAgo } from "@/lib/news";
 
+function shortDate(d: string): string {
+  return new Date(d).toLocaleDateString("tr-TR", { day: "2-digit", month: "long", timeZone: "Europe/Istanbul" });
+}
+
 type Props = {
   news: NewsItem;
   variant?: "default" | "featured" | "featured-small" | "horizontal" | "list" | "text-only";
@@ -121,10 +125,10 @@ export default function NewsCard({ news, variant = "default" }: Props) {
     );
   }
 
-  // default — resim üstüne gradient + metin (her temada çalışır)
+  // default — görsel üstte kategori rozetiyle, altında başlık + özet + yazar · tarih
   return (
-    <Link href={`/haber/${news.slug}`} className="block group relative overflow-hidden wp-card" style={{ borderRadius: "3px", border: "1px solid #e8e8e8" }}>
-      <div className="relative overflow-hidden" style={{ paddingBottom: "62%" }}>
+    <Link href={`/haber/${news.slug}`} className="block group tk-card overflow-hidden h-full">
+      <div className="relative overflow-hidden" style={{ paddingBottom: "62%", backgroundColor: "#e9ecf1" }}>
         <Image
           src={news.image}
           alt={news.title}
@@ -132,21 +136,17 @@ export default function NewsCard({ news, variant = "default" }: Props) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.05) 100%)" }}
-        />
-        <span
-          className="absolute top-2 left-2 text-white text-xs font-bold px-2 py-0.5 uppercase tracking-wider z-10"
-          style={{ backgroundColor: "#d90000" }}
-        >
-          {news.category}
-        </span>
-        <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-          <h3 className="font-bold text-sm leading-snug line-clamp-3 text-white">
-            {news.title}
-          </h3>
-          <span className="text-xs mt-1.5 block" style={{ color: "#bbb" }}>{timeAgo(news.publishedAt)}</span>
+        <span className="tk-badge absolute top-3 left-3 z-10">{news.category}</span>
+      </div>
+      <div className="p-5">
+        <h3 className="text-base md:text-lg font-extrabold uppercase leading-snug line-clamp-3 transition-colors group-hover:text-red-600" style={{ color: "#111827" }}>
+          {news.title}
+        </h3>
+        <p className="text-sm mt-2 line-clamp-2" style={{ color: "#6b7280" }}>{news.summary}</p>
+        <div className="text-xs mt-3 flex items-center gap-2">
+          <span className="font-bold" style={{ color: "#d90000" }}>{news.author}</span>
+          <span style={{ color: "#cbd5e1" }}>·</span>
+          <time dateTime={news.publishedAt} style={{ color: "#6b7280" }}>{shortDate(news.publishedAt)}</time>
         </div>
       </div>
     </Link>

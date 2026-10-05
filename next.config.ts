@@ -42,10 +42,13 @@ const nextConfig: NextConfig = {
         source: "/news-sitemap.xml",
         headers: [{ key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" }],
       },
-      {
-        source: "/_next/static/(.*)",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
-      },
+      // Yalnızca canlıda: geliştirmede dosya adları sabit kaldığı için tarayıcı eski CSS'i önbellekten gösterir
+      ...(process.env.NODE_ENV === "production"
+        ? [{
+            source: "/_next/static/(.*)",
+            headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+          }]
+        : []),
     ];
   },
 

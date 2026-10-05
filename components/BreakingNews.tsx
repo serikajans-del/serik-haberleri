@@ -4,31 +4,26 @@ import Link from "next/link";
 export default async function BreakingNews() {
   const latest = await getLatestNewsFromDB(20);
   if (latest.length === 0) return null;
-  const items = [...latest, ...latest];
+  const items = latest.length > 3 ? [...latest, ...latest] : latest;
 
   return (
-    <div className="flex items-stretch overflow-hidden" style={{ backgroundColor: "#fff", borderBottom: "1px solid #e0e0e0" }}>
-      <div
-        className="flex-shrink-0 px-4 py-2 flex items-center gap-2 text-white text-xs font-black uppercase tracking-widest"
-        style={{ backgroundColor: "#d90000" }}
-      >
-        <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-        Son Haberler
-      </div>
-      <div className="flex-1 overflow-hidden relative py-2">
-        <div className="ticker-track">
-          {items.map((news, i) => (
-            <span key={`${news.id}-${i}`} className="inline-flex items-center gap-3 pr-10">
+    <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #eef0f3" }}>
+      <div className="max-w-7xl mx-auto px-4 flex items-center gap-4 overflow-hidden">
+        <span className="flex-shrink-0 text-base font-black py-2.5" style={{ color: "#d90000" }}>Güncel</span>
+        <div className="flex-1 overflow-hidden relative py-2.5">
+          <div className={latest.length > 3 ? "ticker-track" : "flex"}>
+            {items.map((news, i) => (
               <Link
+                key={`${news.id}-${i}`}
                 href={`/haber/${news.slug}`}
-                className="text-xs font-semibold whitespace-nowrap transition-colors hover:text-red-600"
-                style={{ color: "#333" }}
+                className="inline-flex items-center gap-2 pr-8 text-sm whitespace-nowrap group"
               >
-                {news.title}
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#cbd5e1" }} />
+                <span className="text-xs font-extrabold uppercase tracking-wide" style={{ color: "#d90000" }}>{news.category}</span>
+                <span className="font-bold uppercase transition-colors group-hover:text-red-600" style={{ color: "#111827" }}>{news.title}</span>
               </Link>
-              <span className="font-black" style={{ color: "#d90000" }}>◆</span>
-            </span>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
