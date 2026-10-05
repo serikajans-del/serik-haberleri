@@ -3,11 +3,11 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Belek Otelleri | Belek Otel ve Tatil Köyleri 2026",
-  description: "Belek'teki 5 yıldızlı oteller, tatil köyleri ve apart oteller. Belek otel fiyatları, yorumlar ve rezervasyon bilgileri.",
-  keywords: ["Belek otelleri", "Belek otel", "Belek tatil köyleri", "Belek 5 yıldızlı otel", "Antalya Belek otel", "Belek otel fiyatları"],
+  description: "Belek'teki 5 yıldızlı oteller, tatil köyleri ve apart oteller. Belek otellerinin konumu ve öne çıkan özellikleri.",
+  keywords: ["Belek otelleri", "Belek otel", "Belek tatil köyleri", "Belek 5 yıldızlı otel", "Antalya Belek otel"],
   openGraph: {
     title: "Belek Otelleri 2026",
-    description: "Belek'in en iyi otel ve tatil köyleri. Fiyatlar ve rezervasyon.",
+    description: "Belek'in otel ve tatil köyleri.",
   },
 };
 
@@ -18,8 +18,6 @@ const hotels = [
     type: "Tatil Köyü",
     area: "Belek",
     features: ["Golf Sahası", "Spa", "Özel Plaj", "Su Parkı"],
-    price: "₺8.500",
-    priceNote: "kişi/gece (All Inclusive)",
     image: "🏌️",
   },
   {
@@ -28,8 +26,6 @@ const hotels = [
     type: "Tatil Köyü",
     area: "Belek",
     features: ["18 Delik Golf", "Spa", "5 Havuz", "Plaj"],
-    price: "₺9.200",
-    priceNote: "kişi/gece (Ultra AI)",
     image: "🌊",
   },
   {
@@ -38,8 +34,6 @@ const hotels = [
     type: "Otel",
     area: "Belek",
     features: ["Aquapark", "Golf", "Spa", "Plaj"],
-    price: "₺6.800",
-    priceNote: "kişi/gece (All Inclusive)",
     image: "🏊",
   },
   {
@@ -48,8 +42,6 @@ const hotels = [
     type: "Tatil Köyü",
     area: "Belek",
     features: ["Tenis", "Plaj", "Spa", "Çocuk Kulübü"],
-    price: "₺7.100",
-    priceNote: "kişi/gece (All Inclusive)",
     image: "🎾",
   },
   {
@@ -58,8 +50,6 @@ const hotels = [
     type: "Otel",
     area: "Belek",
     features: ["Golf", "Spa", "Plaj", "Restoranlar"],
-    price: "₺7.800",
-    priceNote: "kişi/gece (All Inclusive)",
     image: "⛳",
   },
   {
@@ -68,8 +58,6 @@ const hotels = [
     type: "Otel",
     area: "Boğazkent",
     features: ["Plaj", "Spa", "Havuz", "Restoranlar"],
-    price: "₺5.500",
-    priceNote: "kişi/gece (All Inclusive)",
     image: "🌴",
   },
 ];
@@ -106,7 +94,7 @@ export default function BelekOtellerPage() {
           </nav>
           <h1 className="text-2xl md:text-3xl font-black mb-2">🏨 Belek Otelleri 2026</h1>
           <p className="text-green-100 text-sm max-w-xl">
-            Dünyanın önde gelen golf destinasyonu Belek'te lüks otel ve tatil köyleri. Fiyatlar, özellikler ve rezervasyon bilgileri.
+            Dünyanın önde gelen golf destinasyonu Belek'te lüks otel ve tatil köyleri ve öne çıkan özellikleri.
           </p>
           <div className="flex flex-wrap gap-2 mt-4">
             {["All Inclusive", "Golf Resort", "Spa", "Plaj", "Çocuk Kulübü"].map((tag) => (
@@ -164,10 +152,6 @@ export default function BelekOtellerPage() {
                           <span className="text-xs text-gray-500">{h.area}</span>
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <div className="font-black text-lg" style={{ color: "#cc0000" }}>{h.price}</div>
-                        <div className="text-xs text-gray-400">{h.priceNote}</div>
-                      </div>
                     </div>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {h.features.map((f) => (
@@ -183,7 +167,7 @@ export default function BelekOtellerPage() {
 
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-500">
-                Fiyatlar yaklaşık olup değişkenlik gösterebilir. Rezervasyon için oteli doğrudan arayın.
+                Güncel fiyat ve rezervasyon için otelle doğrudan iletişime geçin.
               </p>
             </div>
           </div>
