@@ -105,12 +105,11 @@ export default async function HomePage() {
         ))}
 
         {/* Hızlı erişim */}
-        <section className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <section className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { label: "Nöbetçi Eczane", href: "/eczane" },
             { label: "Hava Durumu", href: "/hava-durumu" },
             { label: "Belek Otelleri", href: "/belek-otelleri" },
-            { label: "Firma Rehberi", href: "/firmarehberi" },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="tk-card py-5 px-3 text-center text-sm font-extrabold uppercase transition-colors hover:text-red-600" style={{ color: "#111827" }}>
               {l.label}

@@ -16,7 +16,6 @@ export default async function Sidebar() {
     { label: "Nöbetçi Eczane", href: "/eczane" },
     { label: "Hava Durumu", href: "/hava-durumu" },
     { label: "Belek Otelleri", href: "/belek-otelleri" },
-    { label: "Firma Rehberi", href: "/firmarehberi" },
   ];
 
   return (

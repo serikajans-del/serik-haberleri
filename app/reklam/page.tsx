@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Reklam | Serik Haberleri",
-  description: "Serik Haberleri'nde reklam verin. Serik, Side ve Belek'teki 50.000+ okuyucuya ulaşın.",
+  description: "Serik Haberleri'nde reklam verin. Serik, Side ve Belek'teki okuyuculara ulaşın.",
 };
 
 const packages = [
@@ -14,7 +14,6 @@ const packages = [
     color: "#6b7280",
     features: [
       "Banner Reklam (300×250)",
-      "Ayda 15.000 gösterim",
       "1 kategori sayfası",
       "Temel istatistikler",
     ],
@@ -28,7 +27,6 @@ const packages = [
     badge: "En Çok Tercih Edilen",
     features: [
       "Ana Sayfa Banner (728×90)",
-      "Ayda 60.000 gösterim",
       "Tüm kategori sayfaları",
       "Sponsor haber (1/ay)",
       "Detaylı istatistikler",
@@ -45,7 +43,6 @@ const packages = [
       "Sınırsız gösterim",
       "Tüm sayfalar",
       "Sponsor haber (4/ay)",
-      "Firma Rehberi Öne Çıkan",
       "Sosyal medya tanıtımı",
       "Özel raporlama",
     ],
@@ -54,12 +51,11 @@ const packages = [
 ];
 
 const adFormats = [
-  { name: "Ana Sayfa Manşet Bandı", size: "728×90 px", location: "Ana sayfa üst bölüm", impressions: "~40K/ay" },
-  { name: "Sidebar Reklam", size: "300×250 px", location: "Tüm sayfalarda sağ kolon", impressions: "~25K/ay" },
-  { name: "Haber Arası Reklam", size: "728×90 px", location: "Haber içerikleri arası", impressions: "~30K/ay" },
-  { name: "Sponsor Haber", size: "Tam makale", location: "Ana sayfa & kategori", impressions: "~15K/ay" },
-  { name: "Firma Rehberi Öne Çıkan", size: "Kart görünümü", location: "Firma rehberi sayfası", impressions: "~8K/ay" },
-  { name: "Son Dakika Sponsorluğu", size: "Logo + Metin", location: "Son dakika şeridi", impressions: "~50K/ay" },
+  { name: "Ana Sayfa Manşet Bandı", size: "728×90 px", location: "Ana sayfa üst bölüm" },
+  { name: "Sidebar Reklam", size: "300×250 px", location: "Tüm sayfalarda sağ kolon" },
+  { name: "Haber Arası Reklam", size: "728×90 px", location: "Haber içerikleri arası" },
+  { name: "Sponsor Haber", size: "Tam makale", location: "Ana sayfa & kategori" },
+  { name: "Son Dakika Sponsorluğu", size: "Logo + Metin", location: "Son dakika şeridi" },
 ];
 
 export default function ReklamPage() {
@@ -75,20 +71,8 @@ export default function ReklamPage() {
           </nav>
           <h1 className="text-3xl md:text-4xl font-black mb-3">📣 Reklam Verin, Büyüyün</h1>
           <p className="text-red-100 text-lg max-w-2xl mx-auto mb-6">
-            Serik, Side ve Belek&apos;teki binlerce okuyucuya günlük ulaşın. Yerel işletmenizi dijitalde güçlendirin.
+            Serik, Side ve Belek&apos;teki okuyuculara ulaşın. Yerel işletmenizi dijitalde güçlendirin.
           </p>
-          <div className="flex flex-wrap justify-center gap-6 text-center">
-            {[
-              { value: "50.000+", label: "Aylık Tekil Ziyaretçi" },
-              { value: "180.000+", label: "Aylık Sayfa Görüntüleme" },
-              { value: "12.000+", label: "Sosyal Medya Takipçisi" },
-            ].map((s) => (
-              <div key={s.label} className="bg-white bg-opacity-15 rounded-xl px-6 py-3">
-                <div className="text-2xl font-black">{s.value}</div>
-                <div className="text-red-200 text-xs mt-0.5">{s.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -151,7 +135,6 @@ export default function ReklamPage() {
               <div className="space-y-1 text-sm text-gray-600">
                 <p>📐 <strong>Boyut:</strong> {f.size}</p>
                 <p>📍 <strong>Konum:</strong> {f.location}</p>
-                <p>👁️ <strong>Gösterim:</strong> {f.impressions}</p>
               </div>
             </div>
           ))}

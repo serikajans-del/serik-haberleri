@@ -147,7 +147,6 @@ export default function HavaDurumuPage() {
               {[
                 { label: "🏥 Nöbetçi Eczane", href: "/eczane" },
                 { label: "🏨 Belek Otelleri", href: "/belek-otelleri" },
-                { label: "🏢 Firma Rehberi", href: "/firmarehberi" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} className="flex items-center justify-between px-4 py-2.5 border-b border-gray-50 hover:bg-gray-50 transition-colors">
                   <span className="text-sm text-gray-700">{l.label}</span>
