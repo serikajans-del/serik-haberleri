@@ -58,7 +58,7 @@ export default async function HomePage() {
             </div>
           )}
 
-          <div className={`order-1 lg:order-2 ${leftCol.length > 0 ? "lg:col-span-5" : mostRead.length > 0 ? "lg:col-span-8" : "lg:col-span-8 lg:col-start-3"}`} style={{ minHeight: "420px" }}>
+          <div className={`order-1 lg:order-2 ${leftCol.length > 0 ? "lg:col-span-5" : mostRead.length > 0 ? "lg:col-span-8" : "lg:col-span-8 lg:col-start-3"} lg:min-h-[420px]`}>
             <MansetSlider items={slider} />
           </div>
 

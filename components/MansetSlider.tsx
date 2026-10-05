@@ -27,7 +27,7 @@ export default function MansetSlider({ items }: { items: NewsItem[] }) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="relative flex-1 overflow-hidden tk-radius" style={{ backgroundColor: "#0f172a", minHeight: "320px" }}>
+      <div className="relative overflow-hidden tk-radius aspect-[16/10] lg:aspect-auto lg:flex-1" style={{ backgroundColor: "#0f172a" }}>
         {items.map((item, i) => (
           <Link
             key={item.id}
