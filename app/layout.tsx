@@ -64,8 +64,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@serikhaberleri",
-    creator: "@serikhaberleri",
     title: "Serik Haberleri - Son Dakika",
     description: "Serik'ten güncel ve son dakika haberler",
     images: [DEFAULT_OG_IMAGE],
@@ -132,10 +130,9 @@ const organizationJsonLd = {
     contactType: "editorial",
   },
   sameAs: [
-    "https://facebook.com/serikhaberleri",
-    "https://twitter.com/serikhaberleri",
-    "https://instagram.com/serikhaberleri",
-    "https://youtube.com/@serikhaberleri",
+    "https://www.facebook.com/serikmerkez/",
+    "https://www.instagram.com/serik.merkez/",
+    "https://www.youtube.com/@antalyabelgesel",
   ],
   publishingPrinciples: `${SITE_URL}/yayin-ilkeleri`,
 };
