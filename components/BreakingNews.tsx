@@ -4,14 +4,16 @@ import Link from "next/link";
 export default async function BreakingNews() {
   const latest = await getLatestNewsFromDB(20);
   if (latest.length === 0) return null;
-  const items = latest.length > 3 ? [...latest, ...latest] : latest;
+  // Az haber olsa da şerit dolsun diye liste en az 8 öğeye tamamlanır, kesintisiz döngü için iki kez basılır
+  const base = Array.from({ length: Math.max(8, latest.length) }, (_, i) => latest[i % latest.length]);
+  const items = [...base, ...base];
 
   return (
     <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #eef0f3" }}>
       <div className="max-w-7xl mx-auto px-4 flex items-center gap-4 overflow-hidden">
         <span className="flex-shrink-0 text-base font-black py-2.5" style={{ color: "#d90000" }}>Güncel</span>
         <div className="flex-1 overflow-hidden relative py-2.5">
-          <div className={latest.length > 3 ? "ticker-track" : "flex"}>
+          <div className="ticker-track" style={{ animationDuration: `${base.length * 9}s` }}>
             {items.map((news, i) => (
               <Link
                 key={`${news.id}-${i}`}
