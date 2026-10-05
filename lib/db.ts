@@ -2,6 +2,10 @@ import { supabaseAdmin } from "./supabase";
 import { newsData } from "./news";
 import type { NewsItem } from "./news";
 
+// Sitenin yeniden yayına başladığı an. Bundan önceki kayıtlar (eski botun topladığı
+// ajans kopyaları) veritabanında durur ama sitede, site haritasında ve RSS'te gösterilmez.
+export const YAYIN_BASLANGIC = process.env.YAYIN_BASLANGIC || "2026-10-05T00:00:00+03:00";
+
 // İçerik kalitesi yetersizse filtrele (placeholder/boş metin tespiti)
 const PLACEHOLDER_PHRASES = [
   "hakkında bilgi yok",
@@ -47,6 +51,7 @@ export async function getMostReadFromDB(count = 10): Promise<NewsItem[]> {
     const { data, error } = await supabaseAdmin
       .from("haberler")
       .select("*")
+      .gte("published_at", YAYIN_BASLANGIC)
       .order("views", { ascending: false })
       .limit(count * 2);
     if (!error && data && data.length > 0) {
@@ -62,6 +67,7 @@ export async function getLatestNewsFromDB(count = 12): Promise<NewsItem[]> {
     const { data, error } = await supabaseAdmin
       .from("haberler")
       .select("*")
+      .gte("published_at", YAYIN_BASLANGIC)
       .order("published_at", { ascending: false })
       .limit(count * 4); // fazla çek, filtrelemeden sonra yeterli kalsın
     if (!error && data && data.length > 0) {
@@ -79,6 +85,7 @@ export async function getNewsBySlugFromDB(slug: string): Promise<NewsItem | null
     const { data, error } = await supabaseAdmin
       .from("haberler")
       .select("*")
+      .gte("published_at", YAYIN_BASLANGIC)
       .eq("slug", slug)
       .single();
     if (!error && data) return mapToNewsItem(data);
@@ -91,6 +98,7 @@ export async function getNewsByCategoryFromDB(categorySlug: string, count = 12):
     const { data, error } = await supabaseAdmin
       .from("haberler")
       .select("*")
+      .gte("published_at", YAYIN_BASLANGIC)
       .eq("category_slug", categorySlug)
       .order("published_at", { ascending: false })
       .limit(count * 2);
@@ -112,6 +120,7 @@ export async function searchNewsFromDB(query: string, count = 24): Promise<NewsI
     const { data, error } = await supabaseAdmin
       .from("haberler")
       .select("*")
+      .gte("published_at", YAYIN_BASLANGIC)
       .or(`title.ilike.%${q}%,summary.ilike.%${q}%`)
       .order("published_at", { ascending: false })
       .limit(count * 2);
@@ -131,6 +140,7 @@ export async function getFeaturedNewsFromDB(): Promise<NewsItem[]> {
     const { data, error } = await supabaseAdmin
       .from("haberler")
       .select("*")
+      .gte("published_at", YAYIN_BASLANGIC)
       .eq("featured", true)
       .order("published_at", { ascending: false })
       .limit(12);

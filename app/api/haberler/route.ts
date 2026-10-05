@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { YAYIN_BASLANGIC } from "@/lib/db";
 
 export async function GET() {
   const { data, error } = await supabaseAdmin
     .from("haberler")
     .select("*")
+    .gte("published_at", YAYIN_BASLANGIC)
     .order("published_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
