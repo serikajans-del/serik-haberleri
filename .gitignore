@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# haber videosu çalışma dosyaları
+/video/calisma/
+/video/*.mp4
