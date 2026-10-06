@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isAdminRequest } from "@/lib/admin";
 import { YAYIN_BASLANGIC } from "@/lib/db";
 
 export async function GET() {
@@ -14,9 +15,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const auth = req.headers.get("x-admin-password");
-  if (auth !== adminPassword) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
   }
 

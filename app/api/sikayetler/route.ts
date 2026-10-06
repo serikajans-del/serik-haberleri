@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isAdminRequest } from "@/lib/admin";
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,8 +57,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const adminPassword = req.headers.get("x-admin-password");
-  if (adminPassword !== process.env.ADMIN_PASSWORD) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
@@ -71,8 +71,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const adminPassword = req.headers.get("x-admin-password");
-  if (adminPassword !== process.env.ADMIN_PASSWORD) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 

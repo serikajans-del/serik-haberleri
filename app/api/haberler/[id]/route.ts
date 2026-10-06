@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isAdminRequest } from "@/lib/admin";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -16,9 +17,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
 }
 
 export async function PUT(req: NextRequest, { params }: Props) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const auth = req.headers.get("x-admin-password");
-  if (auth !== adminPassword) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
   }
 
@@ -36,9 +35,7 @@ export async function PUT(req: NextRequest, { params }: Props) {
 }
 
 export async function DELETE(req: NextRequest, { params }: Props) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const auth = req.headers.get("x-admin-password");
-  if (auth !== adminPassword) {
+  if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
   }
 
