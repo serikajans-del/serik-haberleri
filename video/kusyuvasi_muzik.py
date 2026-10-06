@@ -4,6 +4,7 @@ import numpy as np, wave, sys
 SR = 44100
 DUR = float(sys.argv[2])
 DONUS = float(sys.argv[3])
+SADE = len(sys.argv) > 4 and sys.argv[4] == "sade"   # yalnızca ped: nabız ve gümleme yok
 n = int(SR * DUR)
 t = np.arange(n) / SR
 out = np.zeros(n)
@@ -51,13 +52,14 @@ while z < DUR:
     z += olcu
     k += 1
 kalp = 60 / 68
-for i in range(int(DUR / kalp)):                                     # yavaş nabız
+for i in range(0 if SADE else int(DUR / kalp)):                                     # yavaş nabız
     add(vurus(), i * kalp, 0.55 if i * kalp < DONUS else 0.4)
     if i % 2 == 1:
         add(vurus(), i * kalp + kalp * 0.28, 0.28)
-add(gum(), 0.05, 1.0)
-add(gum(), DONUS, 0.9)
-out *= np.clip((DUR - t) / 1.5, 0, 1) * np.clip(t / 0.3, 0, 1)
+if not SADE:
+    add(gum(), 0.05, 1.0)
+    add(gum(), DONUS, 0.9)
+out *= np.clip((DUR - t) / 2.5, 0, 1) * np.clip(t / 1.5, 0, 1)
 out = np.tanh(out * 1.3) * 0.8
 st = np.stack([out, np.roll(out, 14)], 1)
 w = wave.open(sys.argv[1], "wb")
