@@ -45,3 +45,4 @@ next-env.d.ts
 # haber videosu çalışma dosyaları
 /video/calisma/
 /video/*.mp4
+/video/reklam/
