@@ -1,31 +1,8 @@
 import { NextResponse } from "next/server";
 
-// Open-Meteo — ücretsiz, API key gerektirmez
-// Serik koordinatları: lat=36.92, lon=31.10
-const WMO_CODES: Record<number, { desc: string; icon: string }> = {
-  0:  { desc: "Açık", icon: "☀️" },
-  1:  { desc: "Az bulutlu", icon: "🌤️" },
-  2:  { desc: "Parçalı bulutlu", icon: "⛅" },
-  3:  { desc: "Bulutlu", icon: "☁️" },
-  45: { desc: "Sisli", icon: "🌫️" },
-  48: { desc: "Dondurucu sis", icon: "🌫️" },
-  51: { desc: "Hafif çisenti", icon: "🌦️" },
-  53: { desc: "Çisenti", icon: "🌦️" },
-  55: { desc: "Yoğun çisenti", icon: "🌧️" },
-  61: { desc: "Hafif yağmur", icon: "🌦️" },
-  63: { desc: "Yağmur", icon: "🌧️" },
-  65: { desc: "Şiddetli yağmur", icon: "🌧️" },
-  71: { desc: "Hafif kar", icon: "🌨️" },
-  73: { desc: "Kar", icon: "❄️" },
-  75: { desc: "Yoğun kar", icon: "❄️" },
-  80: { desc: "Sağanak", icon: "🌦️" },
-  81: { desc: "Sağanak", icon: "🌧️" },
-  82: { desc: "Şiddetli sağanak", icon: "⛈️" },
-  95: { desc: "Fırtınalı", icon: "⛈️" },
-  96: { desc: "Fırtına + dolu", icon: "⛈️" },
-  99: { desc: "Şiddetli fırtına", icon: "⛈️" },
-};
+import { WMO_CODES } from "@/lib/hava";
 
+// Open-Meteo — ücretsiz, API key gerektirmez. Serik koordinatları: lat=36.92, lon=31.10
 export async function GET() {
   try {
     const res = await fetch(
