@@ -25,7 +25,7 @@ export default function YeniHaber() {
     category: "Gündem",
     category_slug: "gundem",
     image: "",
-    author: "Serik Haberleri",
+    author: "Atakan Şimşir",
     published_at: new Date().toISOString().slice(0, 16),
     featured: false,
     tags: "",

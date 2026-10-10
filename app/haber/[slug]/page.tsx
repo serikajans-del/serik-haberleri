@@ -63,6 +63,9 @@ export default async function NewsDetailPage({ params }: Props) {
   const wordCount = news.content.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
 
   const isStaffByline = !news.author || news.author === "Serik Haberleri";
+  // Yazar sayfası olan yazarlar (haberde adı bağlantılı görünür; yapısal veride Person.url olarak verilir)
+  const YAZAR_SAYFASI: Record<string, string> = { "Atakan Şimşir": "/yazar/atakan-simsir" };
+  const yazarYolu = YAZAR_SAYFASI[news.author] ?? null;
   const updated = news.updatedAt && new Date(news.updatedAt).getTime() - new Date(news.publishedAt).getTime() > 60_000 ? news.updatedAt : null;
 
   const articleJsonLd = {
@@ -76,7 +79,7 @@ export default async function NewsDetailPage({ params }: Props) {
     dateModified: news.updatedAt ?? news.publishedAt,
     author: isStaffByline
       ? { "@type": "Organization", name: "Serik Haberleri", url: `${SITE_URL}/hakkimizda` }
-      : { "@type": "Person", name: news.author, url: `${SITE_URL}/hakkimizda` },
+      : { "@type": "Person", name: news.author, url: `${SITE_URL}${yazarYolu ?? "/hakkimizda"}` },
     publisher: {
       "@type": "NewsMediaOrganization",
       name: "Serik Haberleri",
@@ -171,7 +174,11 @@ export default async function NewsDetailPage({ params }: Props) {
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                     </svg>
-                    <span style={{ color: "#555" }}>{news.author}</span>
+                    {yazarYolu ? (
+                      <Link href={yazarYolu} rel="author" className="hover:underline" style={{ color: "#555" }}>{news.author}</Link>
+                    ) : (
+                      <span style={{ color: "#555" }}>{news.author}</span>
+                    )}
                   </span>
                   {/* Okuma süresi */}
                   {(() => {
@@ -253,8 +260,10 @@ export default async function NewsDetailPage({ params }: Props) {
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-base" style={{ backgroundColor: "#f5f5f5", border: "1px solid #e0e0e0" }}>📰</div>
                     <div>
-                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#999" }}>Kaynak</div>
-                      <div className="text-sm font-bold" style={{ color: "#1a1a1a" }}>{news.author}</div>
+                      <div className="text-xs uppercase tracking-wide mb-0.5" style={{ color: "#999" }}>{yazarYolu ? "Yazar" : "Kaynak"}</div>
+                      <div className="text-sm font-bold" style={{ color: "#1a1a1a" }}>
+                        {yazarYolu ? <Link href={yazarYolu} rel="author" className="hover:underline">{news.author}</Link> : news.author}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

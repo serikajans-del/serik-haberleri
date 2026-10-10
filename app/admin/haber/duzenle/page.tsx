@@ -24,7 +24,7 @@ function DuzenleForm() {
   const [form, setForm] = useState({
     title: "", slug: "", summary: "", content: "",
     category: "Gündem", category_slug: "gundem",
-    image: "", author: "Serik Haberleri",
+    image: "", author: "Atakan Şimşir",
     published_at: "", featured: false, tags: "",
   });
   const [loading, setLoading] = useState(true);

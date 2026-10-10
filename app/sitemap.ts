@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: "hourly", priority: 1 },
     { url: `${SITE_URL}/hakkimizda`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
+    { url: `${SITE_URL}/yazar/atakan-simsir`, lastModified: new Date(), changeFrequency: "daily", priority: 0.5 },
     { url: `${SITE_URL}/iletisim`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE_URL}/sikayet`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/hava-durumu`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.6 },
