@@ -32,15 +32,15 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/feed.xml",
-        headers: [{ key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600, stale-while-revalidate=7200" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=300, s-maxage=300, stale-while-revalidate=600" }],
       },
       {
         source: "/sitemap.xml",
-        headers: [{ key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=300, s-maxage=300" }],
       },
       {
         source: "/news-sitemap.xml",
-        headers: [{ key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=300, s-maxage=300" }],
       },
       // Yalnızca canlıda: geliştirmede dosya adları sabit kaldığı için tarayıcı eski CSS'i önbellekten gösterir
       ...(process.env.NODE_ENV === "production"

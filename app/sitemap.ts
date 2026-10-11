@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { categories } from "@/lib/news";
 import { getLatestNewsFromDB } from "@/lib/db";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
 

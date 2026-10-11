@@ -3,7 +3,7 @@ import type { NewsItem } from "@/lib/news";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export async function GET() {
   let news: NewsItem[] = [];
@@ -58,7 +58,7 @@ ${items}
   return new Response(rss, {
     headers: {
       "Content-Type": "application/rss+xml; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=7200",
+      "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
     },
   });
 }
