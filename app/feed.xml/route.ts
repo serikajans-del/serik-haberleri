@@ -3,7 +3,7 @@ import type { NewsItem } from "@/lib/news";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic"; // her istekte veritabanından üretilir: ISR ile yalnızca yayına alımda yenileniyordu, yeni haberler haritaya girmiyordu
 
 export async function GET() {
   let news: NewsItem[] = [];
