@@ -11,6 +11,7 @@ type WeatherData = {
 } | null;
 
 const utilityLinks = [
+  { label: "Esnaf Rehberi", href: "/firmarehberi" },
   { label: "Nöbetçi Eczane", href: "/eczane" },
   { label: "Hava Durumu", href: "/hava-durumu" },
   { label: "Şikayet / İhbar", href: "/sikayet" },

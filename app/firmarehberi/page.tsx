@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.serikhaberleri.com/firmarehberi" },
 };
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 function telTemiz(t: string) {
   return t.replace(/[^0-9+]/g, "");
