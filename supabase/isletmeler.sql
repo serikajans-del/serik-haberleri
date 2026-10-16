@@ -24,3 +24,7 @@ create index if not exists isletmeler_kategori_idx on public.isletmeler (kategor
 
 -- Site yalnızca sunucudaki service_role anahtarıyla okur/yazar.
 alter table public.isletmeler enable row level security;
+
+-- Görsel alanı ve depolama kutusu (sonradan eklendi)
+alter table public.isletmeler add column if not exists gorsel text not null default '';
+insert into storage.buckets (id, name, public) values ('isletme-gorseller','isletme-gorseller', true) on conflict (id) do nothing;
