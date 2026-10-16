@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { KATEGORILER, type Isletme } from "@/lib/firmalar";
+import { KATEGORILER, KATEGORI_RENK, kategoriEmoji, type Isletme } from "@/lib/firmalar";
 import { onayliIsletmeler } from "@/lib/firmalar-db";
 
 export const metadata: Metadata = {
@@ -16,8 +16,18 @@ function telTemiz(t: string) {
 }
 
 function Kart({ i }: { i: Isletme }) {
+  const [c1, c2] = KATEGORI_RENK[i.kategori] ?? KATEGORI_RENK["hizmet"];
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-2">
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
+      {i.gorsel ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={i.gorsel} alt={i.ad} className="w-full h-40 object-cover" loading="lazy" />
+      ) : (
+        <div className="w-full h-24 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
+          <span className="text-4xl drop-shadow">{kategoriEmoji(i.kategori)}</span>
+        </div>
+      )}
+      <div className="p-4 flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-bold text-gray-900 leading-tight">{i.ad}</h3>
         <span className="shrink-0 text-[11px] font-semibold text-red-700 bg-red-50 rounded px-2 py-0.5">{i.kategori_ad}</span>
@@ -31,6 +41,7 @@ function Kart({ i }: { i: Isletme }) {
         {i.instagram && <a href={`https://instagram.com/${i.instagram}`} target="_blank" rel="noopener" className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#E1306C" }}>Instagram</a>}
         {i.website && <a href={i.website.startsWith("http") ? i.website : `https://${i.website}`} target="_blank" rel="noopener" className="text-xs font-bold text-gray-700 px-3 py-1.5 rounded-lg bg-gray-100">Web</a>}
         {i.harita && <a href={i.harita} target="_blank" rel="noopener" className="text-xs font-bold text-gray-700 px-3 py-1.5 rounded-lg bg-gray-100">Yol Tarifi</a>}
+      </div>
       </div>
     </div>
   );

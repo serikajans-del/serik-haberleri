@@ -15,9 +15,27 @@ export type Isletme = {
   calisma_saatleri: string;
   harita: string;
   aciklama: string;
+  gorsel: string;
   durum: "beklemede" | "onayli" | "reddedildi";
   created_at?: string;
 };
+
+// Kategoriye göre kart başlığı degrade rengi (fotoğraf yoksa kullanılır)
+export const KATEGORI_RENK: Record<string, [string, string]> = {
+  "yeme-icme": ["#f97316", "#ea580c"],
+  "gida": ["#16a34a", "#15803d"],
+  "giyim": ["#8b5cf6", "#6d28d9"],
+  "guzellik": ["#ec4899", "#be185d"],
+  "saglik": ["#0ea5e9", "#0369a1"],
+  "otomotiv": ["#64748b", "#334155"],
+  "konaklama": ["#0d9488", "#0f766e"],
+  "egitim": ["#eab308", "#a16207"],
+  "hizmet": ["#dc2626", "#991b1b"],
+};
+
+export function kategoriEmoji(slug: string): string {
+  return KATEGORILER.find((k) => k.slug === slug)?.emoji ?? "🔧";
+}
 
 // Rehber kategorileri (slug → görünen ad). Yeni kategori eklemek için buraya satır ekle.
 export const KATEGORILER: { slug: string; ad: string; emoji: string }[] = [

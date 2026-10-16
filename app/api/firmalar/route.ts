@@ -6,11 +6,12 @@ import { KATEGORILER, kategoriAd, slugify } from "@/lib/firmalar";
 // Esnafın kendi kaydını açtığı form (herkese açık) → "beklemede" olarak eklenir, admin onaylayınca yayına girer.
 export async function POST(req: NextRequest) {
   try {
-    const b = await req.json();
-    const ad = (b.ad ?? "").toString().trim();
-    const kategori = (b.kategori ?? "").toString().trim();
-    const telefon = (b.telefon ?? "").toString().trim();
-    const adres = (b.adres ?? "").toString().trim();
+    const fd = await req.formData();
+    const g = (k: string) => (fd.get(k) ?? "").toString().trim();
+    const ad = g("ad");
+    const kategori = g("kategori");
+    const telefon = g("telefon");
+    const adres = g("adres");
 
     if (!ad || ad.length < 2) return NextResponse.json({ error: "İşletme adı zorunludur." }, { status: 400 });
     if (!KATEGORILER.some((k) => k.slug === kategori)) return NextResponse.json({ error: "Geçerli bir kategori seçin." }, { status: 400 });
@@ -21,19 +22,31 @@ export async function POST(req: NextRequest) {
     const { data: mevcut } = await supabaseAdmin.from("isletmeler").select("slug").like("slug", `${slug}%`);
     if (mevcut && mevcut.some((r) => r.slug === slug)) slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
 
+    // görsel yükleme (opsiyonel)
+    let gorsel = "";
+    const foto = fd.get("gorsel") as File | null;
+    if (foto && foto.size > 0 && foto.size <= 6 * 1024 * 1024) {
+      const ext = (foto.name.split(".").pop() || "jpg").toLowerCase();
+      const dosya = `${slug}-${Date.now()}.${ext}`;
+      const buf = Buffer.from(await foto.arrayBuffer());
+      const { error: upErr } = await supabaseAdmin.storage.from("isletme-gorseller").upload(dosya, buf, { contentType: foto.type });
+      if (!upErr) gorsel = supabaseAdmin.storage.from("isletme-gorseller").getPublicUrl(dosya).data.publicUrl;
+    }
+
     const kayit = {
+      gorsel,
       slug,
       ad: ad.slice(0, 120),
       kategori,
       kategori_ad: kategoriAd(kategori),
       adres: adres.slice(0, 300),
       telefon: telefon.slice(0, 40),
-      whatsapp: (b.whatsapp ?? "").toString().trim().slice(0, 40),
-      instagram: (b.instagram ?? "").toString().trim().replace(/^@/, "").slice(0, 60),
-      website: (b.website ?? "").toString().trim().slice(0, 200),
-      calisma_saatleri: (b.calisma_saatleri ?? "").toString().trim().slice(0, 120),
-      harita: (b.harita ?? "").toString().trim().slice(0, 400),
-      aciklama: (b.aciklama ?? "").toString().trim().slice(0, 500),
+      whatsapp: g("whatsapp").slice(0, 40),
+      instagram: g("instagram").replace(/^@/, "").slice(0, 60),
+      website: g("website").slice(0, 200),
+      calisma_saatleri: g("calisma_saatleri").slice(0, 120),
+      harita: g("harita").slice(0, 400),
+      aciklama: g("aciklama").slice(0, 500),
       durum: "beklemede",
     };
 

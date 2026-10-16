@@ -8,6 +8,8 @@ export default function IsletmeKayitPage() {
     ad: "", kategori: "", telefon: "", adres: "", whatsapp: "",
     instagram: "", website: "", calisma_saatleri: "", harita: "", aciklama: "",
   });
+  const [foto, setFoto] = useState<File | null>(null);
+  const [onizleme, setOnizleme] = useState<string>("");
   const [gonderiliyor, setGonderiliyor] = useState(false);
   const [sonuc, setSonuc] = useState<"basarili" | "hata" | null>(null);
   const [hataMesaj, setHataMesaj] = useState("");
@@ -16,19 +18,27 @@ export default function IsletmeKayitPage() {
     setF((p) => ({ ...p, [k]: v }));
   }
 
+  function fotoSec(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 6 * 1024 * 1024) { alert("Görsel 6 MB'tan küçük olmalı."); return; }
+    setFoto(file);
+    setOnizleme(URL.createObjectURL(file));
+  }
+
   async function gonder(e: React.FormEvent) {
     e.preventDefault();
     setGonderiliyor(true);
     setSonuc(null);
     try {
-      const res = await fetch("/api/firmalar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(f),
-      });
+      const fd = new FormData();
+      Object.entries(f).forEach(([k, v]) => fd.append(k, v));
+      if (foto) fd.append("gorsel", foto);
+      const res = await fetch("/api/firmalar", { method: "POST", body: fd });
       if (res.ok) {
         setSonuc("basarili");
         setF({ ad: "", kategori: "", telefon: "", adres: "", whatsapp: "", instagram: "", website: "", calisma_saatleri: "", harita: "", aciklama: "" });
+        setFoto(null); setOnizleme("");
       } else {
         const j = await res.json().catch(() => ({}));
         setHataMesaj(j.error || "Kayıt gönderilemedi.");
@@ -113,6 +123,12 @@ export default function IsletmeKayitPage() {
         <div>
           <label className={lbl}>Kısa açıklama</label>
           <textarea className={inp} value={f.aciklama} onChange={(e) => set("aciklama", e.target.value)} maxLength={500} rows={3} placeholder="İşletmen hakkında birkaç cümle" />
+        </div>
+        <div>
+          <label className={lbl}>İşletme fotoğrafı / logo</label>
+          {onizleme && <img src={onizleme} alt="önizleme" className="w-full h-40 object-cover rounded-lg mb-2" />}
+          <input type="file" accept="image/*" onChange={fotoSec} className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-red-50 file:text-red-700" />
+          <p className="text-xs text-gray-400 mt-1">İsteğe bağlı. En fazla 6 MB. Kart daha şık görünür.</p>
         </div>
 
         {sonuc === "hata" && <p className="text-sm text-red-600">{hataMesaj}</p>}
