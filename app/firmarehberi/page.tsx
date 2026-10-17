@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { KATEGORILER, KATEGORI_RENK, kategoriEmoji, type Isletme } from "@/lib/firmalar";
+import { KATEGORILER, kategoriEmoji, type Isletme } from "@/lib/firmalar";
 import { onayliIsletmeler } from "@/lib/firmalar-db";
 
 export const metadata: Metadata = {
@@ -16,22 +16,17 @@ function telTemiz(t: string) {
 }
 
 function Kart({ i }: { i: Isletme }) {
-  const [c1, c2] = KATEGORI_RENK[i.kategori] ?? KATEGORI_RENK["hizmet"];
+  const kapak = i.gorsel || `/firmarehberi/kapak-${i.kategori}.jpg`;
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-      {i.gorsel ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={i.gorsel} alt={i.ad} className="w-full h-40 object-cover" loading="lazy" />
-      ) : (
-        <div className="w-full h-24 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
-          <span className="text-4xl drop-shadow">{kategoriEmoji(i.kategori)}</span>
-        </div>
-      )}
-      <div className="p-4 flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2">
-        <h3 className="font-bold text-gray-900 leading-tight">{i.ad}</h3>
-        <span className="shrink-0 text-[11px] font-semibold text-red-700 bg-red-50 rounded px-2 py-0.5">{i.kategori_ad}</span>
+      <div className="relative w-full h-40">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={kapak} alt={i.ad} className="w-full h-full object-cover" loading="lazy" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.78) 100%)" }} />
+        <span className="absolute top-2 left-2 text-[11px] font-bold text-white bg-black/45 backdrop-blur rounded-full px-2.5 py-1">{kategoriEmoji(i.kategori)} {i.kategori_ad}</span>
+        <h3 className="absolute bottom-2 left-3 right-3 font-black text-white text-lg leading-tight drop-shadow">{i.ad}</h3>
       </div>
+      <div className="p-4 flex flex-col gap-2">
       {i.aciklama && <p className="text-sm text-gray-600 leading-snug">{i.aciklama}</p>}
       {i.adres && <p className="text-sm text-gray-500">📍 {i.adres}</p>}
       {i.calisma_saatleri && <p className="text-xs text-gray-400">🕒 {i.calisma_saatleri}</p>}
