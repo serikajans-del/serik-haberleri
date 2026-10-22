@@ -53,7 +53,7 @@ export default function Footer() {
               <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-3 pb-1" style={{ borderBottom: "1px solid #222" }}>Kurumsal</h4>
               <ul className="space-y-1.5">
                 {[
-                  { name: "Esnaf Rehberi", href: "/firmarehberi" },
+                  { name: "Serik Ustam", href: "/ustam" },
                   { name: "Hakkımızda", href: "/hakkimizda" },
                   { name: "İletişim", href: "/iletisim" },
                   { name: "Reklam", href: "/reklam" },
