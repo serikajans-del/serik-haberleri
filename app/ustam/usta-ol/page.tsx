@@ -8,12 +8,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.serikhaberleri.com/ustam/usta-ol" },
 };
 
-export default function UstaOlSayfasi() {
+export default async function UstaOlSayfasi({ searchParams }: { searchParams: Promise<{ paket?: string }> }) {
+  const { paket = "" } = await searchParams;
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-black mb-2" style={{ color: RENK.lacivert }}>Usta Olarak Katıl</h1>
-      <p className="text-gray-600 mb-6">Başvurunuz ekibimiz tarafından incelenir; onaylandığında profiliniz yayına girer ve bölgenizdeki talepler size iletilir. Başvuru ve temel profil ücretsizdir.</p>
-      <BasvuruFormu />
+      <p className="text-gray-600 mb-6">Formu doldurun, profiliniz hemen yayına girsin ve bölgenizdeki talepler size iletilsin. Temel profil ücretsizdir.</p>
+      <BasvuruFormu ilkPaket={paket} />
     </main>
   );
 }

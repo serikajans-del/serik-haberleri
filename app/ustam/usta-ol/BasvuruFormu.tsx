@@ -1,14 +1,15 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { KATEGORILER, MAHALLELER, RENK, telGecerli } from "@/lib/ustam";
+import { KATEGORILER, MAHALLELER, PAKETLER, RENK, telGecerli } from "@/lib/ustam";
 
-export default function BasvuruFormu() {
+export default function BasvuruFormu({ ilkPaket }: { ilkPaket: string }) {
   const [kategoriler, setKategoriler] = useState<string[]>([]);
   const [mahalleler, setMahalleler] = useState<string[]>([]);
+  const [paket, setPaket] = useState(PAKETLER.some((p) => p.id === ilkPaket) ? ilkPaket : "ucretsiz");
   const [hata, setHata] = useState("");
   const [gonderiliyor, setGonderiliyor] = useState(false);
-  const [tamam, setTamam] = useState(false);
+  const [slug, setSlug] = useState<string | null>(null);
 
   const degistir = (liste: string[], set: (l: string[]) => void, v: string, sinir = 99) =>
     set(liste.includes(v) ? liste.filter((x) => x !== v) : liste.length < sinir ? [...liste, v] : liste);
@@ -21,23 +22,32 @@ export default function BasvuruFormu() {
     if (!mahalleler.length) return setHata("Hizmet verdiğiniz en az bir bölgeyi seçin.");
     kategoriler.forEach((k) => fd.append("kategoriler", k));
     mahalleler.forEach((m) => fd.append("mahalleler", m));
+    fd.set("paket", paket);
     setGonderiliyor(true);
     try {
       const r = await fetch("/api/ustam/usta", { method: "POST", body: fd });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || "Gönderilemedi");
-      setTamam(true); window.scrollTo({ top: 0 });
+      setSlug(j.slug || ""); window.scrollTo({ top: 0 });
     } catch (e) { setHata((e as Error).message); } finally { setGonderiliyor(false); }
   };
 
-  if (tamam) return (
-    <div className="bg-white rounded-3xl p-8 text-center">
-      <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl text-white mb-4" style={{ backgroundColor: RENK.turkuaz }}>✓</div>
-      <h2 className="text-2xl font-black mb-2" style={{ color: RENK.lacivert }}>Başvurunuz alındı!</h2>
-      <p className="text-gray-600">Ekibimiz bilgilerinizi inceleyip sizi telefonla arayacak. Onaylandığında profiliniz Serik Ustam&apos;da yayına girer.</p>
-      <Link href="/ustam" className="inline-block mt-6 px-6 py-3 rounded-xl font-bold text-white" style={{ backgroundColor: RENK.lacivert }}>Ana sayfaya dön</Link>
-    </div>
-  );
+  if (slug !== null) {
+    const secilen = PAKETLER.find((p) => p.id === paket)!;
+    return (
+      <div className="bg-white rounded-3xl p-8 text-center">
+        <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl text-white mb-4" style={{ backgroundColor: RENK.turkuaz }}>✓</div>
+        <h2 className="text-2xl font-black mb-2" style={{ color: RENK.lacivert }}>Profiliniz yayında!</h2>
+        <p className="text-gray-600">Artık Serik Ustam&apos;da listeleniyorsunuz; bölgenizdeki iş talepleri size iletilecek.</p>
+        {paket !== "ucretsiz" && <p className="mt-3 text-sm font-semibold rounded-xl p-3" style={{ backgroundColor: "#FFF1E6", color: "#9A4A0E" }}>{secilen.ad} ({secilen.fiyat}) talebiniz alındı. Ödeme için ekibimiz sizi arayacak; ödeme sonrası paketiniz etkinleşir.</p>}
+        <p className="text-xs text-gray-400 mt-3">&quot;Doğrulanmış Usta&quot; rozeti için belgelerinizi ekibimize gösterebilirsiniz.</p>
+        <div className="flex flex-wrap justify-center gap-2 mt-6">
+          {slug && <Link href={`/ustam/usta/${slug}`} className="px-6 py-3 rounded-xl font-bold text-white" style={{ backgroundColor: RENK.turkuaz }}>Profilimi gör</Link>}
+          <Link href="/ustam" className="px-6 py-3 rounded-xl font-bold text-white" style={{ backgroundColor: RENK.lacivert }}>Ana sayfa</Link>
+        </div>
+      </div>
+    );
+  }
 
   const girdi = "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 outline-none focus:border-teal-500";
   const etiket = "block text-sm font-bold text-gray-700 mb-1";
@@ -82,14 +92,31 @@ export default function BasvuruFormu() {
         <p className="text-xs text-gray-400 mt-1">&quot;Doğrulanmış Usta&quot; rozeti, ekibimiz belgelerinizi gördükten sonra verilir.</p>
       </div>
 
+      <div>
+        <p className={etiket}>Paket</p>
+        <div className="grid sm:grid-cols-3 gap-2">
+          {PAKETLER.map((p) => (
+            <button type="button" key={p.id} onClick={() => setPaket(p.id)} className="text-left rounded-xl border-2 p-3"
+              style={paket === p.id ? { borderColor: RENK.turuncu, backgroundColor: "#FFF7F0" } : { borderColor: "#E5E7EB", backgroundColor: "#fff" }}>
+              <span className="block font-black text-sm" style={{ color: RENK.lacivert }}>{p.ad}</span>
+              <span className="block text-sm font-bold" style={{ color: RENK.turkuaz }}>{p.fiyat}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 mt-1">Ücretli paketlerde ödeme sitede alınmaz; ekibimiz sizi arar. <Link href="/ustam/paketler" target="_blank" className="underline">Paket ayrıntıları</Link></p>
+      </div>
+
+      {/* bot tuzağı: insanlar görmez */}
+      <input name="web" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+
       <label className="flex gap-2 items-start text-sm text-gray-600">
         <input type="checkbox" name="kvkk" required className="mt-1" />
-        <span>Bilgilerimin başvurumun değerlendirilmesi ve onaylanırsa profilimin yayınlanması için işlenmesini kabul ediyorum. Telefonum herkese açık gösterilmez. <Link href="/kvkk" target="_blank" className="underline">KVKK Aydınlatma Metni</Link></span>
+        <span>Bilgilerimin işlenmesini ve profilimin Serik Ustam&apos;da yayınlanmasını kabul ediyorum. Telefonum herkese açık gösterilmez. <Link href="/kvkk" target="_blank" className="underline">KVKK Aydınlatma Metni</Link></span>
       </label>
 
       {hata && <p className="text-sm font-semibold text-red-600">{hata}</p>}
       <button disabled={gonderiliyor} className="py-4 rounded-xl text-white font-black text-lg disabled:opacity-60" style={{ backgroundColor: RENK.turkuaz }}>
-        {gonderiliyor ? "Gönderiliyor…" : "Ücretsiz Başvur"}
+        {gonderiliyor ? "Kaydediliyor…" : "Kaydol, Profilimi Yayınla"}
       </button>
     </form>
   );

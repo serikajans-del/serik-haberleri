@@ -19,7 +19,8 @@ create table if not exists public.ustam_ustalar (
   galeri          text[] not null default '{}',
   belge_notu      text not null default '',      -- yeterlilik/ruhsat bilgisi (yalnız yönetici görür)
   dogrulandi      boolean not null default false, -- "Doğrulanmış Usta" rozeti
-  paket           text not null default 'ucretsiz', -- ucretsiz | profesyonel | premium
+  paket           text not null default 'ucretsiz', -- ucretsiz | profesyonel | premium (ödeme alınınca yönetici etkinleştirir)
+  istenen_paket   text not null default 'ucretsiz', -- kayıtta seçilen paket; paket'ten farklıysa ödeme bekliyor
   tamamlanan_is   int not null default 0,
   durum           text not null default 'beklemede', -- beklemede | onayli | reddedildi
   created_at      timestamptz not null default now()

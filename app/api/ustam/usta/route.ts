@@ -2,13 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { isAdminRequest } from "@/lib/admin";
 import { gorselYukle } from "@/lib/ustam-db";
-import { KATEGORILER, MAHALLELER, slugify, telGecerli } from "@/lib/ustam";
+import { yoneticiyeBildir } from "@/lib/bildirim";
+import { KATEGORILER, MAHALLELER, PAKETLER, slugify, telGecerli } from "@/lib/ustam";
 
-// Usta başvurusu (herkese açık) → "beklemede"; yönetici inceleyip onaylayınca profil yayına girer.
+// Usta kaydı (herkese açık) → anında yayında ("onayli"). Doğrulanmış rozeti ve ücretli paket yönetici onayıyla verilir.
+// Ücretli paket istenirse yöneticiye telefon bildirimi gider; paket ödeme alınınca panelden etkinleştirilir.
 export async function POST(req: NextRequest) {
   try {
     const fd = await req.formData();
     const g = (k: string) => (fd.get(k) ?? "").toString().trim();
+    if (g("web")) return NextResponse.json({ success: true, slug: "" }); // bot tuzağı: gizli alan doluysa kaydetme
+    const istenenPaket = PAKETLER.some((p) => p.id === g("paket")) ? g("paket") : "ucretsiz";
     const ad = g("ad"), telefon = g("telefon");
     const kategoriler = fd.getAll("kategoriler").map(String).filter((k) => KATEGORILER.some((x) => x.slug === k)).slice(0, 5);
     const mahalleler = fd.getAll("mahalleler").map(String).filter((m) => MAHALLELER.includes(m));
@@ -30,10 +34,16 @@ export async function POST(req: NextRequest) {
       slug, ad: ad.slice(0, 120), telefon: telefon.slice(0, 20), whatsapp: g("whatsapp").slice(0, 20), kategoriler, mahalleler,
       deneyim_yil: Math.max(0, Math.min(60, parseInt(g("deneyim_yil")) || 0)), isyeri: g("isyeri").slice(0, 200),
       hakkinda: g("hakkinda").slice(0, 800), calisma_saatleri: g("calisma_saatleri").slice(0, 120), foto, galeri,
-      belge_notu: g("belge_notu").slice(0, 300), durum: "beklemede",
+      belge_notu: g("belge_notu").slice(0, 300), durum: "onayli", istenen_paket: istenenPaket,
     }]);
-    if (error) { console.error("usta insert:", error); return NextResponse.json({ error: "Başvuru kaydedilemedi." }, { status: 500 }); }
-    return NextResponse.json({ success: true });
+    if (error) { console.error("usta insert:", error); return NextResponse.json({ error: "Kayıt yapılamadı." }, { status: 500 }); }
+
+    // Bildirim üçüncü taraf servisten geçer: kişisel veri (ad, telefon) GÖNDERİLMEZ, ayrıntı yönetim panelinde
+    if (istenenPaket !== "ucretsiz") {
+      const p = PAKETLER.find((x) => x.id === istenenPaket)!;
+      await yoneticiyeBildir(`Serik Ustam: yeni ${p.ad} talebi`, `Bir usta ${p.ad} paketini seçti (${p.fiyat}). Ayrıntılar ve iletişim bilgisi yönetim panelinde.`, "https://www.serikhaberleri.com/admin/ustam");
+    }
+    return NextResponse.json({ success: true, slug });
   } catch (e) {
     console.error(e); return NextResponse.json({ error: "Beklenmeyen bir hata oluştu." }, { status: 500 });
   }
@@ -48,11 +58,12 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   if (!isAdminRequest(req)) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
-  const { id, durum, dogrulandi, paket } = await req.json();
+  const { id, durum, dogrulandi, paket, istenen_paket } = await req.json();
   const alan: Record<string, unknown> = {};
   if (["beklemede", "onayli", "reddedildi"].includes(durum)) alan.durum = durum;
   if (typeof dogrulandi === "boolean") alan.dogrulandi = dogrulandi;
   if (["ucretsiz", "profesyonel", "premium"].includes(paket)) alan.paket = paket;
+  if (["ucretsiz", "profesyonel", "premium"].includes(istenen_paket)) alan.istenen_paket = istenen_paket;
   const { error } = await supabaseAdmin.from("ustam_ustalar").update(alan).eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });

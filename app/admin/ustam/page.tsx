@@ -20,7 +20,7 @@ export default function AdminUstamPage() {
   const [ustalar, setUstalar] = useState<Usta[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
-  const [ustaFiltre, setUstaFiltre] = useState<"beklemede" | "onayli" | "hepsi">("beklemede");
+  const [ustaFiltre, setUstaFiltre] = useState<"odeme" | "onayli" | "hepsi">("hepsi");
   const router = useRouter();
   const sifre = typeof window !== "undefined" ? localStorage.getItem("admin_password") || "" : "";
   const bas = { "x-admin-password": sifre, "Content-Type": "application/json" };
@@ -61,15 +61,16 @@ export default function AdminUstamPage() {
   };
 
   const yeniSayi = talepler.filter((t) => t.durum === "yeni").length;
-  const bekleyenUsta = ustalar.filter((u) => u.durum === "beklemede").length;
+  const odemeBekliyor = (u: Usta) => u.istenen_paket && u.istenen_paket !== "ucretsiz" && u.istenen_paket !== u.paket;
+  const bekleyenUsta = ustalar.filter(odemeBekliyor).length;
   const istatistik = [
     ["Toplam talep", talepler.length], ["Yeni talep", yeniSayi],
-    ["Yayındaki usta", ustalar.filter((u) => u.durum === "onayli").length], ["Bekleyen başvuru", bekleyenUsta],
+    ["Yayındaki usta", ustalar.filter((u) => u.durum === "onayli").length], ["Ödeme bekleyen", bekleyenUsta],
     ["Doğrulanmış usta", ustalar.filter((u) => u.dogrulandi).length], ["Ücretli paket", ustalar.filter((u) => u.paket !== "ucretsiz").length],
   ] as const;
   const enCokTalep = Object.entries(talepler.reduce<Record<string, number>>((a, t) => ({ ...a, [t.kategori]: (a[t.kategori] ?? 0) + 1 }), {}))
     .sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const gosterilenUsta = ustalar.filter((u) => ustaFiltre === "hepsi" || u.durum === ustaFiltre);
+  const gosterilenUsta = ustalar.filter((u) => ustaFiltre === "hepsi" || (ustaFiltre === "odeme" ? odemeBekliyor(u) : u.durum === ustaFiltre));
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: RENK.zemin }}>
@@ -93,7 +94,7 @@ export default function AdminUstamPage() {
           {(["talepler", "ustalar"] as const).map((s) => (
             <button key={s} onClick={() => setSekme(s)} className="px-4 py-2 text-sm font-bold rounded-lg"
               style={sekme === s ? { backgroundColor: RENK.turkuaz, color: "#fff" } : { backgroundColor: "#fff", color: "#4b5563" }}>
-              {s === "talepler" ? `İş Talepleri${yeniSayi ? ` (${yeniSayi} yeni)` : ""}` : `Ustalar${bekleyenUsta ? ` (${bekleyenUsta} bekliyor)` : ""}`}
+              {s === "talepler" ? `İş Talepleri${yeniSayi ? ` (${yeniSayi} yeni)` : ""}` : `Ustalar${bekleyenUsta ? ` (${bekleyenUsta} ödeme bekliyor)` : ""}`}
             </button>
           ))}
         </div>
@@ -147,10 +148,10 @@ export default function AdminUstamPage() {
         ) : (
           <>
             <div className="flex gap-2 mb-3">
-              {(["beklemede", "onayli", "hepsi"] as const).map((d) => (
+              {(["hepsi", "odeme", "onayli"] as const).map((d) => (
                 <button key={d} onClick={() => setUstaFiltre(d)} className="px-3 py-1.5 text-xs font-bold rounded-lg"
                   style={ustaFiltre === d ? { backgroundColor: RENK.lacivert, color: "#fff" } : { backgroundColor: "#fff", color: "#4b5563" }}>
-                  {d === "beklemede" ? "Bekleyen" : d === "onayli" ? "Yayında" : "Hepsi"}
+                  {d === "odeme" ? `Ödeme bekleyen${bekleyenUsta ? ` (${bekleyenUsta})` : ""}` : d === "onayli" ? "Yayında" : "Hepsi"}
                 </button>
               ))}
             </div>
@@ -169,6 +170,13 @@ export default function AdminUstamPage() {
                             : <span className="font-black" style={{ color: RENK.lacivert }}>{u.ad}</span>}
                           <span className="text-xs text-gray-400">{tarihYaz(u.created_at)}</span>
                         </div>
+                        {odemeBekliyor(u) && (
+                          <div className="flex flex-wrap items-center gap-2 rounded-lg p-2 mb-2" style={{ backgroundColor: "#FFF1E6" }}>
+                            <span className="text-xs font-black" style={{ color: "#9A4A0E" }}>💰 Ödeme bekliyor: {PAKETLER.find((p) => p.id === u.istenen_paket)?.ad} ({PAKETLER.find((p) => p.id === u.istenen_paket)?.fiyat})</span>
+                            <button onClick={() => ustaGuncelle(u.id, { paket: u.istenen_paket })} className="px-2.5 py-1 text-xs font-bold rounded bg-green-600 text-white">Ödeme alındı, paketi aç</button>
+                            <button onClick={() => ustaGuncelle(u.id, { istenen_paket: u.paket })} className="px-2.5 py-1 text-xs font-bold rounded bg-white text-gray-600">Vazgeçti</button>
+                          </div>
+                        )}
                         <p className="text-gray-600">{u.kategoriler.map((k) => kategoriBul(k)?.ad).join(", ")} · {u.mahalleler.join(", ")}</p>
                         <p className="text-gray-600"><a href={`tel:${telTemiz(u.telefon)}`} className="underline">{u.telefon}</a>{u.whatsapp && ` · WA ${u.whatsapp}`}{u.deneyim_yil ? ` · ${u.deneyim_yil} yıl` : ""}{u.isyeri && ` · ${u.isyeri}`}</p>
                         {u.belge_notu && <p className="text-gray-600"><b>Belge:</b> {u.belge_notu}</p>}

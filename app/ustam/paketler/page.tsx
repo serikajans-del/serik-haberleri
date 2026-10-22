@@ -22,8 +22,8 @@ export default function PaketlerSayfasi() {
             <ul className="text-sm text-gray-600 flex flex-col gap-2 flex-1">
               {p.ozellikler.map((o) => <li key={o} className="flex gap-2"><span style={{ color: RENK.turkuaz }}>✓</span>{o}</li>)}
             </ul>
-            <Link href="/ustam/usta-ol" className="mt-6 text-center py-3 rounded-xl font-black text-white" style={{ backgroundColor: p.one ? RENK.turuncu : RENK.lacivert }}>
-              {p.id === "ucretsiz" ? "Ücretsiz Başla" : "Başvur"}
+            <Link href={p.id === "ucretsiz" ? "/ustam/usta-ol" : `/ustam/usta-ol?paket=${p.id}`} className="mt-6 text-center py-3 rounded-xl font-black text-white" style={{ backgroundColor: p.one ? RENK.turuncu : RENK.lacivert }}>
+              {p.id === "ucretsiz" ? "Ücretsiz Başla" : "Bu Paketi Seç"}
             </Link>
           </div>
         ))}

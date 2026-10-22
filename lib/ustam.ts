@@ -47,7 +47,7 @@ export const PAKETLER = [
 export type Usta = {
   id: number; slug: string; ad: string; telefon: string; whatsapp: string; kategoriler: string[]; mahalleler: string[];
   deneyim_yil: number; isyeri: string; hakkinda: string; calisma_saatleri: string; foto: string; galeri: string[];
-  belge_notu: string; dogrulandi: boolean; paket: string; tamamlanan_is: number; durum: "beklemede" | "onayli" | "reddedildi"; created_at?: string;
+  belge_notu: string; dogrulandi: boolean; paket: string; istenen_paket: string; tamamlanan_is: number; durum: "beklemede" | "onayli" | "reddedildi"; created_at?: string;
 };
 
 export type Talep = {
@@ -56,10 +56,10 @@ export type Talep = {
 };
 
 // Herkese açık profilde gösterilecek alanlar (telefon, belge notu gibi bilgiler sızmasın)
-export type AcikUsta = Omit<Usta, "telefon" | "whatsapp" | "belge_notu">;
+export type AcikUsta = Omit<Usta, "telefon" | "whatsapp" | "belge_notu" | "istenen_paket">;
 export function acikUsta(u: Usta): AcikUsta {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { telefon, whatsapp, belge_notu, ...geri } = u;
+  const { telefon, whatsapp, belge_notu, istenen_paket, ...geri } = u;
   return geri;
 }
 
