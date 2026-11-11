@@ -123,6 +123,7 @@ export default function AdminDashboard() {
             )}
           </button>
           <Link href="/admin/ustam" className="px-5 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700">Serik Ustam →</Link>
+          <Link href="/admin/okur" className="px-5 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700">Okur Haberleri →</Link>
         </div>
 
         {/* HABERLER SEKMESİ */}

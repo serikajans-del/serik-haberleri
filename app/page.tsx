@@ -4,6 +4,7 @@ import BreakingNews from "@/components/BreakingNews";
 import MansetSlider from "@/components/MansetSlider";
 import NewsCard from "@/components/NewsCard";
 import AdBanner from "@/components/AdBanner";
+import OkurAnaSayfaKutusu from "@/components/okur/AnaSayfaKutusu";
 import { categories } from "@/lib/news";
 import { getLatestNewsFromDB, getMostReadFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
@@ -85,6 +86,7 @@ export default async function HomePage() {
 
       {/* Kategori bölümleri */}
       <div className="max-w-7xl mx-auto px-4 pb-10">
+        <OkurAnaSayfaKutusu />
         {categoryBlocks.map(({ cat, news }, idx) => (
           <section key={cat.slug} className="mt-12">
             <div className="flex items-end justify-between mb-5">

@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { categories } from "@/lib/news";
 import { getLatestNewsFromDB } from "@/lib/db";
+import { supabaseAdmin } from "@/lib/supabase";
+import { KATEGORILER as OKUR_KATEGORILER, MAHALLELER, mahalleSlug, type Paylasim } from "@/lib/okur";
+import { dizinlenebilir } from "@/lib/okur-sunucu/veri";
 
 export const dynamic = "force-dynamic"; // her istekte veritabanından üretilir: ISR ile yalnızca yayına alımda yenileniyordu, yeni haberler haritaya girmiyordu
 
@@ -25,6 +28,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/reklam`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.2 },
   ];
 
+  // Okur Haberleri: bölüm, kategori ve mahalle sayfaları + dizinlenebilir okur paylaşımları (news-sitemap'e GİRMEZ)
+  let okurPages: MetadataRoute.Sitemap = [];
+  try {
+    okurPages = [
+      { url: `${SITE_URL}/okur`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.8 },
+      { url: `${SITE_URL}/okur/liderler`, lastModified: new Date(), changeFrequency: "daily", priority: 0.5 },
+      ...OKUR_KATEGORILER.map((k) => ({ url: `${SITE_URL}/okur/kategori/${k.slug}`, lastModified: new Date(), changeFrequency: "hourly" as const, priority: 0.7 })),
+      ...MAHALLELER.filter((m) => m !== "Diğer").map((m) => ({ url: `${SITE_URL}/okur/mahalle/${mahalleSlug(m)}`, changeFrequency: "daily" as const, priority: 0.4 })),
+    ];
+    const { data } = await supabaseAdmin.from("meydan_paylasimlar")
+      .select("slug, icerik, fotolar, durum, begeni_sayisi, yorum_sayisi, faydali_sayisi, yayin_at, created_at")
+      .eq("durum", "yayinda").order("yayin_at", { ascending: false }).limit(5000);
+    okurPages.push(...((data ?? []) as Paylasim[]).filter(dizinlenebilir).map((p) => ({
+      url: `${SITE_URL}/okur/konu/${p.slug}`, lastModified: new Date(p.yayin_at ?? p.created_at), changeFrequency: "daily" as const, priority: 0.6,
+    })));
+  } catch {
+    // okur tabloları yoksa yalnız haber sayfaları yayınlanır
+  }
+
   let categoryPages: MetadataRoute.Sitemap = [];
   let newsPages: MetadataRoute.Sitemap = [];
   try {
@@ -48,5 +70,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB erişilemezse statik + kategori sayfaları yayınlanır
   }
 
-  return [...staticPages, ...categoryPages, ...newsPages];
+  return [...staticPages, ...categoryPages, ...newsPages, ...okurPages];
 }

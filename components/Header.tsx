@@ -11,6 +11,7 @@ type WeatherData = {
 } | null;
 
 const utilityLinks = [
+  { label: "Okur Haberleri", href: "/okur" },
   { label: "Serik Ustam", href: "/ustam" },
   { label: "Nöbetçi Eczane", href: "/eczane" },
   { label: "Hava Durumu", href: "/hava-durumu" },
@@ -122,6 +123,9 @@ export default function Header() {
               ))}
               <li className="flex-shrink-0">
                 <Link href="/trend" className="main-nav-link">Trend</Link>
+              </li>
+              <li className="flex-shrink-0">
+                <Link href="/okur" className="main-nav-link">Okur Haberleri</Link>
               </li>
             </ul>
           </nav>
