@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import PaylasimKarti from "@/components/okur/PaylasimKarti";
 import { Avatar } from "@/components/okur/Rumuz";
-import { CINSIYET, tarihYaz } from "@/lib/okur";
+import { CINSIYET, EDITOR_RUMUZ, tarihYaz } from "@/lib/okur";
 import { db } from "@/lib/okur-sunucu/db";
 import { aktifUye } from "@/lib/okur-sunucu/oturum";
 import { ayBilgisi, paylasimlar, uyeGetir } from "@/lib/okur-sunucu/veri";
@@ -25,7 +25,7 @@ export default async function UyeSayfasi({ params }: { params: Promise<{ rumuz: 
     kendi ? db.from("meydan_paylasimlar").select("slug, baslik, durum, red_nedeni").eq("uye_id", u.id).neq("durum", "yayinda").order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
     db.rpc("meydan_ay_puanlari", { p_bas: ay.bas.toISOString(), p_bit: ay.bit.toISOString(), adet: 1000 }),
   ]);
-  const siralama = ((puan.data ?? []) as { uye_id: number; puan: number }[]);
+  const siralama = ((puan.data ?? []) as { uye_id: number; rumuz: string; puan: number }[]).filter((x) => x.rumuz !== EDITOR_RUMUZ);
   const sira = siralama.findIndex((x) => x.uye_id === u.id);
   const c = CINSIYET[u.cinsiyet];
   const toplamBegeni = liste.reduce((a, p) => a + p.begeni_sayisi, 0);

@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "./db";
-import type { AyKazanani, Lider, Paylasim, Yorum } from "../okur";
+import { EDITOR_RUMUZ, type AyKazanani, type Lider, type Paylasim, type Yorum } from "../okur";
 
 const PAYLASIM_ALANLARI = "*, uye:meydan_uyeler!meydan_paylasimlar_uye_id_fkey(rumuz, cinsiyet)";
 const tekil = <T,>(x: T | T[] | null | undefined): T | null => (Array.isArray(x) ? x[0] ?? null : x ?? null);
@@ -65,9 +65,10 @@ export async function etkilesimDurumu(paylasimId: number, uyeId?: number) {
 
 export async function liderler(fark = 0, adet = 5): Promise<Lider[]> {
   const { bas, bit } = ayBilgisi(fark);
-  const { data, error } = await db.rpc("meydan_ay_puanlari", { p_bas: bas.toISOString(), p_bit: bit.toISOString(), adet });
+  const { data, error } = await db.rpc("meydan_ay_puanlari", { p_bas: bas.toISOString(), p_bit: bit.toISOString(), adet: adet + 1 });
   if (error || !data) return [];
-  return (data as Lider[]).map((l) => ({ ...l, puan: Number(l.puan), begeni: Number(l.begeni) }));
+  return (data as Lider[]).filter((l) => l.rumuz !== EDITOR_RUMUZ).slice(0, adet)
+    .map((l) => ({ ...l, puan: Number(l.puan), begeni: Number(l.begeni) }));
 }
 
 // Geçmiş ayların kazananları. Biten ayın kazananı ilk kez istendiğinde hesaplanıp kalıcı yazılır

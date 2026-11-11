@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CINSIYET } from "@/lib/okur";
+import { CINSIYET, EDITOR_RUMUZ } from "@/lib/okur";
 
 const RENKLER = ["#D90000", "#1D4ED8", "#B45309", "#7C3AED", "#BE185D", "#0F766E", "#C2410C", "#334155"];
 export const avatarRengi = (r: string) => RENKLER[[...r].reduce((a, c) => a + c.charCodeAt(0), 0) % RENKLER.length];
@@ -19,6 +19,7 @@ export default function Rumuz({ rumuz, cinsiyet, baglantisiz = false, boyut = 26
       <Avatar rumuz={rumuz} boyut={boyut} />
       <span className="font-semibold text-murekkep truncate max-w-36">{rumuz}</span>
       {c?.ikon && <span className="font-bold" style={{ color: c.renk }} title={c.ad} aria-label={c.ad}>{c.ikon}</span>}
+      {rumuz === EDITOR_RUMUZ && <span className="cip !text-[10px] !py-0 !px-1.5 bg-ana text-white" title="Serik Haberleri editörü">✓ Editör</span>}
     </>
   );
   if (baglantisiz) return <span className="flex items-center gap-1.5 min-w-0">{ic}</span>;

@@ -3,6 +3,9 @@
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.serikhaberleri.com").replace(/\/$/, "");
 export const SITE_ADI = "Okur Haberleri";
+// Serik Haberleri editör hesabı: paylaşımları "Editör" rozetiyle görünür, Ayın Liderleri yarışına katılmaz.
+// (Kayıtta "serikhaberleri" içeren rumuzlar yasak; bu ad başkasına verilemez.)
+export const EDITOR_RUMUZ = "SerikHaberleri";
 export const SLOGAN = "Serik'te olup biten, Seriklilerden";
 
 export type Kategori = { slug: string; ad: string; kisa: string; ikon: string; renk: string; zemin: string; aciklama: string; ipucu: string };

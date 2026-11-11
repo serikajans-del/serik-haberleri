@@ -11,12 +11,27 @@ import Bildir from "./Bildir";
 import FotoGaleri from "./FotoGaleri";
 import Paylastir from "./Paylastir";
 import Goruntulenme from "./Goruntulenme";
-import { SIKAYET_TURU, SITE_URL, gunYaz, kategoriBul, mahalleSlug, ozet, tarihYaz } from "@/lib/okur";
+import { EDITOR_RUMUZ, SIKAYET_TURU, SITE_URL, gunYaz, kategoriBul, mahalleSlug, ozet, tarihYaz } from "@/lib/okur";
 import { dizinlenebilir, etkilesimDurumu, paylasimGetir, paylasimlar, yorumlar } from "@/lib/okur-sunucu/veri";
 import { aktifUye } from "@/lib/okur-sunucu/oturum";
 
 export const dynamic = "force-dynamic";
 const getir = cache(paylasimGetir);
+
+// Metindeki http(s) bağlantılarını tıklanabilir yapar; site dışı bağlantılar nofollow ugc
+function baglantili(metin: string) {
+  return metin.split(/(https?:\/\/[^\s<>"]+)/g).map((parca, i) => {
+    if (!/^https?:\/\//.test(parca)) return parca;
+    const url = parca.replace(/[.,;:!?)]+$/, "");
+    const kalan = parca.slice(url.length);
+    const ic = /^https:\/\/(www\.)?serikhaberleri\.com\//.test(url);
+    return (
+      <span key={i}>
+        <a href={url} className="text-ana font-semibold underline break-all" {...(ic ? {} : { target: "_blank", rel: "nofollow ugc noopener" })}>{url.replace(/^https?:\/\/(www\.)?/, "")}</a>{kalan}
+      </span>
+    );
+  });
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const p = await getir((await params).slug);
@@ -121,9 +136,11 @@ export default async function KonuSayfasi({ params }: { params: Promise<{ slug: 
               )}
             </dl>
 
-            <div className="metin-icerik text-[1.02rem] text-slate-800 mt-5">{p.icerik}</div>
+            <div className="metin-icerik text-[1.02rem] text-slate-800 mt-5">{baglantili(p.icerik)}</div>
             <p className="text-xs text-soluk mt-5 rounded-xl bg-zemin px-3.5 py-2.5">
-              ℹ️ Bu bir <b>okur paylaşımıdır</b>; içerik paylaşan kişiye aittir ve Serik Haberleri editörlerince doğrulanmamıştır. Hatalı veya hak ihlali içeriyorsa “Bildir” ile haber ver.
+              {p.uye?.rumuz === EDITOR_RUMUZ
+                ? <>ℹ️ Bu paylaşım <b>Serik Haberleri editörü</b> tarafından yapılmıştır. Yorumlar okurlara aittir.</>
+                : <>ℹ️ Bu bir <b>okur paylaşımıdır</b>; içerik paylaşan kişiye aittir ve Serik Haberleri editörlerince doğrulanmamıştır. Hatalı veya hak ihlali içeriyorsa “Bildir” ile haber ver.</>}
             </p>
 
             {p.durum === "yayinda" && (
