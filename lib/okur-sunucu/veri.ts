@@ -95,7 +95,7 @@ export async function uyeGetir(rumuz: string) {
 export async function genelSayilar() {
   const [p, u, c] = await Promise.all([
     db.from("meydan_paylasimlar").select("*", { count: "exact", head: true }).eq("durum", "yayinda"),
-    db.from("meydan_uyeler").select("*", { count: "exact", head: true }),
+    db.from("meydan_uyeler").select("*", { count: "exact", head: true }).neq("rumuz", EDITOR_RUMUZ),
     db.from("meydan_paylasimlar").select("*", { count: "exact", head: true }).eq("durum", "yayinda").eq("cozum", "cozuldu"),
   ]);
   return { paylasim: p.count ?? 0, uye: u.count ?? 0, cozulen: c.count ?? 0 };
