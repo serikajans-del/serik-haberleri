@@ -142,11 +142,64 @@ for (const e of eksi) {
   adaylar.push({ baslik: `[Ekşi gündem] ${e.konu}`, url: e.url, dil: "tr", site_sayisi: 0, siteler: ["Ekşi Sözlük"], yas_saat: null,
     on_puan: puan, etiket, gonderildi: false, diger: [], not: "Haber kaynağını WebSearch ile bul; Ekşi tek başına kaynak değildir." });
 }
+// ---- Reddit (resmî API, uygulama anahtarıyla; anahtar yoksa atlanır) --------------------------------------
+// Kimliksiz istekleri Reddit 403/429 ile reddediyor; engeli aşmaya çalışılmaz. .env.local: REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET.
+// "Patlamak üzere" ölçüsü HIZ: saat başına oy ve yorum. rising = yeni ve hızla yükselen, top?t=day = günün patlamış gönderileri.
+const REDDIT_SUB = {
+  tuhaf: ["nottheonion", "interestingasfuck", "Damnthatsinteresting", "BeAmazed", "nextfuckinglevel", "mildlyinteresting", "Weird", "interesting"],
+  duygu: ["UpliftingNews", "MadeMeSmile", "HumansBeingBros", "AnimalsBeingBros", "aww"],
+  bilim: ["science", "Futurology", "gadgets", "EverythingScience", "space"],
+  turkiye: ["Turkey", "Antalya"],
+};
+const reddit = { durum: "anahtar yok", sayi: 0 };
+if (process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET) {
+  const RUA = { "User-Agent": "windows:serikmerkez-viral-radar:v1.1 (personal news radar)" };
+  try {
+    const t = await fetch("https://www.reddit.com/api/v1/access_token", { method: "POST", signal: AbortSignal.timeout(15000),
+      headers: { ...RUA, Authorization: "Basic " + Buffer.from(`${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`).toString("base64"),
+        "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" }).then((r) => r.json());
+    if (!t.access_token) throw new Error(t.error || "token alınamadı");
+    const H = { ...RUA, Authorization: `Bearer ${t.access_token}` };
+    const istek = Object.entries(REDDIT_SUB).flatMap(([grup, subs]) => subs.flatMap((s) => ["rising?limit=25", "top?t=day&limit=15"].map((yol) =>
+      fetch(`https://oauth.reddit.com/r/${s}/${yol}&raw_json=1`, { headers: H, signal: AbortSignal.timeout(15000) })
+        .then((r) => (r.ok ? r.json() : null)).then((j) => (j?.data?.children || []).map((c) => ({ ...c.data, grup, liste: yol.split("?")[0] })))
+        .catch(() => []))));
+    const gonder = new Map();
+    for (const p of (await Promise.all(istek)).flat()) {
+      if (p.over_18 || p.stickied || p.spoiler || gonder.has(p.id)) continue;
+      const yas = Math.max((SIMDI / 1000 - p.created_utc) / 3600, 0.25);
+      if (yas > 30) continue;
+      const hiz = p.score / yas, yhiz = p.num_comments / yas;
+      // eşikler: rising'de küçük ama hızlı, top'ta büyük
+      if (p.liste === "rising" ? hiz < 150 && yhiz < 30 : p.score < 3000 && p.num_comments < 400) continue;
+      gonder.set(p.id, { ...p, yas, hiz, yhiz });
+    }
+    reddit.durum = "tamam"; reddit.sayi = gonder.size;
+    for (const p of gonder.values()) {
+      const dis = p.url_overridden_by_dest && !/reddit\.com|redd\.it|imgur|v\.redd/.test(p.url_overridden_by_dest) ? p.url_overridden_by_dest : null;
+      const metin = `${p.title} ${p.link_flair_text || ""}`;
+      let puan = 0; const etiket = [`reddit:r/${p.subreddit}`, `↑${Math.round(p.hiz)}/sa`, `💬${Math.round(p.yhiz)}/sa`];
+      for (const [re, pp, e] of [...ARTI, ...EKSI]) if (re.test(metin)) { puan += pp; etiket.push(e); }
+      puan += p.hiz >= 2000 ? 5 : p.hiz >= 800 ? 4 : p.hiz >= 300 ? 3 : 2;                       // oy hızı
+      puan += p.yhiz >= 300 ? 3 : p.yhiz >= 100 ? 2 : p.yhiz >= 30 ? 1 : 0;                        // yorum hızı (tartışma)
+      if (p.liste === "rising") { puan += 2; etiket.push("yükselişte"); }                          // henüz patlamadı: erken yakala
+      if (p.upvote_ratio && p.upvote_ratio < 0.8) { puan -= 2; etiket.push("tartışmalı"); }
+      if (p.grup === "turkiye") puan += 2;
+      if (!dis) etiket.push("haber bağlantısı yok");
+      if (gorulenW.some((g) => [...g].filter((x) => kelime(p.title).has(x)).length >= 3)) continue;
+      adaylar.push({ baslik: `[Reddit r/${p.subreddit}] ${p.title}`, url: dis || `https://www.reddit.com${p.permalink}`, dil: "en",
+        site_sayisi: 0, siteler: ["Reddit"], yas_saat: Math.round(p.yas * 10) / 10, on_puan: Math.round(puan * 10) / 10, etiket, gonderildi: false,
+        reddit: { oy: p.score, yorum: p.num_comments, oran: p.upvote_ratio, liste: p.liste, gonderi: `https://www.reddit.com${p.permalink}` },
+        diger: [], not: dis ? "Haber bağlantısı var; ikinci kaynakla doğrula." : "Reddit gönderisi tek başına kaynak değildir: olayı haber sitesinde bul, bulamazsan ele." });
+    }
+  } catch (e) { reddit.durum = `hata: ${e.message}`; }
+}
+
 adaylar.sort((a, b) => b.on_puan - a.on_puan).splice(60);
 
 writeFileSync(`${KOK}/aday.json`, JSON.stringify({ zaman: new Date().toISOString(), ham: ham.length, kume: kumeler.length,
-  trendler: trendler.slice(0, 20).map(({ konu, hacim }) => ({ konu, hacim })), eksi: eksi.slice(0, 20), adaylar }, null, 2));
-console.log(`ham ${ham.length} · küme ${kumeler.length} · aday ${adaylar.length} · trend ${trendler.length} · ekşi ${eksi.length}`);
+  trendler: trendler.slice(0, 20).map(({ konu, hacim }) => ({ konu, hacim })), eksi: eksi.slice(0, 20), reddit, adaylar }, null, 2));
+console.log(`ham ${ham.length} · küme ${kumeler.length} · aday ${adaylar.length} · trend ${trendler.length} · ekşi ${eksi.length} · reddit ${reddit.durum} (${reddit.sayi})`);
 for (const a of adaylar.slice(0, 25))
   console.log(`${String(a.on_puan).padStart(5)} | ${a.dil} | ${a.site_sayisi} site | ${a.yas_saat}s | ${a.etiket.join(",")} | ${a.baslik.slice(0, 95)}`);
 console.log("TRENDLER:", trendler.slice(0, 12).map((t) => `${t.konu} (${t.hacim}+)`).join(" · "));

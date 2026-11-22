@@ -26,10 +26,16 @@ Kullanıcı bir gönderiye yanıt yazdıysa (ör. "paylaştım 14B beğeni 300 y
 Gerçek beğeni/yorum sayısı yazdıysa raporun sonuna "veri.md'ye eklenecek: …" satırı koy.
 
 ### 1. Sinyal topla (otomatik, 5 sn)
-`node masa/radar/sinyal.mjs` → `masa/radar/aday.json` + ekranda en iyi 25.
+`node --env-file=.env.local masa/radar/sinyal.mjs` → `masa/radar/aday.json` + ekranda en iyi 25.
 29 Google Haberler araması (TR + EN, "görenler şaşırdı", "rekor", "mucit", "bizarre", "world's first"…), UPI Odd News, Oddity Central, Guinness, Bored Panda,
-New Atlas, ScienceAlert, AA/Hürriyet yaşam, NTV dünya + Google Trendler TR. Aynı olayı yazan siteler kümelenir; `site_sayisi` = yayılma, `on_puan` = ham sinyal.
+New Atlas, ScienceAlert, AA/Hürriyet yaşam, NTV dünya + Google Trendler TR + **Reddit** (resmî API, anahtar varsa). Aynı olayı yazan siteler kümelenir; `site_sayisi` = yayılma, `on_puan` = ham sinyal.
 Ön puan bir **pusula**, karar değil: siyaset/spor/magazin/piyasa sızmışsa ele.
+
+**Reddit adayları** (`[Reddit r/…]`, kullanıcı 22 Kas: "patlamış ya da patlamak üzere, ani yorum/beğeni alan konuları da ekleyelim"):
+- Ölçü HIZDIR: `↑N/sa` saat başı oy, `💬N/sa` saat başı yorum. `yükselişte` = rising listesinde, henüz patlamadı → **erken yakalama fırsatı**, Türkiye'de kimse yazmadan önce.
+- Reddit gönderisi KAYNAK DEĞİLDİR, konu ipucudur. Gönderi bir habere bağlanıyorsa o haberi oku + ikinci kaynak bul; "haber bağlantısı yok" ise olayı haber sitesinde ara, bulamazsan ELE (video/fotoğraf sahte ya da eski olabilir).
+- Reddit fotoğraf/videosunu kullanma önerme (telif + kimlik); görsel promptu her zamanki gibi canlandırma/detay karesi.
+- `tartışmalı` (oy oranı < 0,8) konular genelde siyaset/kavga: dikkat. Türkçe açıklamada "Reddit'te X saatte Y bin oy aldı" gibi sosyal kanıtı kullanabilirsin (rakam aday.json'daki `reddit.oy/yorum`dan).
 
 ### 2. Boşluk doldur (WebSearch, 3–6 arama, hedefli)
 Sinyalin göremediği yerleri tara; her turda farklı bir "av sahası" seç (saat dilimine göre döndür):
@@ -137,6 +143,7 @@ Aynı satırı kaydet: `node --env-file=.env.local masa/radar/radar.mjs nabiz "<
 kullanıcıya "🟢 Radar çalışıyor" mesajı gider (sessizlik arıza sanılmasın).
 
 ## Bilinen sınırlar
+- Reddit yalnız `.env.local`'de REDDIT_CLIENT_ID ve REDDIT_CLIENT_SECRET varsa çalışır (resmî API, script uygulaması). Yoksa "reddit anahtar yok" yazar ve atlanır; kimliksiz erişim/engeli aşma DENEME.
 - Ekşi Sözlük otomatik istekleri engelliyor; sinyal.mjs denemeye devam eder ama genelde boş döner. Engeli aşmaya ÇALIŞMA (başka araç, başlık oyunu yok). Ekşi gündemini gerekirse WebSearch ile gör.
 - Düğme geri bildirimi tur başında okunur (en geç 30 dk sonra "✔️ Kaydedildi"ye döner).
 
