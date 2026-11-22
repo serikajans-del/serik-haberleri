@@ -96,7 +96,7 @@ fc += (
     f"[g]subtitles={W}/yazi.ass:fontsdir='C{BS}:/Windows/Fonts',fade=t=in:d=0.8,fade=t=out:st={DUR - 1.0:.2f}:d=1.0,format=yuv420p[v];"
     f"[{n}:a]aresample=48000,highpass=f=70,acompressor=threshold=-18dB:ratio=2.5:attack=5:release=150,volume=1.5,apad,asplit=2[ses][anahtar];"
     f"[{n + 1}:a]aresample=48000,volume=0.28[muz];[muz][anahtar]sidechaincompress=threshold=0.03:ratio=3:attack=40:release=600[muzk];"
-    f"[ses][muzk]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000,afade=t=out:st={DUR - 1.5:.2f}:d=1.5[a]"
+    f"[ses][muzk]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000:async=1,asetpts=N/SR/TB,aresample=48000,afade=t=out:st={DUR - 1.5:.2f}:d=1.5[a]"
 )
 run(["ffmpeg", "-v", "error", "-y", *girdi, "-i", f"{W}/anlatim.mp3", "-i", f"{W}/muzik.wav", "-loop", "1", "-t", str(DUR), "-i", f"{W}/golge.png", "-filter_complex", fc,
      "-map", "[v]", "-map", "[a]", "-t", str(DUR), "-c:v", "libx264", "-preset", "medium", "-crf", "19",

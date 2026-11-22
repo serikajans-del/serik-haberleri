@@ -1,0 +1,4 @@
+@echo off
+title Serik Merkez Haber Botu
+cd /d "C:\Users\MONSTER\Desktop\yapayzeka\serik-haberleri"
+node --env-file=.env.local bot/auto-haber.mjs --daemon >> bot/bot.log 2>&1

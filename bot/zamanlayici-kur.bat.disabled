@@ -1,0 +1,13 @@
+@echo off
+set "BOT_RUNNER=C:\Users\MONSTER\Desktop\yapayzeka\serik-haberleri\bot\calistir.bat"
+
+echo Serik Merkez Haber Botu zamanlanmis gorevi kuruluyor...
+schtasks /create /tn "SerikMerkezHaberBot" /tr "\"%BOT_RUNNER%\"" /sc minute /mo 15 /f
+
+if errorlevel 1 (
+  echo Gorev kurulurken hata olustu. Dosyayi Yonetici olarak calistirin.
+  exit /b 1
+)
+
+schtasks /run /tn "SerikMerkezHaberBot"
+echo Bot her 15 dakikada bir calisacak sekilde kuruldu.

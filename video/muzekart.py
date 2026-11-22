@@ -114,7 +114,7 @@ fc += (
     "[0:a]highpass=f=80,acompressor=threshold=-20dB:ratio=3:attack=5:release=120,volume=1.8,asplit=2[ses][anahtar];"
     f"[{mz}:a]aresample=48000,volume=0.22[muz];[muz][anahtar]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=300[muzk];"
     f"[{ef}:a]aresample=48000,volume=0.75,pan=stereo|c0=c0|c1=c0[efk];"
-    f"[ses][muzk][efk]amix=inputs=3:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000,afade=t=out:st={DUR - 0.5:.2f}:d=0.5[a]"
+    f"[ses][muzk][efk]amix=inputs=3:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000:async=1,asetpts=N/SR/TB,aresample=48000,afade=t=out:st={DUR - 0.5:.2f}:d=0.5[a]"
 )
 run(["ffmpeg", "-v", "error", "-y", *girdi, "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", str(DUR),
      "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart",

@@ -1,0 +1,3 @@
+@echo off
+cd /d "C:\Users\MONSTER\Desktop\yapayzeka\serik-haberleri"
+node --env-file=.env.local bot/auto-haber.mjs >> bot/bot.log 2>&1

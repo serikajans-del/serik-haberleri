@@ -72,7 +72,7 @@ fc = ("[0:v]subtitles=yazi.ass:fontsdir='C" + BS + ":/Windows/Fonts',fade=t=in:d
       "[0:a]highpass=f=90,acompressor=threshold=-20dB:ratio=3:attack=5:release=120,volume=2.2,asplit=2[ses][anahtar];"
       "[1:a]aresample=48000,volume=0.55[muz];"
       "[muz][anahtar]sidechaincompress=threshold=0.03:ratio=8:attack=15:release=260[muzk];"
-      "[ses][muzk]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[a]")
+      "[ses][muzk]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000:async=1,asetpts=N/SR/TB,aresample=48000[a]")
 run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", "liste.txt", "-i", "muzik.wav", "-filter_complex", fc,
      "-map", "[v]", "-map", "[a]", "-t", f"{TOPLAM:.2f}", "-c:v", "libx264", "-preset", "medium", "-crf", "19",
      "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "../karsu-gross-reklam.mp4"], cwd=W)

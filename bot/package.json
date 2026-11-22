@@ -5,8 +5,9 @@
   "description": "Serik Haberleri otomatik haber botu",
   "main": "auto-haber.mjs",
   "scripts": {
-    "start": "node auto-haber.mjs",
-    "test": "node auto-haber.mjs --test"
+    "start": "node --env-file=../.env.local auto-haber.mjs",
+    "test": "node --test haber-filtre.test.mjs",
+    "test:integration": "node --env-file=../.env.local auto-haber.mjs --test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

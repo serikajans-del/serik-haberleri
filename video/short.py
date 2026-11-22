@@ -63,7 +63,7 @@ open(f"{W}/short.ass", "w", encoding="utf-8").write(ass)
 print("altyazı", len(out))
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", "short.txt",
     "-vf", "subtitles=short.ass:fontsdir='C\\:/Windows/Fonts',fade=t=in:d=0.3,format=yuv420p",
-    "-af", "loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000",
+    "-af", "loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000:async=1,asetpts=N/SR/TB,aresample=48000",
     "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart",
     "../umit-uysal-chp-serik-short.mp4"], check=True, cwd=W)
 print("bitti", sum(b - a for a, b, _ in SEGS))

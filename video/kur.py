@@ -73,7 +73,7 @@ fc = (
     "[v1][3:v]overlay=0:0:enable='between(t,0.6,8.6)'[v2];"
     f"[v2][4:v]overlay=0:0:enable='between(t,{GIRIS+0.6},{GIRIS+6.6})'[v3];"
     "[v3]subtitles=altyazi.ass:fontsdir='C\\:/Windows/Fonts',fade=t=in:d=0.4,format=yuv420p[v4];"
-    "[a0]loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[a1];"
+    "[a0]loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000:async=1,asetpts=N/SR/TB,aresample=48000[a1];"
     "[5:v]scale=1920:1080,fps=30,format=yuv420p,fade=t=in:d=0.4,fade=t=out:st=3.4:d=0.6[kv];"
     "[v4][a1][kv][6:a]concat=n=2:v=1:a=1[v][a]"
 )
