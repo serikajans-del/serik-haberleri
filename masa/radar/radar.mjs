@@ -80,6 +80,48 @@ function mesaj(h, i, n) {
   return satir.filter((x) => x !== null).join("\n");
 }
 
+// Kalite kapısı: RADAR.md kurallarının ölçülebilir kısmı. Hata varsa HİÇBİR ŞEY gönderilmez, tur düzeltir.
+const kelimeSay = (s = "") => s.replace(/\*\*/g, "").trim().split(/\s+/).filter(Boolean).length;
+function kontrol(tur) {
+  const hata = [], uyari = [];
+  const h = tur?.haberler || [];
+  if (h.length > 3) hata.push(`turda ${h.length} haber var, en fazla 3`);
+  h.forEach((x, i) => {
+    const ad = `#${i + 1} ${x.baslik || x.anahtar || "?"}`;
+    for (const a of ["anahtar", "baslik", "kanca", "aciklama", "gorsel_prompt", "puan", "kategori", "tetik", "zaman"])
+      if (x[a] === undefined || x[a] === null || x[a] === "") hata.push(`${ad}: "${a}" boş`);
+    if (+x.puan < 11) hata.push(`${ad}: puan ${x.puan} < 11 (gönderim eşiği)`);
+    for (const [alan, k] of [["kanca", x.kanca], ["kanca_b", x.kanca_b]]) {
+      if (!k) continue;
+      const n = kelimeSay(k);
+      if (n < 14 || n > 34) hata.push(`${ad}: ${alan} ${n} kelime (hedef 18–28)`); else if (n < 18 || n > 28) uyari.push(`${ad}: ${alan} ${n} kelime (hedef 18–28)`);
+      if (!/\*\*.+?\*\*/.test(k)) hata.push(`${ad}: ${alan} içinde **kalın** kısım yok`);
+      if (/!|\b(şok|flaş|bomba)\b/i.test(k)) hata.push(`${ad}: ${alan} ünlem/şok/flaş içeriyor`);
+      if (/\?\s*$/.test(k.replace(/\*/g, ""))) hata.push(`${ad}: ${alan} soru ile bitiyor`);
+    }
+    if (!x.kanca_b) uyari.push(`${ad}: kanca_b yok (A/B önerilir)`);
+    if (x.aciklama && !/\?/.test(x.aciklama)) hata.push(`${ad}: açıklamada yorum sorusu yok`);
+    const etiket = (x.aciklama || "").match(/#[\p{L}\p{N}_]+/gu) || [];
+    if (etiket.length < 3 || etiket.length > 7) hata.push(`${ad}: açıklamada ${etiket.length} etiket (4–6)`);
+    for (const [alan, p] of [["gorsel_prompt", x.gorsel_prompt], ["gorsel_prompt_b", x.gorsel_prompt_b]]) {
+      if (!p) continue;
+      if (!/4:5/.test(p)) hata.push(`${ad}: ${alan} 4:5 demiyor`);
+      if (!/no text/i.test(p) || !/no logo/i.test(p)) hata.push(`${ad}: ${alan} "no text, no logos" yok`);
+      if (!/(seen from behind|face[s]? (turned away|out of frame|hidden|not visible)|no faces|no recognizable|hands only)/i.test(p)) hata.push(`${ad}: ${alan} yüz/kimlik yasağını belirtmiyor`);
+      if (p.split(/\s+/).length < 45) uyari.push(`${ad}: ${alan} kısa (${p.split(/\s+/).length} kelime) — 8 katmanı içeriyor mu?`);
+      if (/[çğışöüÇĞİŞÖÜ]/.test(p)) uyari.push(`${ad}: ${alan} Türkçe karakter içeriyor (İngilizce olmalı)`);
+    }
+    if (!x.gorsel_prompt_b) uyari.push(`${ad}: gorsel_prompt_b (detay karesi) yok`);
+    const kay = (x.kaynaklar || []).filter((k) => k.url);
+    if (!kay.length) hata.push(`${ad}: bağlantılı kaynak yok`);
+    else if (kay.length < 2 && !/birincil|tek kaynak/i.test(x.risk || "")) hata.push(`${ad}: tek kaynak; ikinci kaynak bul ya da risk'e "Tek kaynak (birincil: …)" yaz`);
+    if (kay.some((k) => /news\.google\.com/.test(k.url))) uyari.push(`${ad}: kaynak Google Haberler bağlantısı; masa/oku.mjs ile asıl adrese çevir`);
+  });
+  const kat = h.map((x) => x.kategori);
+  if (new Set(kat).size < kat.length) uyari.push(`aynı kategoriden birden çok haber: ${kat.join(", ")}`);
+  return { hata, uyari };
+}
+
 // Uzun mesajı Telegram sınırına göre böl (4096); düğmeler son parçada.
 function parcala(metin, sinir = 3900) {
   if (metin.length <= sinir) return [metin];
@@ -103,6 +145,9 @@ if (komut === "deneme") {
 } else if (komut === "gonder") {
   const tur = oku(arg || `${KOK}/tur.json`, null);
   if (!tur?.haberler?.length) { console.log("Gönderilecek haber yok"); process.exit(0); }
+  const { hata, uyari } = kontrol(tur);
+  for (const u of uyari) console.log("UYARI:", u);
+  if (hata.length) { for (const e of hata) console.log("HATA:", e); console.log("KALİTE KAPISI KALDI — hiçbir şey gönderilmedi; tur.json'u düzelt ve tekrar çalıştır."); process.exit(1); }
   const yeni = tur.haberler.filter((h) => !gorulduMu(h.anahtar));
   if (!yeni.length) { console.log("Hepsi daha önce gönderilmiş"); process.exit(0); }
   const d = oku(DURUM, { sayac: 0, offset: 0 });
@@ -122,7 +167,28 @@ if (komut === "deneme") {
     isaretle({ no, mesaj_id: son.message_id, anahtar: h.anahtar, baslik: h.baslik, kategori: h.kategori, tetik: h.tetik, puan: h.puan, gonderildi: true });
     console.log("GÖNDERİLDİ", no, h.baslik);
   }
+  d.son_gonderim = Date.now();
   kaydet(DURUM, d);
+} else if (komut === "kontrol") {
+  const { hata, uyari } = kontrol(oku(arg || `${KOK}/tur.json`, {}));
+  for (const u of uyari) console.log("UYARI:", u);
+  for (const e of hata) console.log("HATA:", e);
+  console.log(hata.length ? "KALDI" : "GEÇTİ");
+  process.exit(hata.length ? 1 : 0);
+} else if (komut === "nabiz") {
+  // Her turun sonunda çağrılır: tur kaydı tutar; gündüz 3 saattir hiçbir şey gönderilmediyse kullanıcıya "çalışıyorum" der,
+  // böylece sessizlik "radar durdu" diye anlaşılmaz.
+  const d = oku(DURUM, { sayac: 0, offset: 0 });
+  const rapor = String(arg || "").slice(0, 600);
+  writeFileSync(`${KOK}/log.txt`, `${new Date().toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" })} ${rapor}\n`, { flag: "a" });
+  const saat = +new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul", hour: "numeric", hour12: false });
+  const sessiz = Date.now() - Math.max(d.son_gonderim || 0, d.son_nabiz || 0) > 3 * 36e5;
+  if (sessiz && saat >= 9 && saat <= 23) {
+    await tg("sendMessage", { chat_id: CHAT, disable_web_page_preview: true,
+      text: `🟢 Radar çalışıyor — son 3 saatte 11/18 eşiğini geçen haber çıkmadı, dolgu göndermiyorum.\n${rapor}` });
+    d.son_nabiz = Date.now(); kaydet(DURUM, d);
+    console.log("NABIZ GÖNDERİLDİ");
+  } else console.log("nabız kaydedildi");
 } else if (komut === "geri") {
   // Düğmeler ve gönderilere verilen yanıtlar ("paylaştım 12B beğeni 340 yorum" gibi) → geribildirim.json
   const d = oku(DURUM, { sayac: 0, offset: 0 });
@@ -137,7 +203,12 @@ if (komut === "deneme") {
       const k = bul((x) => String(x.no) === no);
       const ad = { p: "paylaşıldı", i: "beğenildi", z: "zayıf" }[tur] || tur;
       geri.push({ zaman: Date.now(), tur: ad, no: +no, anahtar: k?.anahtar, baslik: k?.baslik, kategori: k?.kategori, tetik: k?.tetik, puan: k?.puan });
-      try { await tg("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: "Kaydedildi, radar bunu öğrenecek 👍" }); } catch { /* süresi geçmiş olabilir */ }
+      if (tur === "x") continue; // "kaydedildi" düğmesine tekrar basılması
+      try { await tg("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: "Kaydedildi, radar bunu öğrenecek 👍" }); } catch { /* 30 dk geçmiş olabilir */ }
+      // Düğmeler tur başında okunur (en geç 30 dk); kullanıcı kaydı görsün diye düğmeyi onaya çevir.
+      const m = u.callback_query.message;
+      if (m) try { await tg("editMessageReplyMarkup", { chat_id: m.chat.id, message_id: m.message_id,
+        reply_markup: { inline_keyboard: [[{ text: `✔️ Kaydedildi: ${ad}`, callback_data: "x:0" }]] } }); } catch { /* mesaj çok eski */ }
       say++;
     } else if (u.message?.text && String(u.message.chat.id) === String(CHAT)) {
       const r = u.message.reply_to_message?.message_id;

@@ -7,7 +7,8 @@
 //   node masa/radar/sinyal.mjs --saat 12  → yalnız son 12 saat (varsayılan 36)
 import { readFileSync, writeFileSync, existsSync } from "fs";
 
-const UA = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131 Safari/537.36" };
+const UA = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
+  "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.8", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" }; // Ekşi dil başlığı olmadan boş döner
 const SAAT = Number(process.argv[process.argv.indexOf("--saat") + 1]) || 36;
 const SIMDI = Date.now();
 const KOK = "masa/radar";
@@ -53,7 +54,7 @@ const ARTI = [ // [düzenli ifade, puan, etiket]
 const EKSI = [
   [kok("seçim|milletvekil|bakan |cumhurbaşkan|chp|akp|ak parti|mhp|dem parti|meclis|trump|biden|putin|netanyahu|zelensk|senate|congress|belediye başkan"), -4, "siyaset"],
   [kok("borsa|dolar|euro |faiz|enflasyon|merkez bankası|altın fiyat|bitcoin|stock|nasdaq|ipo|banker|ücretli çalışan|sektör"), -4, "piyasa"],
-  [kok("cinayet|öldürül|bıçak|silahlı|tecavüz|taciz|intihar|murder|stabbed|shooting|killed|rape|suicide"), -5, "şiddet"],
+  [kok("cinayet|öldürül|bıçak|silahlı|tecavüz|taciz|intihar|köprüden atla|hayatını kaybett|cesed|murder|stabbed|shooting|killed|rape|suicide"), -5, "şiddet"],
   [kok("kaza|yangın|deprem|crash|wildfire|earthquake"), -1, "afet"],
   [kok("kampanya|indirim|lansman|tanıtım|sponsor|reklam|discount|coupon|temizlik ve hijyen"), -3, "reklam"],
   [kok("maç|gol|transfer|derbi|teknik direktör|beşiktaş|fenerbahçe|galatasaray|trabzonspor|league|nba|nfl|f1 |podium|quarterback|coach|76ers|cowboys|lsu|playoff|halftime|teammate"), -4, "spor"],
@@ -97,7 +98,7 @@ const trendler = [...trendXml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(([, it]
 }));
 // Ekşi gündem: entry sayısı
 const eksiHtml = await getir("https://eksisozluk.com/basliklar/gundem");
-const eksi = [...eksiHtml.matchAll(/<a\s+href="(\/[^"]+\?a=popular)">([^<]+?)\s*<small>(\d+)<\/small>/g)].map(([, u, b, n]) => ({ konu: ent(b), entry: +n }));
+const eksi = [...eksiHtml.matchAll(/<a\s+href="(\/[^"]+\?a=popular)">([^<]+?)\s*<small>(\d+)<\/small>/g)].map(([, u, b, n]) => ({ konu: ent(b), entry: +n, url: "https://eksisozluk.com" + u.split("?")[0] }));
 
 // ---- kümele (aynı olayı yazan siteler) -------------------------------------------------------------------
 const kumeler = [];
@@ -112,7 +113,7 @@ for (const h of ham) {
 // ---- puanla ----------------------------------------------------------------------------------------------
 const gorulen = existsSync(`${KOK}/gorulen.json`) ? JSON.parse(readFileSync(`${KOK}/gorulen.json`, "utf8")) : [];
 const gorulenW = gorulen.map((g) => kelime(`${g.anahtar} ${g.baslik || ""}`));
-const adaylar = kumeler.map((k) => {
+let adaylar = kumeler.map((k) => {
   const bas = k.uyeler.sort((a, b) => (b.dil === "tr") - (a.dil === "tr") || b.zaman - a.zaman)[0];
   const metin = `${bas.baslik} ${bas.dil === "en" ? "" : bas.ozet} ` + k.uyeler.slice(0, 5).map((u) => u.baslik).join(" ");
   const siteler = [...new Set(k.uyeler.map((u) => u.site))];
@@ -130,7 +131,18 @@ const adaylar = kumeler.map((k) => {
   return { baslik: bas.baslik, url: bas.url, dil: bas.dil, site_sayisi: siteler.length, siteler: siteler.slice(0, 6),
     yas_saat: Math.round(yas * 10) / 10, on_puan: Math.round(puan * 10) / 10, etiket, gonderildi: tekrar,
     diger: k.uyeler.slice(1, 4).map((u) => ({ site: u.site, baslik: u.baslik, url: u.url })) };
-}).filter((a) => !a.gonderildi && a.on_puan > 0).sort((a, b) => b.on_puan - a.on_puan).slice(0, 60);
+}).filter((a) => !a.gonderildi && a.on_puan > 0);
+// Ekşi gündem başlıkları: haber sitelerinde kümesi olmayan ama Türkiye'nin konuştuğu konular (kaynak WebSearch ile bulunur)
+for (const e of eksi) {
+  if (adaylar.some((a) => a.etiket.includes(`ekşi:${e.entry}`))) continue;
+  let puan = e.entry >= 200 ? 4 : e.entry >= 80 ? 3 : 2; const etiket = [`ekşi:${e.entry}`];
+  for (const [re, p, et] of [...ARTI, ...EKSI]) if (re.test(e.konu)) { puan += p; etiket.push(et); }
+  if (!ARTI.some(([re]) => re.test(e.konu))) continue; // viral özelliği olmayan Ekşi başlığını alma
+  if (gorulenW.some((g) => [...g].filter((x) => kelime(e.konu).has(x)).length >= 2)) continue;
+  adaylar.push({ baslik: `[Ekşi gündem] ${e.konu}`, url: e.url, dil: "tr", site_sayisi: 0, siteler: ["Ekşi Sözlük"], yas_saat: null,
+    on_puan: puan, etiket, gonderildi: false, diger: [], not: "Haber kaynağını WebSearch ile bul; Ekşi tek başına kaynak değildir." });
+}
+adaylar.sort((a, b) => b.on_puan - a.on_puan).splice(60);
 
 writeFileSync(`${KOK}/aday.json`, JSON.stringify({ zaman: new Date().toISOString(), ham: ham.length, kume: kumeler.length,
   trendler: trendler.slice(0, 20).map(({ konu, hacim }) => ({ konu, hacim })), eksi: eksi.slice(0, 20), adaylar }, null, 2));

@@ -62,7 +62,9 @@ Bulduğun aday `radar.mjs goruldu "<anahtar>"` → EVET ise ele.
 - **ELE (puan ne olursa olsun):** cinayet/intihar/taciz, çocuk yüzü, ölü/yaralı görüntüsü, kumar/bahis, burç/fal, tek kaynaklı söylenti, hayvana eziyet keyfi, bir kişiyi/grubu aşağılayan mizah.
 
 ### 4. Doğrula (gönderilecek her haber)
-En az **iki bağımsız kaynak** ya da bir birincil kaynak (Guinness, üniversite, kurum, olayı ilk veren ajans). Kaynağı oku (WebSearch özeti yetmiyorsa sayfayı aç).
+En az **iki bağımsız kaynak** ya da bir birincil kaynak (Guinness, üniversite, kurum, olayı ilk veren ajans). Kaynağı oku:
+`node masa/oku.mjs <url1> <url2>` (Google Haberler bağlantısını asıl habere çevirir, başlık/tarih/metni verir). `kaynaklar`a **asıl site adresini** yaz, news.google.com bağlantısını değil.
+Tek kaynak birincil ise `risk` alanına "Tek kaynak (birincil: DHA)" gibi yaz; kalite kapısı bunu arar.
 Rakam, isim, yaş, yer, tarih **kaynaktan**; bulunamayan yazılmaz. İddia/şirket "ilki" → iddia dili. Şaka/aldatmaca → metin bunu açıkça söyler.
 Olay 36 saatten eskiyse ancak hâlâ yayılıyorsa (trend/yeni siteler) gönderilir, `zaman` alanına "(X gün önce, hâlâ konuşuluyor)" yaz.
 
@@ -123,12 +125,20 @@ Her prompt şu 8 katmanı sırayla içerir (İngilizce, tek paragraf):
  "kanca":"… **…**","kanca_b":"… **…**","aciklama":"…\n…\n#Kars #KöyHayatı …","gorsel_prompt":"…","gorsel_prompt_b":"…",
  "zaman":"Akşam 20–22","risk":"Video İHA'ya ait","kaynaklar":[{"ad":"Hürriyet","url":"https://…"},{"ad":"Karar","url":"https://…"}],"foto_url":null}]}
 ```
-→ `node --env-file=.env.local masa/radar/radar.mjs gonder masa/radar/tur.json`
+→ önce `node --env-file=.env.local masa/radar/radar.mjs kontrol masa/radar/tur.json` (KALİTE KAPISI: eşik 11, kanca 18–28 kelime + **kalın**, ünlem/şok yok,
+açıklamada soru + 4–6 etiket, promptta 4:5 + "no text, no logos" + yüz yasağı, bağlantılı kaynak). KALDI ise düzelt; GEÇTİ olunca:
+→ `node --env-file=.env.local masa/radar/radar.mjs gonder masa/radar/tur.json` (gönder de aynı kapıdan geçer; kalırsa hiçbir şey gitmez)
 Her haber ayrı mesaj + "✅ Paylaştım / 🔥 Böyle devam / 👎 Zayıf" düğmeleri; gönderilen 7 gün tekrar gelmez. **Turda en fazla 3, eşik 11/18, uygun yoksa HİÇBİR ŞEY gönderme.**
 Telegram hatası: bir kez yeniden dene; olmazsa `radar.mjs yaz "⚠️ Radar hatası: <kısa neden>"`.
 
-### 7. Rapor
+### 7. Rapor + nabız (HER turda, haber gönderilse de gönderilmese de)
 Tek satır: aday sayısı (sinyal + arama), gönderilenler (başlık + puan + tetik), eşik altında kalan en güçlü 2 aday ve nedeni, uygulanan geri bildirim.
+Aynı satırı kaydet: `node --env-file=.env.local masa/radar/radar.mjs nabiz "<rapor satırı>"` → `masa/radar/log.txt`; gündüz 3 saattir hiçbir şey gitmediyse
+kullanıcıya "🟢 Radar çalışıyor" mesajı gider (sessizlik arıza sanılmasın).
+
+## Bilinen sınırlar
+- Ekşi Sözlük otomatik istekleri engelliyor; sinyal.mjs denemeye devam eder ama genelde boş döner. Engeli aşmaya ÇALIŞMA (başka araç, başlık oyunu yok). Ekşi gündemini gerekirse WebSearch ile gör.
+- Düğme geri bildirimi tur başında okunur (en geç 30 dk sonra "✔️ Kaydedildi"ye döner).
 
 ## Asla
 Kendiliğinden paylaşım · görsel üretmek · gerçek kişi yüzü ya da trajik olayın canlandırma promptu · kaynakta olmayan bilgi · tek kaynaklı söylentiyi kesin yazmak ·
