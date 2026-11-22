@@ -59,7 +59,7 @@ const EKSI = [
   [kok("kaza|yangın|deprem|crash|wildfire|earthquake"), -1, "afet"],
   [kok("kampanya|indirim|lansman|tanıtım|sponsor|reklam|discount|coupon|temizlik ve hijyen"), -3, "reklam"],
   [kok("maç|gol|transfer|derbi|teknik direktör|beşiktaş|fenerbahçe|galatasaray|trabzonspor|league|nba|nfl|f1 |podium|quarterback|coach|76ers|cowboys|lsu|playoff|halftime|teammate"), -4, "spor"],
-  [/(?:^|\s)(?:these|bu)\s+\d+\s|^\d+\s+(?:funny|hilarious|times|people|photos|memes|things)|memes?/i, -4, "liste/mim"],
+  [/(?:^|\s)(?:these|bu)\s+\d+\s|^\d+\s+(?:funny|hilarious|times|people|photos|memes|things)|memes?\b/i, -4, "liste/mim"],
   [kok("evlendi|boşandı|sevgili|aşk yaşıyor|married|dating|rumou?red|kiss|birthday message"), -2, "magazin"],
 ];
 
