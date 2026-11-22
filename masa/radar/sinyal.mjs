@@ -19,9 +19,10 @@ const gn = (q, dil = "tr") => dil === "tr"
   : `https://news.google.com/rss/search?q=${encodeURIComponent(q + " when:1d")}&hl=en-US&gl=US&ceid=US:en`;
 const ARAMALAR_TR = ["sosyal medyada gündem oldu", "görenler şaşırdı", "görenleri şaşırttı", "pes dedirten", "ilginç görüntü",
   "yüzleri güldüren", "duygulandıran", "rekor kırdı", "Guinness", "genç mucit", "buluş geliştirdi", "sıra dışı", "akılalmaz",
-  "viral oldu", "izlenme rekoru", "Antalya ilginç", "Antalya görenler", "köyde ilginç", "dünyada ilk", "Türkiye'de ilk"];
+  "viral oldu", "izlenme rekoru", "Reddit'te", "Reddit kullanıcıları", "Antalya ilginç", "Antalya görenler", "köyde ilginç", "dünyada ilk", "Türkiye'de ilk"];
 const ARAMALAR_EN = ["bizarre", "weird news", "odd news", "Guinness World Records", "goes viral", "world's first",
-  "invention", "scientists discover", "heartwarming", "unusual"];
+  "invention", "scientists discover", "heartwarming", "unusual",
+  "went viral on Reddit", "Redditors"]; // Reddit API kapalı: Reddit'te patlayanı haberleştiren siteler
 const RSS = [
   ["UPI Odd News", "https://rss.upi.com/news/odd_news.rss", "en"],
   ["Oddity Central", "https://www.odditycentral.com/feed/", "en"],
@@ -58,6 +59,7 @@ const EKSI = [
   [kok("kaza|yangın|deprem|crash|wildfire|earthquake"), -1, "afet"],
   [kok("kampanya|indirim|lansman|tanıtım|sponsor|reklam|discount|coupon|temizlik ve hijyen"), -3, "reklam"],
   [kok("maç|gol|transfer|derbi|teknik direktör|beşiktaş|fenerbahçe|galatasaray|trabzonspor|league|nba|nfl|f1 |podium|quarterback|coach|76ers|cowboys|lsu|playoff|halftime|teammate"), -4, "spor"],
+  [/(?:^|\s)(?:these|bu)\s+\d+\s|^\d+\s+(?:funny|hilarious|times|people|photos|memes|things)|memes?/i, -4, "liste/mim"],
   [kok("evlendi|boşandı|sevgili|aşk yaşıyor|married|dating|rumou?red|kiss|birthday message"), -2, "magazin"],
 ];
 
@@ -144,6 +146,8 @@ for (const e of eksi) {
 }
 // ---- Reddit (resmî API, uygulama anahtarıyla; anahtar yoksa atlanır) --------------------------------------
 // Kimliksiz istekleri Reddit 403/429 ile reddediyor; engeli aşmaya çalışılmaz. .env.local: REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET.
+// 22 Kas 2026: Reddit kişisel kullanıma yeni anahtar vermiyor (Responsible Builder Policy). Anahtar ileride onaylanırsa bu blok kendiliğinden çalışır;
+// o zamana kadar Reddit sinyali Google Haberler'deki "went viral on Reddit / Reddit'te" aramalarından ve Bored Panda akışından gelir.
 // "Patlamak üzere" ölçüsü HIZ: saat başına oy ve yorum. rising = yeni ve hızla yükselen, top?t=day = günün patlamış gönderileri.
 const REDDIT_SUB = {
   tuhaf: ["nottheonion", "interestingasfuck", "Damnthatsinteresting", "BeAmazed", "nextfuckinglevel", "mildlyinteresting", "Weird", "interesting"],
