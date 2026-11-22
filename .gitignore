@@ -48,3 +48,22 @@ next-env.d.ts
 /video/reklam/
 /video/muzekart/
 /video/kusyuvasi/
+/video/discovereu/
+
+# Serik haber masası: gizli anahtarlı WP kodu ve çalışma dosyaları
+masa/wp/
+masa/gorulen.json
+masa/adaylar.json
+masa/taslak/
+masa/log/
+masa/gelen/
+masa/telegram/
+
+# X masası durum/görselleri (22 Kas 2026)
+masa/x/*
+!masa/x/XMASA.md
+!masa/x/xmasa.mjs
+
+# Viral radar (haberantalya_bot) çalışma dosyaları
+masa/radar/tur.json
+masa/radar/gorulen.json
