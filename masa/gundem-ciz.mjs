@@ -42,7 +42,7 @@ try {
     // Başlık ve metin boyu + fotoğraf yüksekliği BİRLİKTE aranır: yazı bloğu banttan hemen sonra başlar, fotoğrafa kadar boşluk kalmaz.
     // Satırlar dengelenir (son satırda tek kelime / yarım satır kalmaz).
     const Y = G.yerlesim || {};
-    const TS = Y.baslik || [84, 82, 80, 78, 76, 74, 72, 70, 68, 66, 64], BS = Y.metin || [48, 47, 46, 45, 44, 43, 42, 41, 40];
+    const TS = Y.baslik || [84, 82, 80, 78, 76, 74, 72, 70, 68, 66, 64, 62, 60], BS = Y.metin || [48, 47, 46, 45, 44, 43, 42, 41, 40];
     const PH_MIN = Y.fotoMin || 540, PH_MAX = Y.fotoMax || 800, SABIT = Y.fotoSabit || 0, BOSLUK = 40;
     const orjT = G.title.trim(), orjB = (G.body || "").trim(), MW = W - 2 * SIDE;
     const satirlar = (t, w, f) => wrapRich(parseRich(t), w, f, f).lines;
@@ -58,19 +58,19 @@ try {
     // Başlık (kullanıcı 22 Kas: "başlıklar şiir gibi geliyor, sağda çok boşluk kalıyor, profesyonel görünmüyor"):
     // eskiden %60 genişliğe kadar daraltılıyordu → kısa kısa satırlar. Artık tam genişlikte doldurulur; yalnız son satırda
     // tek kelime / çok kısa satır kalırsa en az %85 genişlikte hafifçe dengelenir.
-    function baslikSar(t, f) {
+    function baslikSar(t, f, taban = .85, esik = .45) { // metin de bununla sarılır (kullanıcı 22 Kas: "alt metinde boşluk kalmasın, kenara kadar düzenli ilerlesin")
       const L = satirlar(t, MW, f); ctx.font = f;
-      const olc = (L) => { const g = L.map(l => ctx.measureText(yazi([l])).width); return { t: yazi(L), n: L.length, son: g[g.length - 1] / Math.max(...g), tekKelime: L[L.length - 1].length === 1, dol: Math.max(...g) / MW }; };
+      const olc = (L) => { const g = L.map(l => ctx.measureText(yazi([l])).width); return { t: yazi(L), n: L.length, son: g[g.length - 1] / Math.max(...g), tekKelime: L[L.length - 1].length === 1, dol: Math.max(...g) / MW, dolgu: g.length > 1 ? g.slice(0, -1).reduce((a, b) => a + b, 0) / (g.length - 1) / MW : 1 }; };
       const tam = olc(L);
-      if (tam.n < 2 || (!tam.tekKelime && tam.son >= .45)) return tam;
-      const d = dengele(t, f, .85);
-      return d.n === tam.n && (!d.tekKelime || tam.tekKelime) ? d : tam;
+      if (tam.n < 2 || (!tam.tekKelime && tam.son >= esik)) return tam;
+      const d = dengele(t, f, taban);
+      return d.n === tam.n && (!d.tekKelime || tam.tekKelime) ? Object.assign(d, { dolgu: tam.dolgu * .97 }) : tam;
     }
     let en = null;
     for (const ts of TS) for (const bs of BS) {
       S.titleSize = ts; S.bodySize = bs;
       const tf = titleFonts(ts), bF = S.bodyFont === "Montserrat" ? "Montserrat" : "Inter";
-      const T = baslikSar(orjT, tf.fN), B = dengele(orjB, S.bodyWeight + " " + bs + "px " + bF + ",Arial,sans-serif", .92);
+      const T = baslikSar(orjT, tf.fN), B = baslikSar(orjB, S.bodyWeight + " " + bs + "px " + bF + ",Arial,sans-serif", .94, .3);
       S.title = T.t; S.body = B.t;
       const bh = buildBlock(1).h;
       const yer = PHOTO_BOTTOM - BOSLUK - TEXT_TOP - bh; // yazıdan sonra fotoğrafa kalan
@@ -78,7 +78,7 @@ try {
       if (!globalThis.__iz || bh < globalThis.__iz.bh) globalThis.__iz = { bh: Math.round(bh), ts, bs, t: T.n, b: B.n };
       if (G.fotoData && ph < PH_MIN) continue;
       const bosluk = G.fotoData ? yer - ph : yer;
-      const puan = bs * 4 + ts * 1.2 - bosluk * .5 - Math.max(0, T.n - 3) * 200 - Math.max(0, T.n - 2) * 30 + (T.dol || 1) * 80 - Math.max(0, B.n - 7) * 25 + Math.min(ph, 720) * .03
+      const puan = bs * 4 + ts * 1.2 - bosluk * .5 - Math.max(0, T.n - 3) * 200 - Math.max(0, T.n - 2) * 160 + (T.dol || 1) * 80 - (1 - (B.dolgu || 1)) * 1000 - Math.max(0, B.n - 7) * 25 + Math.min(ph, 720) * .03
         - (B.n > 1 && B.son < .5 ? 40 : 0) - (T.n > 1 && T.son < .5 ? 40 : 0) - (B.tekKelime ? 60 : 0) - (T.tekKelime && T.n > 1 ? 60 : 0);
       if (!en || puan > en.puan) en = { puan, ts, bs, ph, bosluk: Math.round(bosluk), T, B };
     }
@@ -101,6 +101,27 @@ try {
       const p = { img: c, ox: 0, oy: 0, zoom: 1, blob: null }; processPhoto(p); photos[0] = p;
     }
     render(true);
+    if (G.bant) { // sarı banttaki gömülü "SON DAKİKA - ANLIK HABER - ÖZEL HABER" yazısını örtüp yerine G.bant yazılır (acil olmayan haberler; gundem.py BANT_NORMAL)
+      // Örtü, bandın kendi renginden sütun sütun örneklenir (yazının hemen üstü/altı) → kutu kenarı görünmez.
+      const x = cv.getContext("2d"), A = -Math.atan2(25, 740), OX = 540, OY = 398, U0 = -380, U1 = 420, V0 = -21;
+      const nokta = (u, v) => [Math.round(OX + u * Math.cos(A) - v * Math.sin(A)), Math.round(OY + u * Math.sin(A) + v * Math.cos(A))];
+      const oku = (u, v) => { const [px, py] = nokta(u, v); return x.getImageData(px, py, 1, 1).data; };
+      const sar = (c) => c[0] > 150 && c[1] > 110 && c[2] < 120;
+      const orneks = [];
+      for (let u = U0; u <= U1; u += 4) {
+        const V1 = u < -150 ? 22 : u < -60 ? 20 : 17; // eski yazı solda daha aşağı iniyor, bant da orada daha kalın; sağda alttaki siyah çizgilere dokunma
+        const ust = oku(u, V0 - 2), u2 = sar(ust) ? ust : [240, 192, 10], a2 = [u2[0] * .94, u2[1] * .92, u2[2]];
+        orneks.push([u, u2, a2, V1]);
+      }
+      x.save(); x.translate(OX, OY); x.rotate(A);
+      for (const [u, ust, alt, V1] of orneks) {
+        const gr = x.createLinearGradient(0, V0, 0, V1); gr.addColorStop(0, "rgb(" + ust[0] + "," + ust[1] + "," + ust[2] + ")"); gr.addColorStop(1, "rgb(" + Math.round(alt[0]) + "," + Math.round(alt[1]) + "," + Math.round(alt[2]) + ")");
+        x.fillStyle = gr; x.fillRect(u - 0.5, V0, 5, V1 - V0);
+      }
+      let fs = 38; x.font = "700 " + fs + "px Inter,Arial,sans-serif";
+      while (x.measureText(G.bant).width > 740 && fs > 26) x.font = "700 " + (--fs) + "px Inter,Arial,sans-serif";
+      x.fillStyle = "#151515"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(G.bant, 20, 1); x.restore();
+    }
     const yerlesim = { baslikBoy: en.ts, metinBoy: en.bs, foto: en.ph, ustBosluk: en.bosluk, baslikSatir: en.T.n, metinSatir: en.B.n,
       sonSatir: Math.round(en.B.son * 100), tekKelime: !!(en.B.tekKelime || (en.T.n > 1 && en.T.tekKelime)) };
     return { url: cv.toDataURL("image/jpeg", .93), fitted, yerlesim, cap: (updateCaption(), document.getElementById("caption").value) };
