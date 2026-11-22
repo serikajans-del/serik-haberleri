@@ -67,3 +67,6 @@ masa/x/*
 # Viral radar (haberantalya_bot) çalışma dosyaları
 masa/radar/tur.json
 masa/radar/gorulen.json
+masa/radar/aday.json
+masa/radar/durum.json
+masa/radar/geribildirim.json
