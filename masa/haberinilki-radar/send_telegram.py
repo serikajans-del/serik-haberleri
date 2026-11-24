@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Atakan'ın Telegram botuna (yalnız kendi özel sohbeti) radar seçimi gönderir.
 Kullanım: python -I send_telegram.py --caption-file CAP.html [--photo IMG.jpg] [--button-url URL]
-Token: TELEGRAM_BOT_TOKEN ortam değişkeni; yoksa serik-haberleri/.env.local'dan okunur. Token ASLA yazdırılmaz.
+Token: HABERINILKI_BOT_TOKEN ortam değişkeni; yoksa serik-haberleri/.env.local'dan okunur. Token ASLA yazdırılmaz.
 Chat id: bu klasördeki telegram.json {"chat_id": ...}. Çıktı: OK <mesaj_id> ya da FAIL <neden>."""
 import argparse, json, os, sys
 import requests
@@ -10,14 +10,15 @@ KOK = os.path.dirname(os.path.abspath(__file__))
 
 
 def token():
-    t = os.environ.get("TELEGRAM_BOT_TOKEN")
+    # @serikmasa_bot (TELEGRAM_BOT_TOKEN) KULLANILMAZ (kullanıcı 24 Kas). Yalnız radarın kendi botu.
+    t = os.environ.get("HABERINILKI_BOT_TOKEN")
     if t:
         return t.strip()
     env = os.path.join(KOK, "..", "..", ".env.local")
     try:
         with open(env, encoding="utf-8") as f:
             for satir in f:
-                if satir.startswith("TELEGRAM_BOT_TOKEN="):
+                if satir.startswith("HABERINILKI_BOT_TOKEN="):
                     return satir.split("=", 1)[1].strip().strip('"')
     except OSError:
         pass
