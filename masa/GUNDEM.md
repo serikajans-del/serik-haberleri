@@ -18,6 +18,7 @@ Serik'te elektrik/su kesintisi okurun en çok aradığı ve en çok paylaştığ
 - Görsel: başlık "Serik'te N mahallede elektrik kesintisi" (mahalle sayısı = benzersiz mahalle adları), metin: neden (bakım/altyapı), öne çıkan mahalleler (Merkez, Belek, Boğazkent…), elektriğin kaç arası verileceği. Fotoğraf: haber sayfasındaki yazısız direk/hat fotoğrafı (`foto-ara`); yazılı/afişli kapakları alma.
 - Paylaşım metni (`aciklama`): **tam liste saat gruplarıyla** (⏰ 08.30–15.30: …) + "Kesinti mahallenin tamamını değil belirli bölümlerini kapsayabilir. Arıza ve bilgi: 186" + etiketler. Telegram altyazı sınırı 1024 karakter; aşarsa mahalleleri saat grubunda kısalt, saatleri asla atma.
 - Gönderilince `kesinti-durum.json` o günü işaretler; aynı gün tekrar gönderilmez. Gün içinde **yeni/plansız** (arıza) kesinti haberi çıkarsa ayrı haber olarak normal akışta değerlendir.
+- (23 Kas) Planlı kesinti gittikten sonra da nöbet her turda arar: son 6 saatte YENİ Serik **arıza** haberi çıkarsa adaylarda "⚡ SERİK'TE ARIZA KESİNTİSİ" (no: 0) görünür → kaynağı aç; gerçekten Serik'te plansız kesintiyse `"acil": true` ile o turda gönder (başlık ör. "Serik'te arıza: X mahallede elektrik yok", girdiye "guncelleme": true). Her arıza bağlantısı bir kez önerilir.
 - Örnek (21 Kas 10:15): "Serik'te 25 mahallede elektrik kesintisi" — Antalya Ekspres'ten 8 mahalle grubu.
 
 ## 🌍 UYARI NÖBETİ — kesintiyle birlikte her turun ilk işi (22 Kas: kullanıcı "uyarılar önemli", "haber kaçırmamalı")

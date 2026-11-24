@@ -631,10 +631,22 @@ def kesinti_gonderildi_mi():
     except Exception: return False
 
 
+def kesinti_durum():
+    try:
+        d = json.load(open(KESINTI_DURUM, encoding="utf-8"))
+        return d if d.get("gun") == datetime.now().strftime("%Y-%m-%d") else {}
+    except Exception: return {}
+
+
 def kesinti_isaretle(G):
+    # 23 Kas: sabah planlı kesinti gönderilince gün boyu nöbet kapanıyordu; akşamki arıza kesintisi kaçtı.
+    # Artık planlı gönderim günü işaretler, önerilen arıza bağlantıları "gorulen"e geçer; YENİ arıza gelirse yine aday olur.
     m = (G.get("baslik", "") + " " + " ".join(G.get("kelimeler") or [])).lower()
-    if "kesinti" in m and SERIK.search(m):
-        json.dump({"gun": datetime.now().strftime("%Y-%m-%d"), "baslik": G.get("baslik")}, open(KESINTI_DURUM, "w", encoding="utf-8"), ensure_ascii=False)
+    if ("kesinti" in m or "arıza" in m) and SERIK.search(m):
+        d = kesinti_durum()
+        d = {"gun": datetime.now().strftime("%Y-%m-%d"), "baslik": d.get("baslik") or G.get("baslik"),
+             "gorulen": sorted(set(d.get("gorulen", []) + d.get("sunulan", []))), "sunulan": []}
+        json.dump(d, open(KESINTI_DURUM, "w", encoding="utf-8"), ensure_ascii=False)
 
 
 def kesinti_ara():
@@ -649,10 +661,13 @@ def kesinti_ara():
                 tarihler = re.findall(r"\b(\d{1,2})[-/.](\d{1,2})[-/.]20\d\d", bl) + [(d, str(AYLAR.index(a) + 1)) for d, a in re.findall(r"\b(\d{1,2}) (" + "|".join(AYLAR) + r")", bl)]
                 if any((int(d), int(a)) != (bugun.day, bugun.month) for d, a in tarihler): continue  # başka günün kesintisi
                 baska_ilce = re.search(r"manavgat|alanya|gündoğmuş|kemer|kumluca|finike|kaş|gazipaşa|elmalı|korkuteli|akseki|ibradı|demre|kepez|konyaaltı|muratpaşa|döşemealtı|aksu", bl) and not SERIK.search(bl)
-                if re.search(r"elektrik", bl) and re.search(r"kesinti|kesil", bl) and not baska_ilce and (SERIK.search(bl) or ((re.search(r"antalya", bl) or (tarihler and "ilçe" in bl and not re.search(r"aydın|mersin|konya|izmir|muğla|denizli|burdur|isparta|ısparta|adana|istanbul|ankara|bursa|karaman|hatay", bl)))
+                if re.search(r"elektrik", bl) and re.search(r"kesinti|kesil|arıza|ariza", bl) and not baska_ilce and (SERIK.search(bl) or ((re.search(r"antalya", bl) or (tarihler and "ilçe" in bl and not re.search(r"aydın|mersin|konya|izmir|muğla|denizli|burdur|isparta|ısparta|adana|istanbul|ankara|bursa|karaman|hatay", bl)))
                                                                                                      and (tarihler or "bugün" in bl or "ilçe" in bl))):
                     if all(b != s["baslik"] for s in sonuc["elektrik"]):
-                        sonuc["elektrik"].append({"baslik": b, "url": it.findtext("link")})
+                        try: yas = (datetime.now(timezone.utc) - parsedate_to_datetime(it.findtext("pubDate"))).total_seconds() / 3600
+                        except Exception: yas = 0
+                        sonuc["elektrik"].append({"baslik": b, "url": it.findtext("link"), "yas_saat": round(yas, 1),
+                                                  "ariza": bool(re.search(r"arıza|ariza|plansız|aniden|kesildi|karanlıkta", bl))})
         except Exception as e:
             log("kesinti RSS hata", q, e)
     try:  # ASAT planlı su kesintisi
@@ -725,8 +740,19 @@ def aday_komutu():
                 a["url"] = u; a["ozet"] = ozet(u); a["metin"] = metin(u)
                 if a["metin"] or a["ozet"]: break
         cikis.append(a)
-    if not kesinti_gonderildi_mi():
-        ks = kesinti_ara()
+    ks = kesinti_ara()
+    kd = kesinti_durum()
+    if kd:  # planlı kesinti bugün gitti → yalnız son 6 saatin YENİ arıza haberleri
+        yeni = [e for e in ks["elektrik"] if e["ariza"] and e["yas_saat"] <= 6 and e["url"] not in kd.get("gorulen", [])]
+        if yeni:
+            kd["gorulen"] = sorted(set(kd.get("gorulen", []) + [e["url"] for e in yeni]))  # bir kez önerilir, her turda tekrar etmez
+            json.dump(kd, open(KESINTI_DURUM, "w", encoding="utf-8"), ensure_ascii=False)
+            cikis.insert(0, {"no": 0, "puan": 999, "kesinti": {"elektrik": yeni, "su": []}, "bolge": "SERİK ÇEVRESİ", "etiket_onerisi": "SERİK",
+                             "baslik": "⚡ SERİK'TE ARIZA KESİNTİSİ (planlıdan ayrı, yeni) — ÖNCELİKLİ: kaynağı aç, Serik arızasıysa acil gönder; değilse atla (GUNDEM.md 'KESİNTİ NÖBETİ')",
+                             "url": yeni[0]["url"], "kaynaklar": [], "metin": "", "ozet": "", "kelimeler": ["serik", "kesinti", "arıza", "elektrik"]})
+            print("⚡ KESİNTİ NÖBETİ: planlı kesinti gitti ama YENİ arıza haberi var →")
+            for e in yeni[:6]: print("   ARIZA:", e["baslik"], f"({e['yas_saat']} sa)", "·", e["url"][:90])
+    else:
         if ks["elektrik"] or ks["su"]:
             cikis.insert(0, {"no": 0, "puan": 999, "kesinti": ks, "bolge": "SERİK ÇEVRESİ", "etiket_onerisi": "SERİK",
                              "baslik": "⚡ BUGÜN SERİK KESİNTİSİ — ÖNCELİKLİ, bu turda MUTLAKA gönder (GUNDEM.md 'KESİNTİ NÖBETİ')",
