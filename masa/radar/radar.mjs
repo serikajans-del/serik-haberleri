@@ -12,7 +12,7 @@
 //   node --env-file=.env.local masa/radar/radar.mjs deneme                     → bağlantı testi
 //
 // tur.json: { "haberler": [ { "anahtar", "baslik", "kategori", "tetik", "puan", "pbY": "5/3/5",
-//     "kanca", "kanca_b"?, "aciklama", "gorsel_prompt", "gorsel_prompt_b"?, "neden", "zaman", "risk",
+//     "kanca" (kısa viral başlık), "aciklama" (1–2 cümle + soru + 3–4 etiket), "gorsel_prompt", "neden", "zaman", "risk",
 //     "kaynaklar": [{"ad","url"}], "foto_url"? } ] }
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 
@@ -55,26 +55,17 @@ const DUGME = (no) => ({ inline_keyboard: [[
   { text: "👎 Zayıf", callback_data: `z:${no}` },
 ]] });
 
+// Kısa biçim (kullanıcı 24 Kas: "çok uzun geliyor, çarpıcı viral başlık + kısa açıklama"):
+// kalın başlık, kısa açıklama, katlanmış görsel promptu, tek satır künye.
 function mesaj(h, i, n) {
-  const kaynak = (h.kaynaklar || []).map((k) => (k.url ? `<a href="${html(k.url)}">${html(k.ad)}</a>` : html(k.ad))).join(" · ");
+  const kaynak = (h.kaynaklar || []).filter((k) => k.url).slice(0, 2).map((k) => `<a href="${html(k.url)}">${html(k.ad)}</a>`).join(" · ");
   const satir = [
-    `🔥 <b>VİRAL RADAR ${i}/${n}</b> · ${html(h.puan)}/18${h.pbY ? ` (P/B/Y ${html(h.pbY)})` : ""} · ${html(h.kategori || "GÜNDEM")}${h.tetik ? ` · ${html(h.tetik)}` : ""}`,
+    `🔥 <b>${html(String(h.kanca || h.baslik).replace(/\*\*/g, ""))}</b>`,
     "",
-    `📰 <b>${html(h.baslik)}</b>`,
-    h.neden ? `💡 <i>${html(h.neden)}</i>` : null,
-    "",
-    `🖼 <b>KANCA A</b> (fotoğraf içi metin):`,
-    kalin(h.kanca),
-    h.kanca_b ? `\n🅱️ <b>KANCA B</b>:\n${kalin(h.kanca_b)}` : null,
-    "",
-    `✍️ <b>AÇIKLAMA:</b>`,
     html(h.aciklama),
     "",
-    `🎨 <b>GÖRSEL PROMPTU — hikâye karesi</b> (Temsili):`,
-    `<code>${html(h.gorsel_prompt)}</code>`,
-    h.gorsel_prompt_b ? `\n🔎 <b>Alternatif — detay karesi</b>:\n<code>${html(h.gorsel_prompt_b)}</code>` : null,
-    "",
-    `⏰ ${html(h.zaman || "")}${h.risk ? `  ·  ⚠️ ${html(h.risk)}` : ""}`,
+    `<blockquote expandable>🎨 Görsel promptu (Temsili) — dokun, aç:\n<code>${html(h.gorsel_prompt)}</code></blockquote>`,
+    `<i>${n > 1 ? `${i}/${n} · ` : ""}${html(h.puan)}/18 · ${html(h.kategori || "GÜNDEM")}${h.zaman ? ` · ⏰ ${html(h.zaman)}` : ""}${h.risk && !/^düşük/i.test(h.risk) ? ` · ⚠️ ${html(h.risk)}` : ""}</i>`,
     kaynak ? `🔗 ${kaynak}` : null,
   ];
   return satir.filter((x) => x !== null).join("\n");
@@ -91,19 +82,19 @@ function kontrol(tur) {
     for (const a of ["anahtar", "baslik", "kanca", "aciklama", "gorsel_prompt", "puan", "kategori", "tetik", "zaman"])
       if (x[a] === undefined || x[a] === null || x[a] === "") hata.push(`${ad}: "${a}" boş`);
     if (+x.puan < 11) hata.push(`${ad}: puan ${x.puan} < 11 (gönderim eşiği)`);
-    for (const [alan, k] of [["kanca", x.kanca], ["kanca_b", x.kanca_b]]) {
-      if (!k) continue;
-      const n = kelimeSay(k);
-      if (n < 14 || n > 34) hata.push(`${ad}: ${alan} ${n} kelime (hedef 18–28)`); else if (n < 18 || n > 28) uyari.push(`${ad}: ${alan} ${n} kelime (hedef 18–28)`);
-      if (!/\*\*.+?\*\*/.test(k)) hata.push(`${ad}: ${alan} içinde **kalın** kısım yok`);
-      if (/!|\b(şok|flaş|bomba)\b/i.test(k)) hata.push(`${ad}: ${alan} ünlem/şok/flaş içeriyor`);
-      if (/\?\s*$/.test(k.replace(/\*/g, ""))) hata.push(`${ad}: ${alan} soru ile bitiyor`);
+    if (x.kanca) {
+      const k = x.kanca.replace(/\*\*/g, ""), n = kelimeSay(k);
+      if (n < 4 || n > 14) hata.push(`${ad}: başlık (kanca) ${n} kelime (hedef 6–12, tek satır)`);
+      if (k.length > 90) hata.push(`${ad}: başlık ${k.length} karakter (en çok 90)`);
+      if (/!|(şok|flaş|bomba)/i.test(k)) hata.push(`${ad}: başlık ünlem/şok/flaş içeriyor`);
+      if (/\?\s*$/.test(k)) hata.push(`${ad}: başlık soru ile bitiyor`);
     }
-    if (!x.kanca_b) uyari.push(`${ad}: kanca_b yok (A/B önerilir)`);
     if (x.aciklama && !/\?/.test(x.aciklama)) hata.push(`${ad}: açıklamada yorum sorusu yok`);
+    const govde = (x.aciklama || "").replace(/#[\p{L}\p{N}_]+/gu, "").trim();
+    if (govde.length > 300) hata.push(`${ad}: açıklama ${govde.length} karakter (etiketler hariç en çok 300; 1–2 kısa cümle + soru)`);
     const etiket = (x.aciklama || "").match(/#[\p{L}\p{N}_]+/gu) || [];
-    if (etiket.length < 3 || etiket.length > 7) hata.push(`${ad}: açıklamada ${etiket.length} etiket (4–6)`);
-    for (const [alan, p] of [["gorsel_prompt", x.gorsel_prompt], ["gorsel_prompt_b", x.gorsel_prompt_b]]) {
+    if (etiket.length < 2 || etiket.length > 5) hata.push(`${ad}: açıklamada ${etiket.length} etiket (3–4)`);
+    for (const [alan, p] of [["gorsel_prompt", x.gorsel_prompt]]) {
       if (!p) continue;
       if (!/4:5/.test(p)) hata.push(`${ad}: ${alan} 4:5 demiyor`);
       if (!/no text/i.test(p) || !/no logo/i.test(p)) hata.push(`${ad}: ${alan} "no text, no logos" yok`);
@@ -111,7 +102,6 @@ function kontrol(tur) {
       if (p.split(/\s+/).length < 45) uyari.push(`${ad}: ${alan} kısa (${p.split(/\s+/).length} kelime) — 8 katmanı içeriyor mu?`);
       if (/[çğışöüÇĞİŞÖÜ]/.test(p)) uyari.push(`${ad}: ${alan} Türkçe karakter içeriyor (İngilizce olmalı)`);
     }
-    if (!x.gorsel_prompt_b) uyari.push(`${ad}: gorsel_prompt_b (detay karesi) yok`);
     const kay = (x.kaynaklar || []).filter((k) => k.url);
     if (!kay.length) hata.push(`${ad}: bağlantılı kaynak yok`);
     else if (kay.length < 2 && !/birincil|tek kaynak/i.test(x.risk || "")) hata.push(`${ad}: tek kaynak; ikinci kaynak bul ya da risk'e "Tek kaynak (birincil: …)" yaz`);

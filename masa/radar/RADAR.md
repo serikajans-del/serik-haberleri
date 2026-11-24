@@ -75,28 +75,19 @@ Rakam, isim, yaş, yer, tarih **kaynaktan**; bulunamayan yazılmaz. İddia/şirk
 Olay 36 saatten eskiyse ancak hâlâ yayılıyorsa (trend/yeni siteler) gönderilir, `zaman` alanına "(X gün önce, hâlâ konuşuluyor)" yaz.
 
 ### 5. Yaz — EDİTÖR KURULU (her haber için)
-#### 5a. Kanca (fotoğraf içi metin) — İKİ seçenek yaz, kullanıcı A/B seçer
-TEK cümle, 18–28 kelime, can alıcı kısım `**kalın**`. Sonuna değil ortasına merak bırak; cümle sonunda ödül ver.
-**Kalıplar** (her kanca birini kullanır, A ile B farklı kalıp olur):
-1. **Tezat:** "X sanılıyordu. **Oysa …**" 
-2. **Ölçek:** "…, **180 tonluk Boeing 747'yi iki tekerle çekti.**"
-3. **Yakın plan insan:** "78 yaşındaki Ayşe nine, **…**" (isim/yaş kaynaktaysa)
-4. **Tanıdık yerde tuhaflık:** "Kars'ta bir köy kahvesinde **…**"
-5. **Önce/sonra:** "3 gün önce … idi, **bugün …**"
-6. **Çözüm sürprizi:** "… sorununu çözmek için **… yaptı.**"
-7. **Kimlik/gurur:** "Dünyanın konuştuğu … **bir Türk/Antalyalı …**"
-8. **Merak boşluğu:** "Japonlar Kastamonu'da bir köy okuluna geldi ve **3 günde …**"
-Yasak: "şok/flaş/bomba", ünlem, BÜYÜK HARF, soru kancası, haberde olmayan vaat, "bakın ne oldu" tipi boş merak.
-Antalya bağı varsa "ANTALYA'nın … ilçesinde" ya da "Antalya'da" ile başla.
+#### 5a. Viral başlık (`kanca`) — kullanıcı 24 Kas: "çok uzun geliyor, çarpıcı viral olacak başlık yazsa ve kısa açıklama"
+TEK satır, **6–12 kelime, en çok 90 karakter**. İlk okunuşta "ne?!" dedirten, olguya sadık başlık. A/B YOK, tek başlık.
+**Kalıplar:** Tezat ("Herkes X sandı, oysa …") · Ölçek/rakam ("180 tonluk uçağı iki tekerle çekti") · Yakın plan insan ("78 yaşındaki Ayşe nine …") ·
+Tanıdık yerde tuhaflık ("Kars'ta köy kahvesinde penseyle diş çektiler") · Kimlik/gurur ("Dünyanın konuştuğu buluş bir Antalyalının") · Önce/sonra.
+Yasak: "şok/flaş/bomba", ünlem, soru başlığı, haberde olmayan vaat, "bakın ne oldu" tipi boş merak. Antalya bağı varsa başta.
 
-#### 5b. Açıklama (Instagram)
-1. cümle 5N1K (kancanın tekrarı değil, yeni bilgi). 2–4 cümle: en ilginç ayrıntı + bağlam + (varsa) uzman/kaynak sözü (alıntıyı kaynaktan, ≤15 kelime).
-Son satırdan önce **TEK yorum sorusu**: kişisel anıya ya da zararsız tarafa çağırır ("Siz olsanız …?", "Sizin köyde de …?", "İlk neyi çekerdiniz?"). "Sizce?" gibi boş soru yok.
-Alt satır 4–6 etiket (#Antalya varsa önce, sonra konu + #İlginç/#Dünya/#Buluş). Emoji en fazla 1.
+#### 5b. Kısa açıklama (`aciklama`)
+**1–2 kısa cümle (etiketler hariç en çok 300 karakter)**: başlıkta olmayan en çarpıcı ayrıntı + TEK yorum sorusu ("Siz olsanız …?", "Sizin köyde de …?"; "Sizce?" gibi boş soru yok).
+Alt satır 3–4 etiket (#Antalya varsa önce). Emoji en fazla 1. Uzun 5N1K paragrafı YAZMA.
 
 #### 5c. GÖRSEL PROMPTU — "haberi tek karede anlatan" fotoğraf (İKİ seçenek)
 Kural: Prompt'u okuyan biri **başlığı görmeden** haberin ne olduğunu tahmin edebilmeli. Genel "güzel manzara" YASAK.
-Her prompt şu 8 katmanı sırayla içerir (İngilizce, tek paragraf):
+TEK prompt yaz (B/detay karesi yok; mesajda katlanmış durur). Prompt şu 8 katmanı sırayla içerir (İngilizce, tek paragraf):
 1. **Biçim:** "Photorealistic 4:5 vertical news photograph, documentary photojournalism style,"
 2. **Özne + EYLEM:** haberin fiili sahnede oluyor (çeken, taşıyan, iten, şaşıran). Kişiler anonim: "seen from behind / face turned away / face out of frame / hands only".
 3. **KANIT DETAYI:** haberi anlatan nesne/rakam görünür (pense + çay bardağı; şeker küpü yanında 2,4 cm küp; uçağın tekerleği ile SUV'nin havadaki tekerleri aynı karede).
@@ -105,7 +96,7 @@ Her prompt şu 8 katmanı sırayla içerir (İngilizce, tek paragraf):
 6. **IŞIK/DUYGU:** saat, ışık yönü, renk ısısı, atmosfer ("warm tungsten light, steam rising from tea, tense but comic mood").
 7. **KAMERA:** lens + açı + alan derinliği ("35mm, eye level, f/2.8 shallow depth of field" ya da "100mm macro").
 8. **KOMPOZİSYON + YASAKLAR:** "subject in upper two thirds, lower 35% calm and uncluttered for caption overlay, no text, no logos, no watermark, no recognizable real person, natural skin and hands, no distorted fingers".
-- **Prompt A — hikâye karesi:** geniş/orta plan, eylem ve mekân.  **Prompt B — detay karesi:** makro/yakın plan, kanıt nesnesi (paylaşımda kapak olarak daha temiz).
+- Hikâye karesi: geniş/orta plan, eylem ve mekân, kanıt detayı görünür.
 - **İzinli:** trajik olmayan olaylarda anonim, yüzü görünmeyen kişilerle **canlandırma** (kullanıcı "Temsili" ibaresiyle kullanır).
 - **Yasak:** gerçek/tanınır kişi (ünlü, haberdeki kişi), çocuk yüzü, marka logosu; kaza, yangın, afet, suç, ölüm olaylarının canlandırması (bunlarda yalnız sembolik nesne/mekân: boş sandalye, ışıklı itfaiye kaskı vb.).
 - Örnek (zayıf → güçlü):
@@ -117,7 +108,7 @@ Her prompt şu 8 katmanı sırayla içerir (İngilizce, tek paragraf):
 `risk` (telif, iddia dili, yüz; yoksa "Düşük"), `kaynaklar` ≥2, `foto_url` (varsa haberin kendi görselinin doğrudan .jpg/.png bağlantısı; yalnız fikir için gönderilir).
 
 #### 5e. Öz denetim (göndermeden önce her haber, hepsi EVET olmalı)
-- Kanca 18–28 kelime, tek cümle, kalın kısım var, haberden fazlasını vaat etmiyor mu?
+- Başlık 6–12 kelime, tek satır, haberden fazlasını vaat etmiyor mu? Açıklama 1–2 cümle + soru mu?
 - Bir arkadaşına WhatsApp'ta atar mıydın? Atmazsan ele.
 - Her rakam/isim kaynakta var mı? İki kaynak var mı?
 - Görsel promptu başlıksız okunduğunda haberi anlatıyor mu? 8 katman var mı? Yasak öğe yok mu?
@@ -128,11 +119,11 @@ Her prompt şu 8 katmanı sırayla içerir (İngilizce, tek paragraf):
 ```json
 {"haberler":[{"anahtar":"kars pense dis kahvehane","baslik":"Kars'ta köy kahvesinde penseyle diş çektiler","kategori":"TÜRKİYE",
  "tetik":"MİZAH+YORUM KAPISI","puan":14,"pbY":"5/3/5","neden":"Herkesin köyünde bir 'usta' hikâyesi var; yorum yağar.",
- "kanca":"… **…**","kanca_b":"… **…**","aciklama":"…\n…\n#Kars #KöyHayatı …","gorsel_prompt":"…","gorsel_prompt_b":"…",
+ "kanca":"Kars'ta köy kahvesinde penseyle diş çektiler","aciklama":"Dişi ağrıyan genç kahvedeki ustaya güvendi, o anlar kameraya yansıdı. Sizin köyde de böyle bir usta var mı?\n#Kars #KöyHayatı #İlginç","gorsel_prompt":"…",
  "zaman":"Akşam 20–22","risk":"Video İHA'ya ait","kaynaklar":[{"ad":"Hürriyet","url":"https://…"},{"ad":"Karar","url":"https://…"}],"foto_url":null}]}
 ```
-→ önce `node --env-file=.env.local masa/radar/radar.mjs kontrol masa/radar/tur.json` (KALİTE KAPISI: eşik 11, kanca 18–28 kelime + **kalın**, ünlem/şok yok,
-açıklamada soru + 4–6 etiket, promptta 4:5 + "no text, no logos" + yüz yasağı, bağlantılı kaynak). KALDI ise düzelt; GEÇTİ olunca:
+→ önce `node --env-file=.env.local masa/radar/radar.mjs kontrol masa/radar/tur.json` (KALİTE KAPISI: eşik 11, başlık 4–14 kelime/≤90 karakter, ünlem/şok yok,
+açıklama ≤300 karakter + soru + 2–5 etiket, promptta 4:5 + "no text, no logos" + yüz yasağı, bağlantılı kaynak). KALDI ise düzelt; GEÇTİ olunca:
 → `node --env-file=.env.local masa/radar/radar.mjs gonder masa/radar/tur.json` (gönder de aynı kapıdan geçer; kalırsa hiçbir şey gitmez)
 Her haber ayrı mesaj + "✅ Paylaştım / 🔥 Böyle devam / 👎 Zayıf" düğmeleri; gönderilen 7 gün tekrar gelmez. **Turda en fazla 3, eşik 11/18, uygun yoksa HİÇBİR ŞEY gönderme.**
 Telegram hatası: bir kez yeniden dene; olmazsa `radar.mjs yaz "⚠️ Radar hatası: <kısa neden>"`.
