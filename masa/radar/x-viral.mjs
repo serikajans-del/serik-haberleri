@@ -20,7 +20,7 @@ if (process.argv[2] === "adresler") {
   console.log(ara(`(görenler OR şaşırttı OR ilginç OR inanılmaz OR rekor OR "ilk kez" OR köy OR buluş OR mucit OR duygulandıran OR "yaşındaki") lang:tr min_faves:300${filtre} since_time:${once(6)}`));
   // 24 Kas: kullanıcı "2000 beğeni çok" → 500; daha erken yakalamak için 4 saat; spor/siyaset baştan dışarıda (maç gecesi havuzu doluyordu)
   console.log("2) Genel Türkçe viral, görselli (son 4 saat):");
-  const disla = '-maç -gol -galatasaray -fenerbahçe -beşiktaş -trabzonspor -hakem -transfer -chp -akp -erdoğan "-özgür özel" -imamoğlu -bahçeli -seçim';
+  const disla = '-maç -gol -galatasaray -fenerbahçe -beşiktaş -trabzonspor -hakem -transfer -chp -akp -erdoğan -"özgür özel" -imamoğlu -bahçeli -seçim';
   console.log(ara(`(bir OR ve OR bu OR çok) lang:tr min_faves:500 filter:media ${disla}${filtre} since_time:${once(4)}`));
   console.log("3) Antalya (son 12 saat):");
   console.log(ara(`(Antalya OR Alanya OR Manavgat OR Serik OR Kemer OR Kaş OR Belek OR Kumluca OR Finike OR Gazipaşa) lang:tr min_faves:50${filtre} since_time:${once(12)}`));
