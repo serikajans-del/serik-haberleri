@@ -80,7 +80,7 @@ Adım 1e'de okunan @haberinilki gönderilerini `performance.json`'daki eski seç
 `radar.py perf-ozet` yeterli veri gösterdiğinde en iyi performans gösteren konu/kaynak türünü puanlamada öne al. "İçgörü hakkı VAR" ise rapora tek satır içgörü ekle ve `radar.py icgoru-kullanildi` (günde en çok bir).
 
 ### 8) Rapor (bu oturumun son mesajı = Atakan'a sohbet raporu)
-Uygun seçim yoksa: tek satır "Bu tur yeni seçim yok" (Telegram'a hiçbir şey gitmez). Varsa kısa mesaj, her seçim için:
+Uygun seçim yoksa: tek satır "Bu tur yeni seçim yok" ve Telegram'a kısa nabız (kullanıcı 24 Kas: "telegram'a gelsin"): `python -I masa/haberinilki-radar/radar.py nabiz "yeni seçim yok · <N> aday tarandı · en yakın: <konu, neden elendi>"` — betik günün ilk turunda ve sonra en çok 2 saatte bir gönderir, gerisini kendisi atlar. Varsa kısa mesaj, her seçim için:
 - `[@yazar](kaynak gönderi URL)` · takipçi · yaş · ❤/🔁/💬/👁 · (önceki tura göre artış, biliniyorsa) · neden yükseliyor (tek satır)
 - son gönderi metni (aynen) ve paylaş bağlantısı (aynen)
 - etiketli görselin tam yolu (`masa/haberinilki-radar/images/...`)

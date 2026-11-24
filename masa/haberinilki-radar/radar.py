@@ -11,6 +11,7 @@ Kullanım (serik-haberleri klasöründen):
   python -I masa/haberinilki-radar/radar.py gonder <secim.json>  -> kontrol + görsel etiketi + Telegram + reported.txt
   python -I masa/haberinilki-radar/radar.py perf <perf.json>     -> paylaşılan seçimlerin etkileşimini performance.json'a işle
   python -I masa/haberinilki-radar/radar.py perf-ozet            -> konu/kaynak türüne göre ortalama; günde bir içgörü hakkı var mı
+  python -I masa/haberinilki-radar/radar.py nabiz "<metin>" [--zorla] -> seçimsiz turda Telegram durum notu (günün ilk turu + en çok 2 saatte bir)
 
 secim.json: {"secimler": [{"kaynak_url": "https://x.com/u/status/1", "yazar": "u", "takipci": 1234,
               "metin": "🚨 SON DAKİKA | ...\\n...", "neden": "tek satır: neden yükseliyor",
@@ -395,6 +396,25 @@ def takipci(handle, sayi):
     print(f"@{handle}: {sayi}")
 
 
+def nabiz(metin, zorla=False):
+    """Seçimsiz turda Telegram'a kısa durum notu: günün ilk turunda ve sonra en çok 2 saatte bir."""
+    d = oku(F("nabiz.json"), {})
+    n = simdi()
+    bugun = n.astimezone(TSI).strftime("%Y-%m-%d")
+    son = d.get("son")
+    if not zorla and son and d.get("gun") == bugun and n - zaman(son) < timedelta(hours=2):
+        print("nabız: atlandı (son 2 saatte gönderildi)")
+        return
+    cfile = F("tmp/nabiz.html")
+    with open(cfile, "w", encoding="utf-8") as f:
+        f.write(f"📡 <b>Radar {n.astimezone(TSI):%H.%M}</b> · {esc(metin)}")
+    r = subprocess.run([sys.executable, "-I", F("send_telegram.py"), "--caption-file", cfile],
+                       capture_output=True, text=True, encoding="utf-8")
+    print("nabız: " + (r.stdout + r.stderr).strip()[-200:])
+    if "OK" in r.stdout:
+        yaz(F("nabiz.json"), {"son": n.isoformat(), "gun": bugun})
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if hasattr(sys.stdout, "reconfigure"):
@@ -421,5 +441,7 @@ if __name__ == "__main__":
         izle_sil(a[1])
     elif a[0] == "takipci":
         takipci(a[1], a[2])
+    elif a[0] == "nabiz":
+        nabiz(a[1], zorla="--zorla" in a)
     else:
         print(__doc__)
