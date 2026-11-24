@@ -1,9 +1,12 @@
 import crypto from "crypto";
 
-const TW_API_KEY    = "dPkI6MtIj8IlFRn4diMbMlk6M";
-const TW_API_SECRET = "bmLJhngn20NpPWJdUHjdnBqlDSFQ4fiy7kZEAMuumZgn2OtuIz";
-const TW_TOKEN      = "1814208431051743232-gIm3fLxNn4YycLtByoOp9y5QiLYAWf";
-const TW_TOKEN_SEC  = "VYfDrFVXluT4duBLWT7uFrHwsKPByy90qQKUdfZWbCBz7";
+const TW_API_KEY    = process.env.TWITTER_API_KEY;
+const TW_API_SECRET = process.env.TWITTER_API_SECRET;
+const TW_TOKEN      = process.env.TWITTER_ACCESS_TOKEN;
+const TW_TOKEN_SEC  = process.env.TWITTER_ACCESS_TOKEN_SECRET;
+
+// Anahtarlar .env.local içinde (git dışı): TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET (auto-haber ile aynı adlar)
+if (!TW_API_KEY || !TW_API_SECRET || !TW_TOKEN || !TW_TOKEN_SEC) { console.error("X anahtarları .env.local içinde olmalı (node --env-file=.env.local bot/twitter-test.mjs)"); process.exit(1); }
 
 function buildOAuthHeader(method, url) {
   const p = {

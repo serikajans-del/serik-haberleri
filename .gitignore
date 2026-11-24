@@ -71,3 +71,9 @@ masa/radar/aday.json
 masa/radar/durum.json
 masa/radar/geribildirim.json
 masa/radar/log.txt
+
+# @haberinilki radar: durum dosyaları yerel kalır
+masa/haberinilki-radar/*.json
+masa/haberinilki-radar/reported.txt
+masa/haberinilki-radar/images/
+masa/haberinilki-radar/tmp/
