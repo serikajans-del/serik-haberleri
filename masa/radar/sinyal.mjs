@@ -19,19 +19,28 @@ const gn = (q, dil = "tr") => dil === "tr"
   : `https://news.google.com/rss/search?q=${encodeURIComponent(q + " when:1d")}&hl=en-US&gl=US&ceid=US:en`;
 const ARAMALAR_TR = ["sosyal medyada gündem oldu", "görenler şaşırdı", "görenleri şaşırttı", "pes dedirten", "ilginç görüntü",
   "yüzleri güldüren", "duygulandıran", "rekor kırdı", "Guinness", "genç mucit", "buluş geliştirdi", "sıra dışı", "akılalmaz",
-  "viral oldu", "izlenme rekoru", "Reddit'te", "Reddit kullanıcıları", "Antalya ilginç", "Antalya görenler", "köyde ilginç", "dünyada ilk", "Türkiye'de ilk"];
+  "viral oldu", "izlenme rekoru", "Reddit'te", "Reddit kullanıcıları", "Antalya ilginç", "Antalya görenler", "Alanya görenler", "Manavgat ilginç", "Antalya sosyal medya", "köyde ilginç", "dünyada ilk", "Türkiye'de ilk"];
 const ARAMALAR_EN = ["bizarre", "weird news", "odd news", "Guinness World Records", "goes viral", "world's first",
   "invention", "scientists discover", "heartwarming", "unusual",
   "went viral on Reddit", "Redditors"]; // Reddit API kapalı: Reddit'te patlayanı haberleştiren siteler
-const RSS = [
+const RSS = [ // 24 Kas: Guinness (boş) ve Oddity Central (Eylül'den beri durmuş) çıkarıldı; tabloid "weird" + TR yaşam akışları eklendi
   ["UPI Odd News", "https://rss.upi.com/news/odd_news.rss", "en"],
-  ["Oddity Central", "https://www.odditycentral.com/feed/", "en"],
-  ["Guinness", "https://www.guinnessworldrecords.com/news/rss", "en"],
+  ["Mirror Weird", "https://www.mirror.co.uk/news/weird-news/?service=rss", "en"],
+  ["Daily Star Weird", "https://www.dailystar.co.uk/news/weird-news/?service=rss", "en"],
+  ["Metro Weird", "https://metro.co.uk/news/weird/feed/", "en"],
+  ["Upworthy", "https://www.upworthy.com/feed", "en"],
+  ["Good News Network", "https://www.goodnewsnetwork.org/feed/", "en"],
   ["Bored Panda", "https://www.boredpanda.com/feed/", "en"],
   ["New Atlas", "https://newatlas.com/index.rss", "en"],
   ["ScienceAlert", "https://www.sciencealert.com/feed", "en"],
   ["AA Yaşam", "https://www.aa.com.tr/tr/rss/default?cat=yasam", "tr"],
   ["Hürriyet Yaşam", "https://www.hurriyet.com.tr/rss/yasam", "tr"],
+  ["Sabah Yaşam", "https://www.sabah.com.tr/rss/yasam.xml", "tr"],
+  ["Milliyet Yaşam", "https://www.milliyet.com.tr/rss/rssnew/yasamrss.xml", "tr"],
+  ["Habertürk Yaşam", "https://www.haberturk.com/rss/kategori/yasam.xml", "tr"],
+  ["Sözcü Yaşam", "https://www.sozcu.com.tr/feeds-rss-category-yasam", "tr"],
+  ["NTV Yaşam", "https://www.ntv.com.tr/yasam.rss", "tr"],
+  ["NTV Türkiye", "https://www.ntv.com.tr/turkiye.rss", "tr"],
   ["NTV Dünya", "https://www.ntv.com.tr/dunya.rss", "tr"],
 ];
 
@@ -42,7 +51,7 @@ const tam = (s) => new RegExp(`(?<![\p{L}\p{N}])(?:${s})(?![\p{L}])`, "iu");
 const ARTI = [ // [düzenli ifade, puan, etiket]
   [kok("şaşırt|şaşkın|pes dedirt|akıl ?almaz|inanılmaz|görenler|sıra ?dışı|ilginç|tuhaf|bizarre|weird|bewilder|unusual"), 3, "tuhaflık"],
   [kok("rekor|guinness|dünyanın en|world'?s (?:first|largest|smallest|oldest|biggest|longest|tallest)|world record"), 3, "rekor"],
-  [kok("mucit|buluş|icat|invent|prototype|scientists|bilim insanları|keşfett|discover"), 2, "buluş"],
+  [kok("mucit|buluş(?![tm])|icat|invent|prototype|scientists|bilim insanları|keşfett|discover"), 2, "buluş"],
   [kok("güldür|kahkaha|komik|funny|hilarious|prank"), 3, "komik"],
   [kok("duygulandır|gözyaşı|yürek ?ısıt|heartwarming|reunite|kavuştu|vefa"), 3, "duygu"],
   [tam("kedi\w*|köpe\w*|ayı|kuş\w*|inek\w*|keçi\w*|yavru\w*|hayvan\w*|dogs?|cats?|bears?|animals?|puppy|kitten|parrot|goat|cow"), 2, "hayvan"],
@@ -57,6 +66,7 @@ const EKSI = [
   [kok("borsa|dolar|euro |faiz|enflasyon|merkez bankası|altın fiyat|bitcoin|stock|nasdaq|ipo|banker|ücretli çalışan|sektör"), -4, "piyasa"],
   [kok("cinayet|öldürül|bıçak|silahlı|tecavüz|taciz|intihar|köprüden atla|hayatını kaybett|cesed|murder|stabbed|shooting|killed|rape|suicide"), -5, "şiddet"],
   [kok("kaza|yangın|deprem|crash|wildfire|earthquake"), -1, "afet"],
+  [kok("names .* facility|helps (?:scale|customers)|unveils|launches|partnership|announces|company|corporation|şirketi|holding|a.ş.|yatırım|proje(?:si)? (?:tanıtıldı|hayata)|ihracat|lng|ai-powered|industrial"), -3, "kurumsal"],
   [kok("kampanya|indirim|lansman|tanıtım|sponsor|reklam|discount|coupon|temizlik ve hijyen"), -3, "reklam"],
   [kok("maç|gol|transfer|derbi|teknik direktör|beşiktaş|fenerbahçe|galatasaray|trabzonspor|league|nba|nfl|f1 |podium|quarterback|coach|76ers|cowboys|lsu|playoff|halftime|teammate"), -4, "spor"],
   [/(?:^|\s)(?:these|bu)\s+\d+\s|^\d+\s+(?:funny|hilarious|times|people|photos|memes|things)|memes?\b/i, -4, "liste/mim"],
@@ -76,11 +86,13 @@ async function getir(url, ms = 20000) {
   catch { return ""; } finally { clearTimeout(t); }
 }
 function rssAyikla(xml, kaynak, dil, arama = null) {
-  return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(([, it]) => {
+  // RSS <item> ve Atom <entry> (NTV Atom yayınlar; eskiden hiç okunmuyordu)
+  return [...xml.matchAll(/<(item|entry)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g)].map(([, , it]) => {
     let baslik = tag(it, "title"), site = tag(it, "source") || kaynak;
     if (arama && baslik.includes(" - ")) { const i = baslik.lastIndexOf(" - "); site = baslik.slice(i + 3); baslik = baslik.slice(0, i); }
-    const zaman = Date.parse(tag(it, "pubDate")) || SIMDI;
-    return { baslik, url: tag(it, "link"), site, kaynak, dil, zaman, ozet: tag(it, "description").slice(0, 240), arama };
+    const zaman = Date.parse(tag(it, "pubDate") || tag(it, "updated") || tag(it, "published")) || SIMDI;
+    const link = tag(it, "link") || ent((it.match(/<link[^>]*href="([^"]+)"/) || [])[1] || "");
+    return { baslik, url: link, site, kaynak, dil, zaman, ozet: (tag(it, "description") || tag(it, "summary")).slice(0, 240), arama };
   }).filter((x) => x.baslik && SIMDI - x.zaman < SAAT * 36e5);
 }
 
@@ -199,7 +211,19 @@ if (process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET) {
   } catch (e) { reddit.durum = `hata: ${e.message}`; }
 }
 
+// ---- tur hafızası (24 Kas): önceki turlarda ilk 25'te görülüp gönderilmeyen aday her turda başa dönmesin -------------
+// masa/radar/onceki.json: [{w:[kelimeler], ilk, tur}] · 2+ tur görülen −2/tur (en çok −6), ilk kez görülen "YENİ"
+const ONC = `${KOK}/onceki.json`;
+let onceki = existsSync(ONC) ? JSON.parse(readFileSync(ONC, "utf8")).filter((o) => SIMDI - o.ilk < 48 * 36e5) : [];
+const bul = (a) => { const w = kelime(a.baslik); return onceki.find((o) => { let n = 0; for (const x of o.w) if (w.has(x)) n++; return n >= 3 || (n >= 2 && n >= o.w.length * 0.6); }); };
+for (const a of adaylar) {
+  const o = bul(a);
+  if (!o) { a.etiket.unshift("YENİ"); a.on_puan = Math.round((a.on_puan + 1) * 10) / 10; }
+  else if (o.tur >= 2) { a.on_puan = Math.round((a.on_puan - Math.min(6, 2 * (o.tur - 1))) * 10) / 10; a.etiket.push(`${o.tur}. tur`); }
+}
 adaylar.sort((a, b) => b.on_puan - a.on_puan).splice(60);
+for (const a of adaylar.slice(0, 25)) { const o = bul(a); if (o) o.tur++; else onceki.push({ w: [...kelime(a.baslik)], ilk: SIMDI, tur: 1 }); }
+writeFileSync(ONC, JSON.stringify(onceki));
 
 writeFileSync(`${KOK}/aday.json`, JSON.stringify({ zaman: new Date().toISOString(), ham: ham.length, kume: kumeler.length,
   trendler: trendler.slice(0, 20).map(({ konu, hacim }) => ({ konu, hacim })), eksi: eksi.slice(0, 20), reddit, adaylar }, null, 2));

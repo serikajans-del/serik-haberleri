@@ -28,7 +28,9 @@ Gerçek beğeni/yorum sayısı yazdıysa raporun sonuna "veri.md'ye eklenecek: �
 ### 1. Sinyal topla (otomatik, 5 sn)
 `node --env-file=.env.local masa/radar/sinyal.mjs` → `masa/radar/aday.json` + ekranda en iyi 25.
 29 Google Haberler araması (TR + EN, "görenler şaşırdı", "rekor", "mucit", "bizarre", "world's first"…), UPI Odd News, Oddity Central, Guinness, Bored Panda,
-New Atlas, ScienceAlert, AA/Hürriyet yaşam, NTV dünya + Google Trendler TR + **Reddit** (resmî API, anahtar varsa). Aynı olayı yazan siteler kümelenir; `site_sayisi` = yayılma, `on_puan` = ham sinyal.
+New Atlas, ScienceAlert, AA/Hürriyet yaşam, NTV dünya + Google Trendler TR + **Reddit** (resmî API, anahtar varsa).
+**24 Kas güncellemesi:** Guinness ve Oddity Central akışı ölü, çıkarıldı. Yerine Mirror/Daily Star/Metro "weird", Upworthy, Good News Network, Sabah/Milliyet/Habertürk/Sözcü/NTV yaşam, NTV Türkiye eklendi; NTV (Atom) artık okunuyor; Alanya/Manavgat aramaları eklendi. Ekşi Cloudflare arkasında, boş döner (aşılmaya çalışılmaz).
+**Tur hafızası** (`onceki.json`): ilk kez görülen aday `YENİ` (+1); önceki turlarda ilk 25'te görülüp gönderilmeyen aday `N. tur` etiketiyle her turda −2 iner (en çok −6). Listenin başında hep aynı elenmiş adayları görmezsin; `YENİ` etiketlilere önce bak. Şirketlerin "dünyanın ilki" duyuruları `kurumsal` (−3). Aynı olayı yazan siteler kümelenir; `site_sayisi` = yayılma, `on_puan` = ham sinyal.
 Ön puan bir **pusula**, karar değil: siyaset/spor/magazin/piyasa sızmışsa ele.
 
 **Reddit adayları** (`[Reddit r/…]`, kullanıcı 22 Kas: "patlamış ya da patlamak üzere, ani yorum/beğeni alan konuları da ekleyelim"):
