@@ -39,9 +39,22 @@ const html = (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").
 const kalin = (s = "") => html(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); // **kalın** → <b>
 const norm = (s = "") => s.toLocaleLowerCase("tr").replace(/[^a-zçğıöşü0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 
-function gorulduMu(anahtar) {
-  const g = oku(GORULEN, []), a = norm(anahtar), sinir = Date.now() - 7 * 864e5;
-  return g.some((x) => x.zaman > sinir && (norm(x.anahtar) === a || (a.length > 8 && (norm(x.anahtar).includes(a) || a.includes(norm(x.anahtar))))));
+// 24 Kas: "isveç göta kanal" ile "isvec gota kanali" aynı sayılmadı, haber iki kez gitti → Türkçe harf katlama + kelime örtüşmesi,
+// geçmiş kaydın anahtarı VE başlığı ile karşılaştırılır (3+ ortak kök ya da küçük kümenin %60'ı).
+const katla = (s = "") => norm(s).replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ı/g, "i").replace(/ö/g, "o").replace(/ş/g, "s").replace(/ü/g, "u");
+const DURAK = new Set("ve ile bir bu icin olan oldu gibi daha cok en de da ki the and of to in on for".split(" "));
+const kokler = (s) => new Set(katla(s).split(" ").filter((w) => w.length > 2 && !DURAK.has(w)).map((w) => w.slice(0, 5)));
+function gorulduMu(anahtar, baslik = "") {
+  const g = oku(GORULEN, []), sinir = Date.now() - 7 * 864e5, a = kokler(anahtar), b = kokler(`${anahtar} ${baslik}`);
+  return g.some((x) => {
+    if (x.zaman <= sinir) return false;
+    if (katla(x.anahtar) === katla(anahtar)) return true;
+    for (const [bu, o] of [[a, kokler(x.anahtar)], [b, kokler(`${x.anahtar} ${x.baslik || ""}`)]]) {
+      let n = 0; for (const w of bu) if (o.has(w)) n++;
+      if (n >= 3 && n >= Math.min(bu.size, o.size) * 0.5 || (n >= 2 && n >= Math.min(bu.size, o.size) * 0.6)) return true;
+    }
+    return false;
+  });
 }
 function isaretle(kayit) {
   const g = oku(GORULEN, []).filter((x) => x.zaman > Date.now() - 30 * 864e5);
@@ -138,7 +151,7 @@ if (komut === "deneme") {
   const { hata, uyari } = kontrol(tur);
   for (const u of uyari) console.log("UYARI:", u);
   if (hata.length) { for (const e of hata) console.log("HATA:", e); console.log("KALİTE KAPISI KALDI — hiçbir şey gönderilmedi; tur.json'u düzelt ve tekrar çalıştır."); process.exit(1); }
-  const yeni = tur.haberler.filter((h) => !gorulduMu(h.anahtar));
+  const yeni = tur.haberler.filter((h) => !gorulduMu(h.anahtar, h.baslik));
   if (!yeni.length) { console.log("Hepsi daha önce gönderilmiş"); process.exit(0); }
   const d = oku(DURUM, { sayac: 0, offset: 0 });
   let i = 0;

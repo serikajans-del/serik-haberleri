@@ -19,10 +19,11 @@ const gn = (q, dil = "tr") => dil === "tr"
   : `https://news.google.com/rss/search?q=${encodeURIComponent(q + " when:1d")}&hl=en-US&gl=US&ceid=US:en`;
 const ARAMALAR_TR = ["sosyal medyada gündem oldu", "görenler şaşırdı", "görenleri şaşırttı", "pes dedirten", "ilginç görüntü",
   "yüzleri güldüren", "duygulandıran", "rekor kırdı", "Guinness", "genç mucit", "buluş geliştirdi", "sıra dışı", "akılalmaz",
-  "viral oldu", "izlenme rekoru", "Reddit'te", "Reddit kullanıcıları", "Antalya ilginç", "Antalya görenler", "Alanya görenler", "Manavgat ilginç", "Antalya sosyal medya", "köyde ilginç", "dünyada ilk", "Türkiye'de ilk"];
+  "viral oldu", "izlenme rekoru", "Reddit'te", "Reddit kullanıcıları", "Antalya ilginç", "Antalya görenler", "Alanya görenler", "Manavgat ilginç", "Antalya sosyal medya", "köyde ilginç", "dünyada ilk", "Türkiye'de ilk",
+  "yürekleri ısıttı", "kahkahaya boğdu", "beğeni yağdı", "izleyenleri hayran bıraktı", "sosyal medyada çok konuşuldu", "TikTok'ta"];
 const ARAMALAR_EN = ["bizarre", "weird news", "odd news", "Guinness World Records", "goes viral", "world's first",
   "invention", "scientists discover", "heartwarming", "unusual",
-  "went viral on Reddit", "Redditors"]; // Reddit API kapalı: Reddit'te patlayanı haberleştiren siteler
+  "went viral on Reddit", "Redditors", "internet is obsessed", "TikTok viral", "wholesome"]; // Reddit API kapalı: Reddit'te patlayanı haberleştiren siteler
 const RSS = [ // 24 Kas: Guinness (boş) ve Oddity Central (Eylül'den beri durmuş) çıkarıldı; tabloid "weird" + TR yaşam akışları eklendi
   ["UPI Odd News", "https://rss.upi.com/news/odd_news.rss", "en"],
   ["Mirror Weird", "https://www.mirror.co.uk/news/weird-news/?service=rss", "en"],
@@ -63,14 +64,16 @@ const ARTI = [ // [düzenli ifade, puan, etiket]
 ];
 const EKSI = [
   [kok("seçim|milletvekil|bakan |cumhurbaşkan|chp|akp|ak parti|mhp|dem parti|meclis|trump|biden|putin|netanyahu|zelensk|senate|congress|belediye başkan"), -4, "siyaset"],
-  [kok("borsa|dolar|euro |faiz|enflasyon|merkez bankası|altın fiyat|bitcoin|stock|nasdaq|ipo|banker|ücretli çalışan|sektör"), -4, "piyasa"],
+  [kok("borsa|dolar|euro |faiz|shares|sensex|nse |unusual volume|hisse|enflasyon|merkez bankası|altın fiyat|bitcoin|stock|nasdaq|ipo|banker|ücretli çalışan|sektör"), -4, "piyasa"],
   [kok("cinayet|öldürül|bıçak|silahlı|tecavüz|taciz|intihar|köprüden atla|hayatını kaybett|cesed|murder|stabbed|shooting|killed|rape|suicide"), -5, "şiddet"],
   [kok("kaza|yangın|deprem|crash|wildfire|earthquake"), -1, "afet"],
   [kok("names .* facility|helps (?:scale|customers)|unveils|launches|partnership|announces|company|corporation|şirketi|holding|a.ş.|yatırım|proje(?:si)? (?:tanıtıldı|hayata)|ihracat|lng|ai-powered|industrial"), -3, "kurumsal"],
   [kok("kampanya|indirim|lansman|tanıtım|sponsor|reklam|discount|coupon|temizlik ve hijyen"), -3, "reklam"],
-  [kok("maç|gol|transfer|derbi|teknik direktör|beşiktaş|fenerbahçe|galatasaray|trabzonspor|league|nba|nfl|f1 |podium|quarterback|coach|76ers|cowboys|lsu|playoff|halftime|teammate"), -4, "spor"],
+  [kok("maç|gol|transfer|derbi|teknik direktör|beşiktaş|fenerbahçe|galatasaray|trabzonspor|league|nba|nfl|f1 |podium|quarterback|coach|76ers|cowboys|lsu|playoff|halftime|teammate|dismissal|presser|postgame|wrestl|wwe|ufc|boxing|cricket|wicket|innings|vada|athlete|olympi|futbolcu|basketbol|voleybol"), -4, "spor"],
+  [/[a-zçğıöşü]+spor(?![a-zçğıöşü])|spor'?(?:da|un|a) /iu, -4, "spor"],
+  [kok("gta|video game|oyun konsol|playstation|xbox|nintendo|fortnite|minecraft|roblox|esports|where to find|codes|promo code|dizi(?:si)? |sezon finali|netflix|episode|trailer|fragman"), -3, "oyun/dizi"],
   [/(?:^|\s)(?:these|bu)\s+\d+\s|^\d+\s+(?:funny|hilarious|times|people|photos|memes|things)|memes?\b/i, -4, "liste/mim"],
-  [kok("evlendi|boşandı|sevgili|aşk yaşıyor|married|dating|rumou?red|kiss|birthday message"), -2, "magazin"],
+  [kok("poz verdi|pozlar|elbise|göz kamaştır|bikini|kombin|dekolte|tarz(?:ıyla)?|kırmızı halı|evlendi|boşandı|sevgili|aşk yaşıyor|married|dating|rumou?red|kiss|birthday message"), -4, "magazin"],
 ];
 
 // ---- yardımcılar -----------------------------------------------------------------------------------------
@@ -216,13 +219,21 @@ if (process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET) {
 const ONC = `${KOK}/onceki.json`;
 let onceki = existsSync(ONC) ? JSON.parse(readFileSync(ONC, "utf8")).filter((o) => SIMDI - o.ilk < 48 * 36e5) : [];
 const bul = (a) => { const w = kelime(a.baslik); return onceki.find((o) => { let n = 0; for (const x of o.w) if (w.has(x)) n++; return n >= 3 || (n >= 2 && n >= o.w.length * 0.6); }); };
+// YAYILIYOR (24 Kas, erken yakalama): önceki turdan bu yana konuyu yazan site sayısı arttıysa → haber şu an yayılıyor, tekrar cezası yok
 for (const a of adaylar) {
-  const o = bul(a);
-  if (!o) { a.etiket.unshift("YENİ"); a.on_puan = Math.round((a.on_puan + 1) * 10) / 10; }
-  else if (o.tur >= 2) { a.on_puan = Math.round((a.on_puan - Math.min(6, 2 * (o.tur - 1))) * 10) / 10; a.etiket.push(`${o.tur}. tur`); }
+  const o = bul(a); a._o = o;
+  const art = o ? a.site_sayisi - (o.site || 0) : 0;
+  if (!o) { a.etiket.unshift("YENİ"); a.on_puan += 1; }
+  else if (o.site && (art >= 2 || (art >= 1 && a.site_sayisi >= 3))) { a.on_puan += Math.min(5, 1.5 * art); a.etiket.unshift(`YAYILIYOR +${art} site`); }
+  else if (o.tur >= 2) { a.on_puan -= Math.min(6, 2 * (o.tur - 1)); a.etiket.push(`${o.tur}. tur`); }
+  a.on_puan = Math.round(a.on_puan * 10) / 10;
 }
 adaylar.sort((a, b) => b.on_puan - a.on_puan).splice(60);
-for (const a of adaylar.slice(0, 25)) { const o = bul(a); if (o) o.tur++; else onceki.push({ w: [...kelime(a.baslik)], ilk: SIMDI, tur: 1 }); }
+adaylar.forEach((a, i) => { // 60 adayın site sayısı hatırlanır (yayılma için); tur sayacı yalnız ilk 25'te görünenlere
+  const o = a._o; delete a._o;
+  if (o) { o.site = Math.max(o.site || 0, a.site_sayisi); if (i < 25) o.tur++; }
+  else onceki.push({ w: [...kelime(a.baslik)], ilk: SIMDI, tur: i < 25 ? 1 : 0, site: a.site_sayisi });
+});
 writeFileSync(ONC, JSON.stringify(onceki));
 
 writeFileSync(`${KOK}/aday.json`, JSON.stringify({ zaman: new Date().toISOString(), ham: ham.length, kume: kumeler.length,
