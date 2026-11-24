@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import BreakingNews from "@/components/BreakingNews";
@@ -9,6 +10,15 @@ import { categories } from "@/lib/news";
 import { getLatestNewsFromDB, getMostReadFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
 export const revalidate = 30;
+
+// Kök layout'taki canonical "./" ana sayfada "/index" olarak çözülüyordu.
+// Metadata yüzeysel birleştiği için RSS bağlantısı da burada tekrar veriliyor.
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": "/feed.xml" },
+  },
+};
 
 export default async function HomePage() {
   const latest = await getLatestNewsFromDB(21);
