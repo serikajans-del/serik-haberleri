@@ -37,6 +37,21 @@ New Atlas, ScienceAlert, AA/Hürriyet yaşam, NTV dünya + Google Trendler TR + 
 - Reddit fotoğraf/videosunu kullanma önerme (telif + kimlik); görsel promptu her zamanki gibi canlandırma/detay karesi.
 - `tartışmalı` (oy oranı < 0,8) konular genelde siyaset/kavga: dikkat. Türkçe açıklamada "Reddit'te X saatte Y bin oy aldı" gibi sosyal kanıtı kullanabilirsin (rakam aday.json'daki `reddit.oy/yorum`dan).
 
+### 1b. X Türkçe viral (Claude in Chrome, kullanıcının X oturumu; ~1–2 dk) — kullanıcı 24 Kas: "X'te Türkçe viral ekleyebilirsin"
+`node masa/radar/x-viral.mjs adresler` → 3 arama adresi (Türkiye sıra dışı/ilginç, genel Türkçe viral görselli, Antalya).
+Tek yeni sekmede sırayla aç; her sayfada 3–4 sn bekle, `masa/haberinilki-radar/x-topla.js` dosyasının TAMAMINI çalıştır, ardından:
+- ilk sayfa: `window.HIR_ON = "radar-x"; HIR.sifirla(); await HIR.topla("x:ilginc")`
+- ikinci: `window.HIR_ON = "radar-x"; await HIR.topla("x:viral")` · üçüncü: `window.HIR_ON = "radar-x"; await HIR.topla("x:antalya")`
+- son sayfada ayrıca: `window.HIR_ON = "radar-x"; HIR.indir()` → sekmeyi kapat.
+**`window.HIR_ON = "radar-x"` ŞART** (aynı Chrome'u @haberinilki radarı da kullanır; birikimler karışmasın).
+Sonra `node masa/radar/x-viral.mjs` → hıza göre sıralı liste (`/dk` = dakikada etkileşim) + `masa/radar/x-aday.json`.
+Sayfa "Bir sorun oluştu" der ya da 30 sn'de açılmazsa bir kez yenile, olmazsa X adımını atla (tur yine sürer).
+**X kuralları (Reddit kuralıyla aynı):**
+- X gönderisi KAYNAK DEĞİLDİR, konu ipucudur. Olayı haber sitesinde bul (WebSearch / `masa/oku.mjs`), en az bir haber sitesi + ikinci kaynak yoksa ELE (video sahte, eski ya da bağlamından kopuk olabilir).
+- X'in fotoğraf/videosu kullanılmaz, önerilmez; görsel promptu her zamanki gibi.
+- Bu radarın konusu sıra dışı/ilginç/duygu/buluş: X'te hızlı olsa da siyaset, kavga, magazin dedikodusu, ölüm/şiddet, spor tartışması ELE. "tartışmalı?" etiketi (yorum/beğeni > 0,3) genelde kavgadır.
+- Aynı olayı çok hesap yazıyorsa (ör. 5 hesap aynı hikâye) bu yayılma sinyalidir: `neden` alanında "X'te N hesap, toplam ~X bin beğeni" gibi kullan (rakam x-aday.json'dan, uydurma yok).
+
 ### 2. Boşluk doldur (WebSearch, 3–6 arama, hedefli)
 Sinyalin göremediği yerleri tara; her turda farklı bir "av sahası" seç (saat dilimine göre döndür):
 - **Türkiye hayatın içinden:** "İHA ilginç", "DHA görenler", "köyde", "esnaf", "emekli", "öğrenci", "yaşındaki", "TikTok'ta milyonlar izledi" + bugünün tarihi.

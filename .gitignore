@@ -77,3 +77,6 @@ masa/haberinilki-radar/*.json
 masa/haberinilki-radar/reported.txt
 masa/haberinilki-radar/images/
 masa/haberinilki-radar/tmp/
+
+masa/radar/x/
+masa/radar/x-aday.json

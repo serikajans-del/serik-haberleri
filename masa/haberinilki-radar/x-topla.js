@@ -4,9 +4,12 @@
 //   await HIR.durum()              -> gönderi sayfasında (x.com/u/status/id) ana gönderiyi yeniden ölçer
 //   HIR.takipci()                  -> profil sayfasında {handle, followers}
 //   HIR.indir()                    -> biriken adayları İndirilenler'e hir-aday-<zaman>.json olarak indirir ve temizler
+//   @antalyahaberci_bot radarı: her çağrıdan önce window.HIR_ON = "radar-x" (ayrı birikim, dosya radar-x-<zaman>.json)
 //   HIR.sifirla()                  -> turun başında birikimi temizle
 window.HIR = (() => {
-  const ANAH = "hir_aday";
+  // İki radar aynı Chrome'u kullanır: birikim anahtarı radara göre ayrılır. antalyahaberci radarı her çağrıdan önce window.HIR_ON = "radar-x" der.
+  const ON = () => (window.HIR_ON === "radar-x" ? "radar-x" : "hir-aday");
+  const ANAH = () => "hir_birikim_" + ON();
   const say = (s) => {
     if (!s) return 0;
     s = String(s).trim().replace(/\s/g, "");
@@ -37,8 +40,8 @@ window.HIR = (() => {
     }
     return o;
   };
-  const oku = () => JSON.parse(localStorage.getItem(ANAH) || "[]");
-  const yaz = (v) => localStorage.setItem(ANAH, JSON.stringify(v));
+  const oku = () => JSON.parse(localStorage.getItem(ANAH()) || "[]");
+  const yaz = (v) => localStorage.setItem(ANAH(), JSON.stringify(v));
   const bekle = (ms) => new Promise((r) => setTimeout(r, ms));
 
   function gorunen(kaynak) {
@@ -93,17 +96,17 @@ window.HIR = (() => {
              yok: /Bu hesap mevcut değil|This account doesn’t exist|askıya alındı|suspended/i.test(document.body.innerText) };
   }
 
-  function indir() {
+  function indir(on = ON()) {
     const v = oku();
     const b = new Blob([JSON.stringify({ toplandi: new Date().toISOString(), adaylar: v })], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(b);
-    a.download = "hir-aday-" + Date.now() + ".json";
+    a.download = on + "-" + Date.now() + ".json";
     document.body.appendChild(a); a.click(); a.remove();
-    localStorage.removeItem(ANAH);
+    localStorage.removeItem(ANAH());
     return `${v.length} aday indirildi`;
   }
 
-  return { topla, durum, takipci, indir, sifirla: () => (localStorage.removeItem(ANAH), "temiz"), _gorunen: gorunen };
+  return { topla, durum, takipci, indir, sifirla: () => (localStorage.removeItem(ANAH()), "temiz"), _gorunen: gorunen };
 })();
 "HIR hazır";
