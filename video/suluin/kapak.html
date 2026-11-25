@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="tr" data-ilk-kare-serbest><head><meta charset="utf-8">
+<!-- Suluin kapağı (1080×1920): dikey su kuyusunda aşağı inen iki ışık (ai/g1.png, temsilî) + 3 satır ortada + sağda derinlik çizgisi "? m".
+     Render: node ../motion/render.mjs kapak.html k.mp4 --kare 0 --bicim jpeg -->
+<style>
+@font-face { font-family: M; src: url("../fontlar/Montserrat.ttf"); font-weight: 100 900; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #04101f; font-family: M; }
+canvas { position: absolute; left: 0; top: 0; }
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+window.SURE = 1;
+const K = document.getElementById("c").getContext("2d");
+const a = new Image(); a.src = "ai/g1.png";
+window.seek = async () => {
+  await document.fonts.load("900 100px M"); if (!a.complete) await new Promise((r) => (a.onload = r));
+  const s = 1.25 * 1920 / a.height, w = a.width * s, h = a.height * s; K.drawImage(a, 540 - .5 * w, 1080 - .62 * h, w, h);
+  const g = K.createLinearGradient(0, 250, 0, 1000); g.addColorStop(0, "rgba(2,8,18,0)"); g.addColorStop(.3, "rgba(2,8,18,.62)"); g.addColorStop(.75, "rgba(2,8,18,.62)"); g.addColorStop(1, "rgba(2,8,18,0)");
+  K.fillStyle = g; K.fillRect(0, 250, 1080, 750);
+  const yaz = (m, y, boy, rk, kont) => { K.font = `900 ${boy}px M`; K.textAlign = "center"; K.lineJoin = "round"; K.lineWidth = kont; K.strokeStyle = "#020812"; K.strokeText(m, 540, y); K.fillStyle = rk; K.fillText(m, 540, y); };
+  K.save(); K.rotate(-.03);
+  yaz("FİNİKE'DE YOL KENARINDA", 400, 58, "#fff", 13);
+  yaz("DİBİNİ", 580, 180, "#FDD03E", 26);
+  yaz("KİMSE GÖRMEDİ", 720, 112, "#FDD03E", 20);
+  K.restore();
+  // sağda derinlik çizgisi
+  K.strokeStyle = "rgba(255,255,255,.9)"; K.lineWidth = 8; K.lineCap = "round"; K.beginPath(); K.moveTo(960, 1020); K.lineTo(960, 1560); K.stroke();
+  K.fillStyle = "#fff"; K.beginPath(); K.arc(960, 1560, 18, 0, 7); K.fill();
+  K.font = "900 78px M"; K.textAlign = "center"; K.lineWidth = 12; K.strokeStyle = "#020812"; K.strokeText("? m", 960, 1660); K.fillStyle = "#fff"; K.fillText("? m", 960, 1660);
+};
+window.seek(0);
+</script></body></html>

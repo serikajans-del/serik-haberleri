@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Antalya Belgesel · Finike'de yolun kenarındaki mağara (Suluin)</title>
+<!--
+  Format kaynağı (FORMAT.md): Antalya Belgesel'in tutan Short'ları (nekropol, Saat Kulesi, Kekova) + genel tarama (mağara dalışı trajedisi Short'ları: sonuç başta, adım adım iniş).
+  İmza öğesi: sağda dikey DERİNLİK SAYACI (yazı geçişinde de görünür, Grok karelerinin üstünde de iner).
+  Görsel dil: gerçek foto (açılış/kapanış) + kod ŞEMATİK KESİT (yeraltı/su kuralı) + 3 Grok karesi (taban, kur.py).
+  Üst katman iki geçiş (kur.py): opak (foto + kesit; --alt 1) + saydam yazı (film_yazi.html, Grok aralıklarında).
+  Zaman: zaman.js → window.C[i] = i. cümlenin video saniyesi (1..18), C[19] = SURE. Dış ses videoda +VO_GECIKME.
+  Ölüm canlandırması YOK: 12-13. cümlede ışıklar söner, sayaç donar, yalnız ip kalır.
+-->
+<style>
+  @font-face { font-family: M; src: url("../fontlar/Montserrat.ttf"); font-weight: 100 900; }
+  html, body { width: 1080px; height: 1920px; margin: 0; overflow: hidden; background: transparent; }
+  .tam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  #cv { opacity: 0; }
+  #foto { opacity: 0; overflow: hidden; background: #000; }
+  #foto img { position: absolute; left: 50%; top: 50%; height: 1920px; transform-origin: 50% 50%; display: none; }
+  #foto::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 55%, rgba(0,0,0,.5) 85%, rgba(0,0,0,.35) 100%); }
+  #kara { background: #000; opacity: 0; }
+  /* temsilî sahneler (25 Kas): Grok yerine ChatGPT karesi + kod hareketi (tek opak geçiş) */
+  #ai { opacity: 0; overflow: hidden; background: #000; }
+  #ai img { position: absolute; left: 50%; top: 50%; height: 1920px; transform-origin: 50% 50%; display: none; }
+  #pc { pointer-events: none; }
+  .ky { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; line-height: 1;
+        font: 800 88px M; color: #fff; text-shadow: 0 5px 22px rgba(0,0,0,.75), 0 0 3px rgba(0,0,0,.6); opacity: 0; }
+  .ky.vurgu { color: #FDD03E; }
+  .ky.orta { font-size: 62px; }
+  #baslik { position: absolute; left: 0; right: 0; top: 520px; text-align: center; font: 900 150px M; color: #fff; letter-spacing: 6px;
+            text-shadow: 0 8px 34px rgba(0,0,0,.7); opacity: 0; transform-origin: 50% 50%; }
+  .hap { position: absolute; white-space: nowrap; padding: 8px 18px 10px; border-radius: 30px; transform: translate(-50%, -50%);
+         background: #FDD03E; color: #23160b; font: 800 34px M; box-shadow: 0 6px 18px rgba(0,0,0,.45); opacity: 0; }
+  /* derinlik sayacı: sağ kenar, Shorts arayüz butonlarının (x>960, y 1100-1700) üstünde kalır */
+  #sayac { position: absolute; right: 130px; top: 300px; width: 150px; height: 640px; opacity: 0; }
+  #sayac .ray { position: absolute; left: 68px; top: 0; width: 6px; height: 560px; border-radius: 3px; background: rgba(255,255,255,.28); }
+  #sayac .dolu { position: absolute; left: 68px; top: 0; width: 6px; height: 0; border-radius: 3px; background: #fff; box-shadow: 0 0 12px rgba(255,255,255,.6); }
+  #sayac .uc { position: absolute; left: 59px; width: 24px; height: 24px; margin-top: -12px; border-radius: 50%; background: #fff; box-shadow: 0 0 16px rgba(255,255,255,.8); }
+  #sayac .deger { position: absolute; left: -20px; right: -20px; top: 580px; text-align: center; font: 900 54px M; color: #fff;
+                  text-shadow: 0 4px 16px rgba(0,0,0,.85); white-space: nowrap; }
+  #sayac .etk2 { position: absolute; left: -20px; right: -20px; top: -46px; text-align: center; font: 700 24px M; letter-spacing: 3px;
+                 color: rgba(255,255,255,.85); text-shadow: 0 2px 8px rgba(0,0,0,.9); }
+  #son { position: absolute; left: 110px; right: 110px; top: 660px; padding: 44px 20px 52px; border-radius: 36px; text-align: center; color: #fff; opacity: 0;
+         background: rgba(8,14,22,.6); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+  #son .s1 { font: 900 62px M; letter-spacing: 3px; white-space: nowrap; text-shadow: 0 4px 22px rgba(0,0,0,.8); }
+  #son .s2 { margin-top: 16px; font: 600 40px M; color: rgba(255,255,255,.92); text-shadow: 0 2px 10px rgba(0,0,0,.85); }
+  #son .s3 { display: inline-flex; align-items: center; gap: 18px; margin-top: 40px; padding: 22px 52px; border-radius: 60px; background: #FDD03E; color: #1b1406;
+             font: 900 50px M; letter-spacing: 3px; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+  #son .s3 svg { width: 46px; height: 46px; }
+  .etk { position: absolute; left: 120px; top: 1585px; font: 600 26px M; color: rgba(255,255,255,.9); background: rgba(0,0,0,.45);
+         padding: 6px 12px; border-radius: 6px; opacity: 0; }
+</style>
+<script src="zaman.js"></script>
+<script src="harita/il.js"></script>
+<script src="harita/rota.js"></script>
+</head>
+<body>
+<div id="foto" class="tam"><img id="p1" src="gercek/01_Finike-Demre-road.jpg"><img id="p2" src="gercek/01_Finike-Demre-road.jpg"></div>
+<div id="ai" class="tam"><img id="a0" src="ai/g0.png"><img id="a00" src="ai/g00.png"><img id="a0b" src="ai/g0.png"><img id="a1" src="ai/g1.png"><img id="a2" src="ai/g2.png"><img id="a3" src="ai/g3.png"></div>
+<canvas id="hc" class="tam" width="1080" height="1920" style="opacity:0"></canvas>
+<canvas id="pc" class="tam" width="1080" height="1920"></canvas>
+<canvas id="cv" class="tam" width="1080" height="1920"></canvas>
+<div id="haplar" class="tam"></div>
+<div id="baslik">FİNİKE</div>
+<div class="ky vurgu" id="t_1995" style="top:330px; font-size:96px">AĞUSTOS 1995</div>
+<div class="ky orta" id="t_bar" style="top:1400px">90 m: HER cm²'YE ~10 KG</div>
+<div class="ky vurgu orta" id="t_bina" style="top:300px">≈ 40 KATLI BİNA BOYU</div>
+<div class="ky" id="t_90lar" style="top:330px; font-size:96px">1990'LAR</div>
+<div class="ky vurgu" id="t_2010" style="top:330px; font-size:96px">2010</div>
+<div class="ky orta" id="t_otuz" style="top:300px">1995 → BUGÜN</div>
+<div id="sayac"><div class="etk2">DERİNLİK</div><div class="ray"></div><div class="dolu"></div><div class="uc"></div><div class="deger">0 m</div></div>
+<div id="son"><div class="s1">ANTALYA BELGESEL</div><div class="s2">Antalya'nın bilinmeyen hikâyeleri</div>
+  <div class="s3"><svg viewBox="0 0 24 24"><path fill="#1b1406" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/></svg>ABONE OL</div></div>
+<div class="etk" id="temsil">Yapay zekâ ile temsilî canlandırma</div>
+<div class="etk" id="gercekEt">Finike sahil yolu · gerçek fotoğraf</div>
+<div class="etk" id="haritaEt">Uydu: Sentinel-2 · EOX · © OpenStreetMap</div>
+<div class="etk" id="semaEt">Şematik kesit · ölçek yaklaşık</div>
+<div id="kara" class="tam"></div>
+<script>
+const C = window.C; window.SURE = C[19];
+const $ = (id) => document.getElementById(id);
+const sn = (a, b, t) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+const cik = (p) => 1 - Math.pow(1 - p, 3);
+const yum = (p) => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const ara = (a, b, p) => a + (b - a) * p;
+
+// sahneler (cümle numarasıyla): f foto, k kesit (kod), g Grok (taban)
+// v5 (kullanıcı, 25 Kas): açılış ChatGPT konum karesi (mağara yolun kenarında), "Burası Finike…" konum bloğu haritada (window.L),
+// "Aşağı inince" iç kare (g00), kapanış yine konum karesi. Gerçek foto kalktı (mağarayı göstermiyordu).
+const L = window.L;
+const S = { g0: [0, L.bas], h0: [L.bas, C[3]], olcek: [C[3], C[4]], g00: [C[4], C[5]], kesit: [C[5], C[6]], k95: [C[6], C[7]], g1: [C[7], C[8]], patla: [C[8], C[9]], iner: [C[9], C[10]],
+  g2: [C[10], C[11]], bina: [C[11], C[12]], kayip: [C[12], C[14]], g3: [C[14], C[15]], k45: [C[15], C[16]], dip: [C[16], C[17]], son: [C[17], C[19]] };
+window.SAHNE = S;
+const ic = (k, t) => t >= S[k][0] && t < S[k][1];
+const GROK = ["g0", "g00", "g1", "g2", "g3", "son"];
+const KESIT = ["olcek", "kesit", "k95", "patla", "iner", "bina", "kayip", "k45", "dip"];
+
+// ---------- derinlik (m) zaman çizgisi; null = sayaç gizli
+function derinlik(t) {
+  if (t < 0.5 || (t >= L.bas && t < C[6]) || t >= C[17]) return null;   // v5: konum haritasında gizli   // v3: "? m" 0,5 sn'den (senarist + kurgu: tezat ilk saniyede)
+  if (t < C[3]) return "?";
+  if (t < C[7]) return 0;
+  if (t < C[8]) return 60 * yum(sn(C[7] + .3, C[8] - .2, t));             // 30… 60…
+  if (t < C[9]) return ara(60, 90, cik(sn(C[8], C[8] + 1.2, t)));        // doksan metrede
+  if (t < C[10]) return ara(90, 112, yum(sn(C[9] + .2, C[10] - .2, t)));  // yüz on metreyi geçiyorlar
+  if (t < C[12]) return ara(112, 117, cik(sn(C[10], C[10] + 1.5, t)));   // yüz on yedi
+  if (t < C[12]) return 117;
+  if (t < C[14]) return "—";                                               // 1990'lar: ölümün derinliği bilinmiyor, 117'ye bağlanmaz
+  if (t < C[16]) return 45;                                                // 2010: kırk beş metre
+  return "?";
+}
+let P = 7;   // piksel bölü metre, şematik; v2 kesit sahnelerinde yüzde 7 büyür, yazılar keskin kalır
+function kamera(t) {   // kesitte görüntülenen derinlik (ekran ortası y=960)
+  if (ic("olcek", t)) return -38;
+  if (ic("kesit", t)) return ara(-38, -12, yum(sn(S.kesit[0], S.kesit[0] + 2.5, t)));
+  if (ic("k95", t)) return ara(-12, 8, yum(sn(S.k95[0], S.k95[1], t)));
+  if (ic("bina", t)) return ara(110, 58, yum(sn(S.bina[0], S.bina[0] + 1.6, t)));
+  if (ic("kayip", t)) return 58;
+  if (ic("k45", t)) return ara(58, 45, yum(sn(S.k45[0], S.k45[0] + 1.2, t)));
+  if (ic("dip", t)) return ara(45, 150, yum(sn(S.dip[0], S.dip[1], t)));
+  const d = derinlik(t); return typeof d === "number" ? d : 0;
+}
+// dünya → ekran (x: m, havuz merkezi 0; y: m, havuz yüzeyi 0, aşağı +)
+let XO = 0;   // v3: kesitte yatay kayma (metre)
+const X = (x) => 540 + (x - XO) * P, Y = (y, cam) => 960 + (y - cam) * P;
+// mağara yolu: havuzdan dibe inen kılavuz hat (şematik; gerçekte 230 m'den fazla yatay ilerleme)
+const YOL = [[0, 0], [-4, 20], [2, 40], [-6, 62], [-2, 80], [-12, 98], [-8, 112], [-14, 117]];
+function yolX(d) { for (let i = 1; i < YOL.length; i++) if (d <= YOL[i][1]) { const [x0, y0] = YOL[i - 1], [x1, y1] = YOL[i]; return ara(x0, x1, (d - y0) / (y1 - y0)); } return YOL.at(-1)[0]; }
+const dalga = (y, k) => Math.sin(y * 0.21 + k) * 4 + Math.sin(y * 0.057 + k * 2) * 6;   // belirlenimci kaya pürüzü
+
+const cv = $("cv"), ctx = cv.getContext("2d");
+function kesit(t, cam) {
+  ctx.fillStyle = "#0d0f12"; ctx.fillRect(0, 0, 1080, 1920);
+  // gökyüzü
+  const gy = Y(-90, cam); ctx.fillStyle = "#1c2733"; ctx.fillRect(0, 0, 1080, Math.max(0, Y(0, cam)));
+  // deniz (sağ, yüzey 0)
+  ctx.fillStyle = "#2b78a8"; ctx.fillRect(X(52), Y(0, cam), 1080, 1920);
+  const dg = ctx.createLinearGradient(0, Y(0, cam), 0, Y(60, cam)); dg.addColorStop(0, "rgba(43,120,168,0)"); dg.addColorStop(1, "rgba(5,20,35,.9)");
+  ctx.fillStyle = dg; ctx.fillRect(X(52), Y(0, cam), 1080, 1920);
+  // kaya kütlesi (yamaç + derin kaya)
+  ctx.fillStyle = "#5a4a3a";
+  ctx.beginPath(); ctx.moveTo(-10, Y(-75, cam)); ctx.lineTo(X(-40), Y(-30, cam)); ctx.lineTo(X(40), Y(-26, cam)); ctx.lineTo(X(45), Y(-4, cam));
+  ctx.lineTo(X(52), Y(-2, cam)); ctx.lineTo(X(52), Y(400, cam)); ctx.lineTo(-10, Y(400, cam)); ctx.closePath(); ctx.fill();
+  // kaya dokusu: yatay katmanlar
+  ctx.strokeStyle = "rgba(0,0,0,.18)"; ctx.lineWidth = 2;
+  for (let y = -60; y < 300; y += 9) { ctx.beginPath(); for (let x = -80; x <= 52; x += 6) { const yy = Y(y + Math.sin(x * .13 + y) * 1.2, cam); x === -80 ? ctx.moveTo(X(x), yy) : ctx.lineTo(X(x), yy); } ctx.stroke(); }
+  // yol (yamacın dibi, denize 10 m)
+  ctx.fillStyle = "#222"; ctx.fillRect(X(41), Y(-5, cam), X(50) - X(41), 9);
+  // dev boşluk (mağara içi)
+  ctx.fillStyle = "#07090c";
+  ctx.beginPath(); ctx.moveTo(X(-40), Y(-30, cam));
+  ctx.bezierCurveTo(X(-48), Y(-18, cam), X(-36), Y(-4, cam), X(-28), Y(0, cam));
+  ctx.lineTo(X(24), Y(0, cam)); ctx.bezierCurveTo(X(34), Y(-6, cam), X(44), Y(-16, cam), X(40), Y(-26, cam)); ctx.closePath(); ctx.fill();
+  // havuz + su dolu kuyu (soğuk, tuzlu)
+  const su = ctx.createLinearGradient(0, Y(0, cam), 0, Y(140, cam)); su.addColorStop(0, "#1f5fae"); su.addColorStop(.35, "#123a72"); su.addColorStop(1, "#050b17");
+  ctx.fillStyle = su; ctx.beginPath(); ctx.moveTo(X(-28), Y(0, cam)); ctx.lineTo(X(24), Y(0, cam));
+  for (let d = 0; d <= 160; d += 4) ctx.lineTo(X(yolX(Math.min(d, 117)) + 14 + dalga(d, 1) * .6 - (d > 117 ? (d - 117) * .1 : 0)), Y(d, cam));
+  for (let d = 160; d >= 0; d -= 4) ctx.lineTo(X(yolX(Math.min(d, 117)) - 14 - dalga(d, 3) * .6 + (d > 117 ? (d - 117) * .1 : 0)), Y(d, cam));
+  ctx.closePath(); ctx.fill();
+  // 117 m'den aşağısı: bilinmiyor (kararır)
+  const bil = ctx.createLinearGradient(0, Y(117, cam), 0, Y(150, cam)); bil.addColorStop(0, "rgba(13,15,18,0)"); bil.addColorStop(1, "rgba(13,15,18,1)");
+  ctx.fillStyle = bil; ctx.fillRect(0, Y(117, cam), X(30), Y(300, cam) - Y(117, cam));
+  // derinlik cetveli (sol)
+  ctx.font = "700 26px M"; ctx.textAlign = "right";
+  for (let d = 0; d <= 120; d += 30) { const y = Y(d, cam); if (y < 140 || y > 1800) continue;
+    ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.fillRect(132, y - 1, 26, 2); ctx.textAlign = "left"; ctx.fillText(d + " m", 166, y + 9); }
+}
+function etiket(x, y, metin, a, renk = "#fff", hiza = "center", boy = 30) {
+  if (a <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.font = `800 ${boy}px M`; ctx.textAlign = hiza; ctx.fillStyle = renk;
+  ctx.shadowColor = "rgba(0,0,0,.9)"; ctx.shadowBlur = 10; ctx.fillText(metin, x, y); ctx.restore();
+}
+function cizgi(x0, y0, x1, y1, p, renk = "#FDD03E", w = 5) {
+  if (p <= 0) return; ctx.save(); ctx.strokeStyle = renk; ctx.lineWidth = w; ctx.lineCap = "round"; ctx.shadowColor = renk; ctx.shadowBlur = 10;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(ara(x0, x1, p), ara(y0, y1, p)); ctx.stroke(); ctx.restore();
+}
+function dalgiclar(d, cam, a, t) {   // iki ışık noktası, hafif salınım
+  if (a <= 0) return;
+  for (const [dx, dd, k] of [[-5, 0, 0], [4, -3, 1.7]]) {
+    const x = X(yolX(Math.max(0, d + dd)) + dx + Math.sin(t * 1.3 + k) * 1.2), y = Y(Math.max(0, d + dd), cam);
+    ctx.save(); ctx.globalAlpha = a; const g = ctx.createRadialGradient(x, y, 0, x, y, 46); g.addColorStop(0, "rgba(255,250,220,.95)"); g.addColorStop(.25, "rgba(255,240,180,.4)"); g.addColorStop(1, "rgba(255,240,180,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 46, 0, 7); ctx.fill();
+    ctx.fillStyle = "#fffbe6"; ctx.beginPath(); ctx.arc(x, y, 7, 0, 7); ctx.fill(); ctx.restore();
+  }
+}
+function ip(dmax, cam, a) {   // kılavuz ip: havuzdan dmax'a
+  if (a <= 0 || dmax <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(X(yolX(0)), Y(0, cam)); for (let d = 2; d <= dmax; d += 2) ctx.lineTo(X(yolX(d)), Y(d, cam)); ctx.stroke(); ctx.restore();
+}
+function kaya117(cam, a) {
+  if (a <= 0) return; const x = X(yolX(117)), y = Y(117, cam); ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = "#3b3128";
+  ctx.beginPath(); ctx.ellipse(x, y + 22, 64, 26, -.1, 0, 7); ctx.fill(); ctx.restore();
+}
+function bina(cam, p) {   // 117 m ≈ 39 kat (3 m/kat): kuyunun içinde silüet
+  if (p <= 0) return; const x0 = X(yolX(117)) + 70, w = 66, h = 117 * P * cik(p), yb = Y(117, cam);
+  ctx.save(); ctx.globalAlpha = .9 * Math.min(1, p * 3); ctx.fillStyle = "rgba(253,208,62,.18)"; ctx.strokeStyle = "#FDD03E"; ctx.lineWidth = 3;
+  ctx.fillRect(x0, yb - h, w, h); ctx.strokeRect(x0, yb - h, w, h);
+  ctx.strokeStyle = "rgba(253,208,62,.45)"; ctx.lineWidth = 1.5;
+  for (let k = 1; k < 39; k++) { const y = yb - k * 3 * P; if (y < yb - h) break; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + w, y); ctx.stroke(); }
+  ctx.restore();
+}
+const HAP = {};
+function hap(id, metin, x, y, a) {
+  let e = HAP[id]; if (!e) { e = HAP[id] = document.createElement("div"); e.className = "hap"; e.textContent = metin; $("haplar").appendChild(e); }
+  if (metin) e.textContent = metin; e.style.left = x + "px"; e.style.top = y + "px"; e.style.opacity = a;
+}
+function ky(id, t, a, b) { const e = $(id).style, g = (t >= a && t < b) ? cik(sn(a, a + .14, t)) * (1 - sn(b - .2, b, t)) : 0;
+  e.opacity = g; e.transform = `scale(${ara(.92, 1, cik(sn(a, a + .14, t)))})`; }
+
+
+// ---------- açılış haritası (v4, kullanıcı 25 Kas: "bizi seven insanlar önce haritada nerede olduğunu görüyordu")
+// hazirla.py ile aynı kutular: antalya z8, bati z10, finike z13. Mağara: OSM "Suluin Mağarası" (D400 kenarı).
+function mpx(lon, lat, z) { const n = 2 ** z * 256; return [(lon + 180) / 360 * n, (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n]; }
+const yukle = (s) => { const i = new Image(); i.src = s; i.style.display = "none"; document.body.appendChild(i); return i; };   // document.images içinde: render beklesin
+function katman(src, z, lo0, la1, z0, z1) { const [x, y] = mpx(lo0, la1, z); return { img: yukle(src), z, z0, z1, ox: Math.floor(x / 256) * 256, oy: Math.floor(y / 256) * 256 }; }
+// yakın katmanların kenarı yumuşar (geçişte dikdörtgen kenarı seçilmesin)
+function yumusak(L) { if (L.yk) return L.yk; const im = L.img, w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"); x.drawImage(im, 0, 0); x.globalCompositeOperation = "destination-in"; const F = 220;
+  const gx = x.createLinearGradient(0, 0, w, 0); gx.addColorStop(0, "rgba(0,0,0,0)"); gx.addColorStop(F / w, "#000"); gx.addColorStop(1 - F / w, "#000"); gx.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = gx; x.fillRect(0, 0, w, h);
+  const gy = x.createLinearGradient(0, 0, 0, h); gy.addColorStop(0, "rgba(0,0,0,0)"); gy.addColorStop(F / h, "#000"); gy.addColorStop(1 - F / h, "#000"); gy.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = gy; x.fillRect(0, 0, w, h);
+  return (L.yk = c); }
+const KAT = [katman("harita/antalya.jpg", 8, 27.6, 40.8, -1, 0), katman("harita/bati.jpg", 10, 28.9, 37.1, 8.6, 9.4), katman("harita/finike.jpg", 13, 30.0, 36.43, 11.4, 12.2)];
+const MAG = [30.14971, 36.28206], ILC = [30.85, 36.75], ANT = [30.7040, 36.8869], KUM = [30.2867, 36.3700], DEM = [29.9846, 36.2445], FIN = [30.1460, 36.2975];
+// kamera [t, lon, lat, Z], dış sesle: "Burası Finike" il · "Antalya'dan … 114 km batıda" yol · "Kumluca ile Demre" · "adı Suluin" · "ilçe merkezine 2 km"
+const HKAM = () => [[L.bas, ...ILC, 8.6], [L.antalyadan, 30.45, 36.62, 8.75], [L.kumluca - .3, 30.43, 36.58, 8.9], [L.kumluca + 1.2, 30.14, 36.31, 10.4],
+  [L.adi - .1, 30.14, 36.31, 10.5], [L.adi + 1.3, ...MAG, 12.9], [L.ilce, ...MAG, 13.0], [L.ilce + 1.4, 30.148, 36.2895, 13.45], [C[3], 30.148, 36.2895, 13.55]];
+function hkam(t) { const K = HKAM(); let i = 0; while (i < K.length - 2 && t > K[i + 1][0]) i++;
+  const [t0, lo0, la0, z0] = K[i], [t1, lo1, la1, z1] = K[i + 1], p = yum(sn(t0, t1, t)), a = mpx(lo0, la0, 0), b = mpx(lo1, la1, 0);
+  return { Z: ara(z0, z1, p), cx: ara(a[0], b[0], p), cy: ara(a[1], b[1], p) }; }
+const hc = $("hc"), hx = hc.getContext("2d");
+const hek = (lo, la, K) => { const [x, y] = mpx(lo, la, 0), s = 2 ** K.Z; return [540 + (x - K.cx) * s, 960 + (y - K.cy) * s]; };
+function nok(P, a, r = 11) { if (a <= 0) return; hx.save(); hx.globalAlpha = a; hx.fillStyle = "#fff"; hx.shadowColor = "#FDD03E"; hx.shadowBlur = 16;
+  hx.beginPath(); hx.arc(P[0], P[1], r, 0, 7); hx.fill(); hx.shadowBlur = 0; hx.lineWidth = 3; hx.strokeStyle = "#23160b"; hx.stroke(); hx.restore(); }
+function haritaCiz(t) {
+  const K = hkam(t); hx.fillStyle = "#0b1622"; hx.fillRect(0, 0, 1080, 1920);
+  hx.save(); hx.filter = "saturate(.9) contrast(1.05) brightness(.92)";
+  for (const Lk of KAT) { const a = Lk.z0 < 0 ? 1 : sn(Lk.z0, Lk.z1, K.Z); if (a <= 0 || !Lk.img.naturalWidth) continue;
+    const s = 2 ** (K.Z - Lk.z), x = 540 + (Lk.ox / 2 ** Lk.z - K.cx) * 2 ** K.Z, y = 960 + (Lk.oy / 2 ** Lk.z - K.cy) * 2 ** K.Z;
+    hx.globalAlpha = a; hx.drawImage(Lk.z0 < 0 ? Lk.img : yumusak(Lk), x, y, Lk.img.naturalWidth * s, Lk.img.naturalHeight * s); }
+  hx.restore(); hx.globalAlpha = 1;
+  // Antalya ili kırmızı (yakınlaştıkça söner)
+  const ia = 1 - sn(9.6, 10.3, K.Z);
+  if (ia > 0) { hx.save(); hx.globalAlpha = ia; hx.beginPath(); VERI.antalya.forEach(([la, lo], i) => { const [x, y] = hek(lo, la, K); i ? hx.lineTo(x, y) : hx.moveTo(x, y); }); hx.closePath();
+    hx.fillStyle = "rgba(211,18,63,.45)"; hx.fill(); hx.strokeStyle = "#fff"; hx.lineWidth = 3; hx.stroke(); hx.restore(); }
+  const g = hx.createRadialGradient(540, 960, 380, 540, 960, 1200); g.addColorStop(0, "rgba(5,10,18,0)"); g.addColorStop(1, "rgba(5,10,18,.55)"); hx.fillStyle = g; hx.fillRect(0, 0, 1080, 1920);
+  // sahil yolu: Antalya → mağara, kendini çizer (OSRM / OSM, 114 km)
+  const rp = yum(sn(L.antalyadan + .2, L.kumluca - .4, t)), ra = 1 - sn(L.adi + .6, L.adi + 1.2, t);
+  if (rp > 0 && ra > 0) { const n = Math.max(2, Math.round(ROTA.length * rp)); hx.save(); hx.globalAlpha = ra; hx.strokeStyle = "#FDD03E"; hx.lineWidth = 8; hx.lineCap = "round"; hx.lineJoin = "round";
+    hx.shadowColor = "#FDD03E"; hx.shadowBlur = 14; hx.beginPath(); ROTA.slice(0, n).forEach(([lo, la], i) => { const [x, y] = hek(lo, la, K); i ? hx.lineTo(x, y) : hx.moveTo(x, y); }); hx.stroke(); hx.restore(); }
+  const A = hek(...ANT, K); nok(A, cik(sn(L.antalyadan - .1, L.antalyadan + .2, t)) * ra);
+  // ilçe merkezi → mağara, kesik çizgi
+  const F = hek(...FIN, K), M = hek(...MAG, K), fa = cik(sn(L.ilce + .3, L.ilce + .9, t));
+  if (fa > 0) { hx.save(); hx.globalAlpha = fa; hx.setLineDash([16, 12]); hx.strokeStyle = "#fff"; hx.lineWidth = 5; hx.beginPath(); hx.moveTo(...F); hx.lineTo(...M); hx.stroke(); hx.restore(); nok(F, fa, 10); }
+  // mağara noktası + nabız
+  const na = cik(sn(L.bas + .3, L.bas + .6, t));
+  if (na > 0) { const f = (t * .9) % 1; hx.save(); hx.globalAlpha = na * (1 - f); hx.strokeStyle = "#FDD03E"; hx.lineWidth = 6; hx.beginPath(); hx.arc(M[0], M[1], 20 + f * 70, 0, 7); hx.stroke(); hx.restore(); nok(M, na, 15); }
+  return { K, A, F, M, KU: hek(...KUM, K), DE: hek(...DEM, K), ra };
+}
+
+let ARANDI = false;
+window.seek = function (t) {
+  ARANDI = true;
+  const yazi = !!window.SADECE_YAZI;
+  const kes = KESIT.some((k) => ic(k, t)) && !yazi;
+  cv.style.opacity = kes ? 1 : 0;
+  // KAPI 3 (donma) düzeltmesi, 25 Kas: her kesit sahnesinde ~%7 yavaş yaklaşma (VIDEO_KURALLARI: uzun kesit çizimi donmuş sayılmasın); haplar aynı dönüşümle
+  { const k = KESIT.find((x) => ic(x, t)); P = 7 * (k ? 1 + .07 * yum(sn(S[k][0], S[k][1], t)) : 1); }
+  const ha = {};
+  // v3 (GY + kurgu): "deniz on metre ötede" cümlesinde kesit denize doğru kayar, 1995 kartında geri döner
+  XO = ic("kesit", t) ? 22 * yum(sn(C[5], C[5] + 1.6, t)) : ic("k95", t) ? 22 * (1 - yum(sn(S.k95[0], S.k95[0] + 1.2, t))) : 0;
+  // v3: kapanıştaki kesit hayaleti denendi, kaldırıldı (fotoğraf mağaranın yerini göstermiyor; GY doğruluk uyarısı)
+  if (kes) {
+    const cam = kamera(t);
+    kesit(t, cam);
+    const d = derinlik(t);
+    // ölçek: ağız 80 m+ / futbol sahası eni ~68 m
+    if (ic("olcek", t)) { const p = cik(sn(S.olcek[0] + .2, S.olcek[0] + 1.2, t)), q = cik(sn(S.olcek[0] + 1.4, S.olcek[0] + 2.4, t));
+      const y = Y(-34, cam); cizgi(X(-40), y, X(40), y, p); etiket(540, y - 22, "80 m+", p, "#FDD03E", "center", 46);
+      ctx.save(); ctx.globalAlpha = q; ctx.fillStyle = "rgba(60,140,70,.85)"; ctx.fillRect(X(-34), y + 40, 68 * P, 70); ctx.strokeStyle = "#fff"; ctx.lineWidth = 3;
+      ctx.strokeRect(X(-34), y + 40, 68 * P, 70); ctx.beginPath(); ctx.moveTo(540, y + 40); ctx.lineTo(540, y + 110); ctx.stroke(); ctx.beginPath(); ctx.arc(540, y + 75, 22, 0, 7); ctx.stroke(); ctx.restore();
+      etiket(540, y + 160, "futbol sahasının eni ~68 m", q, "#fff", "center", 30); }
+    if (ic("kesit", t)) { const a = cik(sn(S.kesit[0] + 1.6, S.kesit[0] + 2.2, t)), b = cik(sn(C[5], C[5] + .5, t));
+      ha.deniz = [ (X(40) + X(52)) / 2 + 60, Y(-14, cam), b ];
+      etiket(X(-2), Y(8, cam) + 12, "HAVUZ", a, "#cfe6ff", "center", 32);
+      
+      cizgi(X(40), Y(-2, cam), X(52), Y(-2, cam), b, "#fff", 4); }
+    if (ic("k95", t)) dalgiclar(ara(-1, 0, sn(S.k95[0], S.k95[1], t)), cam, cik(sn(S.k95[0] + .6, S.k95[0] + 1.2, t)), t);
+    if (ic("patla", t) || ic("iner", t)) { ip(d, cam, 1); dalgiclar(d, cam, 1, t);
+      if (ic("patla", t)) { const f = sn(C[8] + 1.2, C[8] + 1.3, t) * (1 - sn(C[8] + 1.35, C[8] + 1.55, t));   // patlama: tek beyaz parlama, sarsıntı yok
+        if (f > 0) { ctx.save(); ctx.globalAlpha = .6 * f; ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 1080, 1920); ctx.restore(); }   // v2: flaş yok, 0,25 sn %60 kararma
+        for (let k = 0; k < 14; k++) { const b0 = C[8] + 1.25, u = sn(b0, b0 + 2.4, t); if (u <= 0 || u >= 1) continue;   // kabarcıklar
+          const x = X(yolX(90)) + Math.sin(k * 2.1) * 40 * u + Math.sin(k * 7.3) * 18, y = Y(90, cam) - u * (120 + k * 14);
+          ctx.save(); ctx.globalAlpha = (1 - u) * .8; ctx.strokeStyle = "#e6f4ff"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 4 + (k % 4) * 3, 0, 7); ctx.stroke(); ctx.restore(); } } }
+    if (ic("k45", t)) { ip(117, cam, 1); kaya117(cam, 1); const q = cik(sn(S.k45[0] + .3, S.k45[0] + .7, t)), x = X(yolX(45)), y = Y(45, cam);
+      if (q > 0) { ctx.save(); ctx.globalAlpha = q; ctx.fillStyle = "#FDD03E"; ctx.shadowColor = "#FDD03E"; ctx.shadowBlur = 16; ctx.beginPath(); ctx.arc(x, y, 14, 0, 7); ctx.fill(); ctx.restore(); }
+      etiket(x - 80, y + 12, "SERAMİK + KEMİK", q, "#FDD03E", "right", 36); etiket(x - 80, y + 58, "dönemi: ?", cik(sn(S.k45[0] + 1.0, S.k45[0] + 1.4, t)), "#fff", "right", 32); }
+    if (ic("bina", t) || ic("kayip", t) || ic("dip", t)) { ip(117, cam, 1); kaya117(cam, 1);
+      const isik = ic("bina", t) ? 1 - sn(S.bina[1] - 1.0, S.bina[1] - .2, t) : 0;
+      dalgiclar(117, cam, isik, t);
+      if (ic("bina", t)) bina(cam, sn(S.bina[0] + .8, S.bina[0] + 2.6, t));
+      if (!ic("kayip", t)) etiket(X(yolX(117)) - 80, Y(117, cam) + 10, "117 m", ic("bina", t) ? 1 : .7, "#FDD03E", "right", 40);
+      if (ic("kayip", t)) ha.yasak = [X(0), Y(-30, cam) + 60, cik(sn(C[13] + .3, C[13] + .6, t))];
+      if (ic("dip", t)) { const q = cik(sn(S.dip[0] + 1.2, S.dip[0] + 2.2, t)); ctx.save(); ctx.globalAlpha = q * .9; ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.setLineDash([10, 14]); ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(X(yolX(117)), Y(117, cam)); ctx.lineTo(X(yolX(117) - 6), Y(150, cam)); ctx.stroke(); ctx.restore();
+        etiket(X(yolX(117) - 6), Y(150, cam) + 70, "?", q, "#FDD03E", "center", 120); } }
+    ctx.globalAlpha = 1;
+  }
+  hap("deniz", "DENİZ 10 m", ...(ha.deniz ? [ha.deniz[0], ha.deniz[1], ha.deniz[2]] : [0, 0, 0]));
+  hap("yasak", "YALNIZ İZİNLİ ARAŞTIRMACI", ...(ha.yasak ? [ha.yasak[0], ha.yasak[1], ha.yasak[2]] : [0, 0, 0]));
+
+  // konum haritası (v5): dış sesle adım adım bilgi
+  { const h = !yazi && t > L.bas - .3 && t < C[3] + .3, ho = h ? sn(L.bas - .3, L.bas, t) * (1 - sn(C[3] - .05, C[3] + .25, t)) : 0; hc.style.opacity = ho;
+    const H = h ? haritaCiz(t) : null, g = (a, b) => h ? cik(sn(a, a + .3, t)) * (1 - sn(b, b + .3, t)) * ho : 0;
+    const Ao = H ? H.A : [0, 0], KU = H ? H.KU : [0, 0], DE = H ? H.DE : [0, 0], M = H ? H.M : [0, 0], F = H ? H.F : [0, 0];
+    hap("hil", "ANTALYA İLİ", 540, 1420, g(L.bas + .2, L.antalyadan - .2));
+    hap("hant", "ANTALYA", Ao[0], Ao[1] - 50, g(L.antalyadan, L.kumluca + .4));
+    hap("hkm", "SAHİL YOLUYLA 114 km BATIDA", 540, 1420, g(L.antalyadan + .6, L.kumluca + .8));
+    hap("hku", "KUMLUCA", KU[0], KU[1] - 50, g(L.kumluca, L.adi + .3));
+    hap("hde", "DEMRE", DE[0], DE[1] - 50, g(L.kumluca + .8, L.adi + .3));
+    hap("hmag", "SULUİN MAĞARASI", M[0], M[1] + 70, g(L.adi + .4, C[3]));
+    hap("hfin", "FİNİKE MERKEZ", F[0], F[1] - 52, g(L.ilce + .5, C[3]));
+    hap("h2km", "2 km", (F[0] + M[0]) / 2 + 90, (F[1] + M[1]) / 2, g(L.ilce + 1.0, C[3]));
+    $("haritaEt").style.opacity = ho; }
+  // açılış: yer adı dev ve eğik gelir, 1 sn'de oturur; ilk kare dolu (gerçek foto + başlık)
+  { const ikinci = t >= L.bas - .1, b0 = ikinci ? L.bas : -0.2, pb = cik(sn(b0, b0 + 1.0, t)); $("baslik").textContent = ikinci ? "FİNİKE" : "ANTALYA";
+    $("baslik").style.opacity = ikinci ? sn(L.bas - .1, L.bas + .1, t) * (1 - sn(L.antalyadan - .3, L.antalyadan, t)) : 1 - sn(C[2] - .5, C[2] - .1, t);
+    $("baslik").style.transform = `rotate(${ara(-9, 0, pb)}deg) scale(${ara(1.5, 1, pb)})`; }
+  ky("t_1995", t, S.k95[0] + .1, S.k95[0] + 3.2);
+  ky("t_bar", t, C[8] + 1.6, C[8] + 4.4);
+  ky("t_bina", t, S.bina[0] + 1.0, S.bina[1]);
+  ky("t_90lar", t, C[12] + .1, C[13]);
+  ky("t_2010", t, S.g3[0] + .1, S.g3[1]);
+  ky("t_otuz", t, S.dip[0] + .1, S.dip[1]);
+
+  // derinlik sayacı (iki geçişte de görünür)
+  const d = derinlik(t), sy = $("sayac");
+  sy.style.opacity = d === null ? 0 : 1;
+  { const n = sn(1.5, 1.7, t) * (1 - sn(1.7, 2.0, t)); sy.style.transform = `scale(${1 + .1 * n})`; sy.style.transformOrigin = "75px 600px"; }
+  if (d !== null) {
+    const v = typeof d === "number" ? d : 130, h = 560 * Math.min(1, v / 130), sari = (typeof d === "number" && d >= 116.5 && t < C[12]) || ic("g3", t);
+    sy.querySelector(".dolu").style.height = (typeof d === "number" ? h : 0) + "px";
+    sy.querySelector(".uc").style.top = (typeof d === "number" ? h : 560) + "px";
+    sy.querySelector(".uc").style.opacity = typeof d === "number" ? 1 : 0;
+    const dg = sy.querySelector(".deger"); dg.textContent = typeof d === "number" ? Math.round(d) + " m" : d === "—" ? "—" : "? m";
+    dg.style.color = sari ? "#FDD03E" : "#fff";
+    sy.style.filter = ic("kayip", t) ? `grayscale(1) brightness(${ara(1, .6, sn(S.kayip[0], S.kayip[0] + 2, t))})` : "none";
+    const kirmizi = ic("patla", t) ? sn(C[8] + 1.2, C[8] + 1.3, t) * (1 - sn(C[8] + 1.8, C[8] + 2.6, t)) : 0;
+    if (kirmizi > 0) dg.style.color = "#ff5a4a";
+  }
+
+  // temsilî sahneler: g1 dalgıçlarla birlikte aşağı iner (kare yukarı kayar), g2 düğüme yavaş itme, g3 dipte yanal kayma
+  // her birinde tek ana hareket + suda süzülen parçacıklar (ikincil)
+  let ao = 0; const pcx = $("pc").getContext("2d"); pcx.clearRect(0, 0, 1080, 1920);
+  for (const [k, id, f] of [["g0", "a0", (u) => `translate(-50%, -50%) scale(${ara(1.0, 1.12, yum(u))})`],
+                             ["g00", "a00", (u) => `translate(-50%, ${-50 + ara(1.5, -1.5, yum(u))}%) scale(1.06)`],
+                             ["son", "a0b", (u) => `translate(-50%, -50%) scale(${ara(1.12, 1.0, yum(u))})`],
+                             ["g1", "a1", (u) => `translate(-50%, ${-50 + ara(-.8, .8, u)}%) scale(${ara(1.02, 1.06, u)})`],
+                             ["g2", "a2", (u) => `translate(-50%, -50%) scale(${ara(1.0, 1.06, yum(u))})`],
+                             ["g3", "a3", (u) => `translate(${-50 + ara(3, -3, u)}%, -50%) scale(1.04)`]]) {
+    const im = $(id); im.style.display = "none"; if (!ic(k, t) || yazi) continue;
+    const u = sn(S[k][0], S[k][1], t); im.style.display = "block"; ao = 1; im.style.transform = f(u);
+    if (["g0", "g00", "son"].includes(k)) continue;   // parçacık yalnız su altında
+    pcx.save(); for (let n = 0; n < 70; n++) {   // belirlenimci parçacıklar: yavaş yukarı süzülür
+      const x = (n * 397.13) % 1080 + Math.sin(t * .6 + n) * 14, y = ((n * 733.7) % 1920 - t * (18 + (n % 7) * 6) * 1.0) % 1920, yy = y < 0 ? y + 1920 : y;
+      pcx.globalAlpha = .18 + (n % 5) * .06; pcx.fillStyle = "#dff1ff"; pcx.beginPath(); pcx.arc(x, yy, 1.2 + (n % 3), 0, 7); pcx.fill(); }
+    pcx.restore();
+  }
+  $("ai").style.opacity = ao; $("pc").style.opacity = ao;
+
+  $("foto").style.opacity = 0; $("gercekEt").style.opacity = 0;   // v5: gerçek foto kullanılmıyor
+  $("temsil").style.opacity = GROK.some((k) => ic(k, t)) ? (ic("g0", t) ? 1 - sn(L.bas - .4, L.bas - .3, t) : 1) : 0;   // v5: harita etiketiyle çakışmasın
+  $("semaEt").style.opacity = kes ? 1 : 0;
+  const so = yazi ? 0 : sn(C[18], C[18] + .5, t); $("son").style.opacity = so; $("son").style.transform = `translateY(${(1 - cik(so)) * 30}px)`;
+  const pop = sn(C[18] + 3.0, C[18] + 3.25, t) * (1 - sn(C[18] + 3.25, C[18] + 3.6, t)); $("son").querySelector(".s3").style.transform = `scale(${1 + .12 * pop})`;
+  $("kara").style.opacity = sn(C[19] - 1.0, C[19], t);
+};
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => 0))]).then(() => { if (!ARANDI) window.seek(0); });
+</script>
+</body>
+</html>
