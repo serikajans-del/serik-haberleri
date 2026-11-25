@@ -29,8 +29,21 @@ def baslik_denetle(baslik, alt):
     h = []
     if baslik.count("**") != 2:
         return ["başlıkta tam bir **vurgu** olmalı (sayfa kalıbı)"]
-    duz = baslik.replace("**", "").strip()
+    # 25 Kas (kullanıcı: "renk çizgisi doğru kelimeleri işaretlemeli, biri aşağıda diğeri yukarıda olmamalı"):
+    # satır kırılımını editör verir: "1. satır beyaz bağlam | **vurgu** (+ kısa devam)". Kendiliğinden kırılma yok.
+    st = [x.strip() for x in baslik.split("|")]
+    if len(st) != 2 or not all(st):
+        h.append('başlık "|" ile tam İKİ satıra bölünmeli: "Bağlam satırı | **can alıcı kısım** …"')
+    elif not st[1].startswith("**"):
+        h.append("2. satır sarı vurguyla başlamalı (sayfa kalıbı: \"Antalya'daki iki eve | **şehit ateşi düştü**\")")
+    if len(st) == 2:
+        for i, x in enumerate(st, 1):   # Poppins Bold ~0,56 em/harf: 31 harf 892 px'e ~52 px'te sığar; sayfada satır ~22–30 harf
+            n = len(x.replace("**", ""))
+            if not 14 <= n <= 31: h.append(f"{i}. satır {n} karakter (14–31; uzunsa punto küçülür ya da taşar)")
+    baslik = baslik.replace("|", " ")
+    duz = re.sub(r"\s+", " ", baslik.replace("**", "")).strip()
     vurgu = re.search(r"\*\*(.+?)\*\*", baslik).group(1).strip()
+    alt = (alt or "").replace("|", " ")
     nk = len(duz.split())
     if not 32 <= len(duz) <= 70: h.append(f"başlık {len(duz)} karakter (32–70: iki dolu satır)")
     if not 5 <= nk <= 11: h.append(f"başlık {nk} kelime (5–11)")

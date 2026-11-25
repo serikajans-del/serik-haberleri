@@ -24,15 +24,24 @@ html, body { margin: 0; width: 1080px; height: 1350px; overflow: hidden; backgro
 #ek { position: absolute; right: 70px; top: 250px; width: 390px; height: 390px; border-radius: 50%; border: 9px solid #fff;
   overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.35); display: none; }
 #ek img { width: 100%; height: 100%; object-fit: cover; }
-#metin { position: absolute; left: 128px; right: 60px; bottom: 170px; }
+/* METİN BLOĞU (kullanıcı 25 Kas: "biri aşağıda diğeri yukarıda olmamalı"): üstten SABİT hizada başlar, her gönderide etiket hapı
+   y=850'de. Başlık editörün yazdığı İKİ satırdır ("|" ile ayrılır): 1. satır beyaz bağlam, 2. satır sarı vurguyla başlar.
+   Satırlar asla kendiliğinden kırılmaz; punto, en uzun satır 892 px'e sığacak kadar (en çok 68, en az 46). */
+#metin { position: absolute; left: 128px; right: 60px; top: 850px; }
 #etiket { display: inline-block; background: #e3242b; color: #fff; font: 700 24px "P"; letter-spacing: 1px; padding: 6px 20px 4px;
-  border-radius: 22px; margin-bottom: 24px; }
-#baslik { font: 700 56px/1.28 "P"; color: #fff; letter-spacing: -.3px; text-shadow: 0 2px 12px rgba(0,0,0,.25); }
-#baslik .v { background: #ffd21f; color: #0d1631; padding: 0 12px; border-radius: 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone; text-shadow: none; }
-/* alt satır (sayfa kalıbı, 25 Kas ölçümü): başlıkta olmayan doyurucu bağlam; 1–2 satır, beyaz yarı kalın.
-   **…** verilirse sayfanın sarı alt satırı olur (Demet Akalın gönderisi: "İzmit'e giderek küçük kıza bisiklet hediye etti."). */
-#alt { font: 600 31px/1.4 "P"; color: #fff; margin-top: 22px; opacity: .96; }
-#alt .v { background: #ffd21f; color: #0d1631; padding: 1px 8px; border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  border-radius: 22px; margin-bottom: 22px; }
+#baslik { font: 700 60px "P"; color: #fff; letter-spacing: -.3px; text-shadow: 0 2px 12px rgba(0,0,0,.25); }
+#baslik .s { white-space: nowrap; line-height: 1.24; width: max-content; }
+/* vurgu kutusu kelimeye ORTALI (25 Kas: inline arka plan Poppins'in alt boşluğu yüzünden kelimenin altına kayıyordu).
+   inline-block + line-height 1: kutu glifin büyük harf üstü ile alt uzantısı arasında dengeli; dolgu ölçülerek ayarlandı. */
+#baslik .v, #alt .v { display: inline-block; background: #ffd21f; color: #0d1631; text-shadow: none; line-height: 1;
+  padding: .13em .2em .11em; border-radius: .16em; vertical-align: baseline; }
+#alt { font: 600 31px/1.42 "P"; color: #fff; margin-top: 20px; opacity: .97; text-wrap: balance; }
+#alt .s { display: block; }
+#alt .v { padding: .1em .26em .08em; }
+/* satır başındaki vurgu kutusunun YAZISI üst satırın yazısıyla aynı dikey çizgide durur; kutu dolgusu kadar sola taşar (sayfa kalıbı) */
+#baslik .s > .v:first-child { margin-left: -.2em; }
+#alt > .v:first-child, #alt .s > .v:first-child { margin-left: -.26em; }
 </style></head>
 <body><div id="sahne">
   <img id="foto" alt="">
@@ -50,24 +59,39 @@ const kac = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").
 document.getElementById("foto").src = V.foto || "";
 if (V.ek_foto) { const e = document.getElementById("ek"); e.style.display = "block"; e.querySelector("img").src = V.ek_foto; }
 const et = document.getElementById("etiket"); if (V.etiket) et.textContent = V.etiket.toLocaleUpperCase("tr"); else et.remove();
-document.getElementById("baslik").innerHTML = kac(V.baslik).replace(/\*\*(.+?)\*\*/g, '<span class="v">$1</span>');
-const al = document.getElementById("alt"); if (V.alt) al.innerHTML = kac(V.alt).replace(/\*\*(.+?)\*\*/g, '<span class="v">$1</span>'); else al.remove();
-// sayfa kalıbı: başlık İKİ satır, genişliği dolduran en BÜYÜK punto (sayfada kısa başlık ~66 px, uzun ~54 px).
-// 66'dan başla, iki satıra sığana kadar küçült (en az 48); yine sığmazsa kesik yazı denetimi KALDI der (başlığı kısalt, ~40–62 karakter).
-// ÖLÇÜ Poppins yüklendikten SONRA yapılmalı (25 Kas: yedek fontla ölçünce 2 satır sanıp 3 satır bastı). render.mjs fonts.ready'den
-// sonra window.seek() çağırır; sığdırma orada koşar.
+const isle = (t) => kac(t).replace(/\*\*(.+?)\*\*/g, '<span class="v">$1</span>');
+const satirlar = (t) => String(t || "").split("|").map((x) => x.trim()).filter(Boolean);
 const b = document.getElementById("baslik");
+b.innerHTML = satirlar(V.baslik).map((x) => `<div class="s">${isle(x)}</div>`).join("");
+const al = document.getElementById("alt");
+if (V.alt) al.innerHTML = satirlar(V.alt).length > 1 ? satirlar(V.alt).map((x) => `<span class="s">${isle(x)}</span>`).join("") : isle(V.alt); else al.remove();
+// ÖLÇÜ Poppins yüklendikten SONRA (render.mjs fonts.ready'den sonra window.seek() çağırır; sığdırma orada koşar).
+const GEN = 892;
 function sigdir() {
-  let fs = 66; b.style.maxHeight = ""; b.style.overflow = "";
-  const satir = () => Math.round(b.getBoundingClientRect().height / (fs * 1.28));
+  let fs = 68; b.style.fontSize = fs + "px";
+  const enGenis = () => Math.max(...[...b.querySelectorAll(".s")].map((d) => d.scrollWidth));
+  fs = Math.max(46, Math.min(68, Math.floor(fs * GEN / enGenis())));
   b.style.fontSize = fs + "px";
-  while (satir() > 2 && fs > 48) { fs -= 2; b.style.fontSize = fs + "px"; }
-  if (satir() > 2) { b.style.maxHeight = (fs * 1.28 * 2) + "px"; b.style.overflow = "hidden"; }
-  // alt satır en çok 2 satır: taşarsa 26 px'e kadar küçült
-  if (V.alt) { let af = 31; al.style.fontSize = af + "px"; const as = () => Math.round(al.getBoundingClientRect().height / (af * 1.4));
-    while (as() > 2 && af > 26) { af -= 1; al.style.fontSize = af + "px"; } }
+  while (enGenis() > GEN && fs > 46) { fs -= 1; b.style.fontSize = fs + "px"; }
+  if (V.alt) { let af = 31; al.style.fontSize = af + "px"; const as = () => Math.round(al.getBoundingClientRect().height / (af * 1.42));
+    while ((as() > 2 || al.scrollWidth > GEN) && af > 26) { af -= 1; al.style.fontSize = af + "px"; } }
 }
-if (!V.alt) document.getElementById("metin").style.bottom = "295px";   // ölçü: alt satırsız gönderilerde başlık 1055 px'te biter
 sigdir(); document.fonts.ready.then(sigdir);
-window.SURE = 1; window.seek = () => sigdir();
+// INSTAGRAM GÜVENLİ ALAN (kullanıcı 25 Kas: "instagram güvenli alan kısmını daima hatırla"):
+// 1080x1350 gönderi profil ızgarasında 3:4'e kırpılır (her yandan ~34 px gider); yazı/etiket/ek foto kenarlardan en az 60 px içeride kalır.
+// Sayfanın kendi markası (logo, dikey şerit) sayfanın gönderileriyle aynı yerde durur, denetim dışıdır.
+// İhlal varsa kadrajın kenarına bir uyarı yazısı konur → render.mjs --denetle "kesik yazı" der → bas.py YERLEŞİM KALDI.
+const GUVENLI = { sol: 60, ust: 60, sag: 1020, alt: 1290 };
+function guvenliDenetle() {
+  document.querySelectorAll(".guvenli-hata").forEach((e) => e.remove());
+  const disari = [...document.querySelectorAll("#etiket, #baslik .s, #alt, #ek")].filter((e) => e.isConnected && getComputedStyle(e).display !== "none")
+    .filter((e) => { const r = e.getBoundingClientRect(), w = e.classList.contains("s") ? e.scrollWidth : r.width;
+      return r.left < GUVENLI.sol || r.top < GUVENLI.ust || r.left + w > GUVENLI.sag || r.bottom > GUVENLI.alt; });
+  if (disari.length) { const u = document.createElement("div"); u.className = "guvenli-hata";
+    u.style.cssText = "position:absolute;left:-40px;top:40px;font:700 28px P;color:#f00;background:#fff;white-space:nowrap";
+    u.textContent = "GÜVENLİ ALAN DIŞI: " + disari.map((e) => e.id || e.textContent.trim().slice(0, 20)).join(", "); document.body.appendChild(u); }
+}
+// başsız Chrome'da fonts.ready Poppins inmeden çözülebiliyor (25 Kas: salyangoz başlığı yedek fontla ölçülüp taştı) → seek fontu açıkça bekler
+const FONT = () => Promise.all(['700 60px "P"', '600 31px "P"'].map((f) => document.fonts.load(f, "ğüşİçö")));
+window.SURE = 1; window.seek = async () => { await FONT(); await document.fonts.ready; sigdir(); guvenliDenetle(); };
 </script></body></html>

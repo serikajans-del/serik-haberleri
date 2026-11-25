@@ -84,7 +84,7 @@ function mesaj(h, i, n) {
   const kaynak = (h.kaynaklar || []).filter((k) => k.url).slice(0, 2).map((k) => `<a href="${html(k.url)}">${html(k.ad)}</a>`).join(" · ");
   const satir = [
     `<b>${seviye(h.puan)}</b>`,
-    `🔥 <b>${html(String(h.kanca || h.baslik).replace(/\*\*/g, ""))}</b>`,
+    `🔥 <b>${html(String(h.kanca || h.baslik).replace(/\*\*/g, "").replace(/\s*\|\s*/g, " "))}</b>`,
     "",
     html(h.aciklama),
     "",
@@ -102,7 +102,7 @@ function kunye(h, i, n) {
   const kaynak = (h.kaynaklar || []).filter((k) => k.url).slice(0, 2).map((k) => `<a href="${html(k.url)}">${html(k.ad)}</a>`).join(" · ");
   return [
     `<b>${seviye(h.puan)}</b>`,
-    `🔥 <b>${html(String(h.kanca || h.baslik).replace(/\*\*/g, ""))}</b>`,
+    `🔥 <b>${html(String(h.kanca || h.baslik).replace(/\*\*/g, "").replace(/\s*\|\s*/g, " "))}</b>`,
     h.gorsel_alt ? html(String(h.gorsel_alt).replace(/\*\*/g, "")) : null,
     h.neden ? `💡 ${html(h.neden)}` : null,
     `<i>${n > 1 ? `${i}/${n} · ` : ""}${html(h.puan)}/18 · ${html(h.kategori || "GÜNDEM")} · ${html(h.tetik || "")}${h.zaman ? ` · ⏰ ${html(h.zaman)}` : ""}${h.risk && !/^düşük/i.test(h.risk) ? ` · ⚠️ ${html(h.risk)}` : ""}</i>`,
@@ -154,6 +154,7 @@ function kontrol(tur) {
     if (x.gorsel) {   // hazır gönderi görseli
       if (!existsSync(x.gorsel)) hata.push(`${ad}: gorsel dosyası yok (${x.gorsel}); masa/radar/ahm/bas.py ile bas`);
       if ((x.gorsel_baslik || "").split("**").length !== 3) hata.push(`${ad}: gorsel_baslik'ta tam bir **vurgu** olmalı`);
+      if ((x.gorsel_baslik || "").split("|").length !== 2) hata.push(`${ad}: gorsel_baslik editörün kırdığı iki satır olmalı ("1. satır | **vurgu** …")`);
       const ia = (x.ig_aciklama || "").trim();
       if (ia.length < 120 || ia.length > 900) hata.push(`${ad}: ig_aciklama ${ia.length} karakter (120–900; sayfa kalıbı: 5N1K haber paragrafı)`);
       if (/\*\*|!/.test(ia)) hata.push(`${ad}: ig_aciklama'da ** ya da ünlem var`);

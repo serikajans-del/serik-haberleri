@@ -164,7 +164,7 @@ Gönderilecek HER haber için:
    (`e.focus(); document.execCommand('selectAll'); document.execCommand('delete')`), sonra `"Create an image. " + gorsel_prompt` metnini `execCommand('insertText')` ile koy, gönder.
    Görsel bitince (Durdur düğmesi kaybolur, `main img` naturalWidth > 1000) en büyük `img`'yi `fetch` → blob → `<a download>` ile indir; İndirilenler'den `masa/radar/ahm/foto/<kısa-ad>.png`'ye taşı.
    ChatGPT sınırı/hatası olursa o haber görselsiz (eski biçim, yalnız prompt) gider; tur durmaz.
-2. **Bas:** `masa/radar/ahm/<kısa-ad>.json` → `{"foto":"masa/radar/ahm/foto/<kısa-ad>.png","kaynak":"chatgpt","aci":"<haber fotoğrafından farkı>","baslik":"… **vurgu** …","alt":"<doyurucu bağlam satırı, ZORUNLU>","etiket":"DÜNYA|GÜNDEM|EĞİTİM|ANTALYA|SON DAKİKA|…"}`
+2. **Bas:** `masa/radar/ahm/<kısa-ad>.json` → `{"foto":"masa/radar/ahm/foto/<kısa-ad>.png","kaynak":"chatgpt","aci":"<haber fotoğrafından farkı>","baslik":"1. satır | **vurgu** …","alt":"<doyurucu bağlam satırı, ZORUNLU>","etiket":"DÜNYA|GÜNDEM|EĞİTİM|ANTALYA|SON DAKİKA|…"}`
    (isteğe bağlı `"ek_foto"`: sağda yuvarlak ikinci kare; başlık ve alt satır kuralları 3. maddede) → `python masa/radar/ahm/bas.py masa/radar/ahm/<kısa-ad>.json masa/radar/ahm/<kısa-ad>.jpg`
    → `YERLEŞİM GEÇTİ` şart. Çıkan JPG'ye Read ile BAK: başlık iki satır mı, vurgu doğru kelimede mi, fotoğrafın odağı yazının altında kalmıyor mu?
 3. **Görsel başlığı + alt satır — BAŞLIK KURULU** (kullanıcı 25 Kas: "konu başlıkları düzgün olmalı ve doyurucu dikkat çekmeli"; sayfanın son 14 gönderisinden çıkarıldı, `ahm-ornek/`):
@@ -178,14 +178,28 @@ Gönderilecek HER haber için:
    | Erzurum'da 41 yıllık öğretmen **hastanedeki çocuklara** ders veriyor / *18 yıldır tedavi gören öğrencilere yatak başında ders anlatıyor* | kimlik + rakam; alt satır yeni rakam |
    | Kepez Belediyesi'ne operasyon: **10 şüpheli gözaltında** | konu: sonuç biçimi |
    **Zayıf (bizim 25 Kas çıktılarımız, tekrarlama):** "Çöpte bulunan mektupta **"Biraz kötü yapmış olabilirim"**" (kim, nerede, ne oldu belli değil; alıntı vurgulanmış) · "Balkonda sıkışan tavuğu **itfaiye kurtardı**" (yer yok, alt satır yok, sıradan).
-   **Kurallar:**
-   - Başlık 32–70 karakter, 5–11 kelime, İKİ dolu satır; tek okumada **KİM/NEREDE + NE YAPTI** anlaşılır. Yüklem ya da rakam şart.
-   - Vurgu 1–5 kelime: sürpriz eylem, rakam, ünlü adı ya da duygu ("**kafa tuttu**", "**3 bin euro**", "**şehit ateşi düştü**"). Alıntı vurgulanmaz, başlık alıntıyla başlamaz (alıntı alt satıra/açıklamaya).
-   - Yer adı başta (Antalya bağı varsa mutlaka: "Serik'te…", "Antalya'da…"); yoksa il/ilçe ya da ülke ("Gölcük'te", "ABD'de").
-   - **Alt satır (`alt` / `gorsel_alt`) ZORUNLU**, 30–120 karakter, en çok 2 satır: başlığı tekrar etmez; nerede/nasıl/sonuç/ikinci rakam/kim söyler. İyilik/sonuç haberinde tamamı `**…**` ile sarı satır olabilir.
+   **EDİTÖR GİBİ DÜŞÜN (kullanıcı 25 Kas: "30 yıllık sosyal medya uzmanı ve sosyal medya haber editörü gibi yaz"):**
+   Akışta parmak 1,5 sn'de karar verir. Başlık bir haber değil, **durduran bir hikâye cümlesi**dir; alt satır o merakı DOYURUR.
+   - **Kahraman önce:** okurun bağ kuracağı özne (anne kedi, 91 yaşındaki öğretmen, köyün tek öğrencisi, esnaf, emekli) ilk satırda ya da vurguda. Kurum/protokol değil, insan/hayvan.
+   - **Tek sürpriz, sarı kutuda:** haberin "ne?!" dedirten kısmı (eylem, rakam, tezat). Okur yalnız sarıyı okusa bile hikâyeyi yakalamalı ("anne kedi bahçeden kovdu", "165 bin liradan satılıyor").
+   - **Somut ve aktif:** "-mektedir / gerçekleştirildi / yaşandı" yok; geçmiş ya da şimdiki zaman, güçlü fiil (kovdu, kurtardı, sattı, buldu, çevirdi). Rakam okurun para birimiyle (euro yerine TL, kaynaktaki kurla).
+   - **Gerilim → çözüm:** 1. satır durumu kurar (merak), 2. satır sarıyla patlatır (sürpriz), alt satır kanıt/ayrıntıyı verir (nerede, nasıl, kim, ikinci rakam). Başlıkta yer adı sığmıyorsa alt satırın ilk kelimesi yerdir ("Gölcük'te…"). Antalya bağı varsa yer başlıkta, ilk kelime.
+   - **Dürüst merak:** başlık haberin vaat ettiğinden fazlasını söylemez; alt satır sorunun cevabını SAKLAMAZ (tıklama tuzağı değil, doyurucu).
+   - **Yorum kapısı:** iyi başlık okurda bir fikir/anı uyandırır ("benim kedim de…", "bu fiyata kim yer?"). Uyandırmıyorsa yeniden yaz.
+   **Biçim kuralları (denetlenir):**
+   - Başlık editörün kırdığı **İKİ satırdır, `|` ile ayrılır**: `"1. satır beyaz bağlam | **sarı vurgu** (kısa devam)"`. Her satır 14–31 karakter; 2. satır sarı vurguyla BAŞLAR. Kendiliğinden kırılma yok (şablon satırları kırmaz, en uzun satıra göre punto seçer).
+   - Metin bloğu her gönderide aynı hizada başlar (etiket hapı y=850); başlıklar arasında "biri yukarıda biri aşağıda" farkı olmaz.
+   - **INSTAGRAM GÜVENLİ ALAN (kullanıcı 25 Kas: "daima hatırla"):** 1080x1350 gönderi profil ızgarasında 3:4'e kırpılır (her yandan ~34 px gider). Yazı, etiket ve ek foto kenarlardan en az **60 px** içeride kalır (x 60–1020, y 60–1290); şablon her basışta ölçer, taşarsa YERLEŞİM KALDI. Görsel promptunda da özne ve kanıt detayı kenarlara değil merkeze yakın kurulur ("main subject centered, nothing important within 80 px of the left and right edges"). Logo ve dikey şerit sayfanın kendi yerinde durur.
+   - Vurgu 1–5 kelime; alıntı vurgulanmaz, başlık alıntıyla başlamaz. Yüklem ya da rakam şart.
+   - **Alt satır (`alt` / `gorsel_alt`) ZORUNLU**, 30–120 karakter, en çok 2 satır (dengeli kırılır; istenirse `|` ile elle). Başlığı tekrar etmez. İyilik/sonuç haberinde tamamı `**…**` sarı satır olabilir.
    - Ünlem, soru, "şok/flaş/bomba/bakın/işte/o anlar/görenler" yok; iki nokta ya da üç noktayla bitmez.
-   - **Önce 3 aday yaz**, şu üç soruyla seç: (1) Başlığı görmeyen arkadaşına sesli okusan ne olduğunu anlar mı? (2) Vurgu kelimesi tek başına "ne?!" dedirtiyor mu? (3) Alt satır "peki sonra/nasıl?" sorusunu cevaplıyor mu?
-   - Hızlı denetim: `python masa/radar/ahm/bas.py --denetle "başlık **vurgu**" "alt satır"` (bas.py basarken de aynı denetimi yapar; KALDI ise basmaz).
+   - **Önce 3 aday yaz**, şu üç soruyla seç: (1) Başlığı görmeyen arkadaşına sesli okusan ne olduğunu anlar mı? (2) Yalnız sarı kutuyu okuyan "ne?!" der mi? (3) Alt satır "peki nasıl/nerede/sonra?" sorusunu cevaplıyor mu?
+   **Önce → sonra (25 Kas):**
+   | Zayıf | Editör |
+   |---|---|
+   | Gölcük'te anne kedi yavruları için **iki köpeğe kafa tuttu** (kırılım rastgele) | Yavrularına yaklaşan iki köpeği \| **anne kedi bahçeden kovdu** / *Gölcük'te kendinden kat kat büyük köpeklere tek başına atıldı, o anlar kameraya yansıdı.* |
+   | Salyangoz yumurtası havyar oldu: **kilosu 3 bin euro** | Salyangoz yumurtasının kilosu \| **165 bin liradan satılıyor** / *Türkiye'de yalnızca Trabzon ve Burdur'da üretiliyor; yumurtalar tek tek elle ayıklanıyor.* |
+   - Hızlı denetim: `python masa/radar/ahm/bas.py --denetle "1. satır | **vurgu** …" "alt satır"` (bas.py basarken de aynı denetimi yapar; KALDI ise basmaz).
    - Telegram başlığı (`kanca`) aynı mantık: kim/nerede + ne yaptı, klişe yok; `gorsel_alt` künyede başlığın altında görünür.
 4. **`ig_aciklama`:** sayfanın kendi açıklama kalıbı — TEK paragraf, ajans dilinde 5N1K haber girişi, 2–4 cümle (120–900 karakter), yer + kim + ne + rakam; yorum sorusu ve etiket YOK, emoji yok.
    Telegram'da fotoğrafın altyazısı olarak gider; kullanıcı görseli kaydedip bu metni kopyalar.
