@@ -1,0 +1,11 @@
+{
+ "aciklama": "Viral radar İZLENEN SAYFALAR (kullanıcı 25 Kas 2026: 'bosunatiklama gibi sayfalarda 1 saat içinde 300 beğeni almış haberleri kaçırmayalım; başka sayfalarda etkileşim almış haberi tespit etmeliyiz'). Haberi paylaşan, takipçisi yüksek gündem/viral sayfaları. Kaynak DEĞİL, sinyaldir. Ekle/çıkar: node masa/radar/x-viral.mjs hesap-ekle <handle> \"not\" | hesap-sil <handle>. ~30'u geçmesin (X arama sorgusu uzar).",
+ "hesaplar": [
+  {"handle": "bosunatiklama", "not": "Boşuna Tıklama, 1,4 Mn; saatte ~6 gönderi, sıradan gönderi ilk saatte 30–300 beğeni, patlayan 1.700+ (25 Kas ölçümü)"},
+  {"handle": "aykiri", "not": "gündem/viral derleme"},
+  {"handle": "pusholder", "not": "son dakika + viral derleme"},
+  {"handle": "ieyiyi", "not": "gündem derleme"},
+  {"handle": "bpthaber", "not": "BPT haber, gündem"},
+  {"handle": "darkwebhaber", "not": "gündem/viral derleme"}
+ ]
+}

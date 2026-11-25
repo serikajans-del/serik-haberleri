@@ -50,7 +50,12 @@ Ek cezalar: magazin pozu/elbise (−4), kulüp adları "…spor" (−4), oyun/di
 
 ### 1b. X Türkçe viral (Claude in Chrome, kullanıcının X oturumu; ~1–2 dk) — kullanıcı 24 Kas: "X'te Türkçe viral ekleyebilirsin"
 **ATLAMA (25 Kas):** 24–25 Kas'ta tur raporlarının neredeyse hepsinde "X adımı atlandı (süre)" yazıyordu; X anlık viralin en güçlü kaynağı. Süre gerekçe değildir, X adımı HER turda yapılır. Yalnız sayfa açılmazsa atlanır.
-`node masa/radar/x-viral.mjs adresler` → 3 arama adresi (Türkiye sıra dışı/ilginç, genel Türkçe viral görselli, Antalya).
+`node masa/radar/x-viral.mjs adresler` → arama adresleri: Türkiye sıra dışı/ilginç, genel Türkçe viral görselli, **izlenen sayfalar (H1e etkileşim + H1 tüm akış)**, Antalya.
+**İZLENEN SAYFALAR (kullanıcı 25 Kas: "bosunatiklama gibi sayfalarda 1 saat içinde 300 beğeni almış haberleri kaçırmayalım; başka sayfalarda etkileşim almış haberi tespit etmeliyiz"):**
+- Liste `masa/radar/x-hesaplar.json` (@bosunatiklama, @aykiri, @pusholder, @ieyiyi, @bpthaber, @darkwebhaber). Ekle/çıkar: `node masa/radar/x-viral.mjs hesap-ekle <handle> "not"` / `hesap-sil <handle>`. Turlarda sık patlayan başka bir derleme sayfası görürsen ekle (en çok ~30).
+- H sayfaları **her turda, X adımının ilk sayfalarıdır** (kaçırılmaz): `H1e` → `await HIR.topla("x:hesap-etk", 8)`, `H1` → `await HIR.topla("x:hesap", 10)`.
+- `x-viral.mjs` çıktısının başında **"İZLENEN SAYFALARDA PATLAYAN"** listesi: `🚨 1 SAATTE 300+` (ilk 60 dk'da 300 beğeni) · `🚨 N/sa HIZ` (2 saate kadar ≥300 beğeni/saat) · `hesabın N katı` (sayfanın kendi ortancasının ≥3 katı) · `N hesapta` (aynı konu ≥3 sayfada) · `ivme +N/dk` (önceki turdan beri artış). `⚽ spor? / 🏛 siyaset? / ⚠ ölüm?` yalnız hatırlatmadır; ELE kararı her zamanki kurallarla verilir.
+- Bu liste turun **ilk bakılacak adaylarıdır** (YAYILIYOR ile aynı öncelik). Konu yine haber sitesinde doğrulanır; X gönderisi kaynak değildir. `neden` alanına sinyali yaz: "@bosunatiklama'da 41 dk'da 623 beğeni, 3 sayfada".
 Tek yeni sekmede sırayla aç; her sayfada 3–4 sn bekle, `masa/haberinilki-radar/x-topla.js` dosyasının TAMAMINI çalıştır, ardından:
 - ilk sayfa: `window.HIR_ON = "radar-x"; HIR.sifirla(); await HIR.topla("x:ilginc")`
 - ikinci: `window.HIR_ON = "radar-x"; await HIR.topla("x:viral")` · üçüncü: `window.HIR_ON = "radar-x"; await HIR.topla("x:antalya")`
