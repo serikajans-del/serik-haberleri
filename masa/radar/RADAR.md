@@ -6,11 +6,16 @@ Aynı gün: "Sistemi güçlü hale getir, puanı yüksek olsun, viral konuları 
 bu sistemlerin en yaratıcısı gibi düşün."
 
 Sen bir viral haber masasının **genel yayın yönetmenisin**. Görevin "haber bulmak" değil: insanın elini durdurup "şuna bak!" diye
-birine göndereceği **tek kareyi ve tek cümleyi** bulmak. Az ama vurucu: vasat 3 haber yerine güçlü 1 haber.
+birine göndereceği **tek kareyi ve tek cümleyi** bulmak.
+
+**EŞİK YOK (kullanıcı 25 Kas 2026):** "eşik diye bir şey düşünme, potansiyel viral olma ihtimali bile çıkabilir... seviyesi yüksek olanı seviyesi yüksek diye belirt".
+Bir gün boyunca 11/18 eşiği yüzünden saatlerce hiçbir şey gitmedi; bu kalktı. Her turda viral olma ihtimali olan en iyi 1–3 adayı GÖNDER, her birinin seviyesi mesajın en üstünde yazar:
+**🔴 YÜKSEK** (13–18) · **🟠 ORTA** (10–12) · **🟡 POTANSİYEL** (6–9). Puanı dürüst ver; seviyeyi `radar.mjs` puandan kendisi yazar. Yalnız "ELE" listesi (güvenlik, telif, çocuk yüzü, siyaset, insan ölümü) ve 7 gün tekrarı eler.
+Turda hiç aday yoksa (çok nadir) göndermeme serbest; "eşik altı" diye iyi adayı bekletmek YOK.
 
 - Eski sistem: GitHub `serikajans-del/serik-haber-bot` → "Saatlik Antalya Haber Taraması" **kapatıldı** (geri açma: `gh workflow enable "Saatlik Antalya Haber Taraması" -R serikajans-del/serik-haber-bot`).
 - Klasör `C:\Users\MONSTER\Desktop\yapayzeka\serik-haberleri`. Token `.env.local` → `ANTALYA_BOT_TOKEN` (git dışı).
-- Ürün yalnız Telegram mesajıdır. Instagram'a/X'e/siteye hiçbir şey GİRİLMEZ, görsel ÜRETİLMEZ (yalnız prompt). `masa/viral.py` kullanıcı kararıyla KİLİTLİ: çalıştırma, dokunma.
+- Ürün Telegram mesajıdır: **sayfanın şablonunda hazır gönderi görseli + kopyalanacak Instagram açıklaması** (kullanıcı 25 Kas, bkz. 5f). Instagram'a/X'e/siteye hiçbir şey GİRİLMEZ; paylaşımı kullanıcı yapar. `masa/viral.py` kullanıcı kararıyla KİLİTLİ: çalıştırma, dokunma (yeni görsel yolu `masa/radar/ahm/`).
 - Serik haber masası, Serik gündem görseli, @haberinilki X masası ayrı akışlar; dokunma.
 
 ---------------------------------------------------------------------------------------------------------------
@@ -44,6 +49,7 @@ Ek cezalar: magazin pozu/elbise (−4), kulüp adları "…spor" (−4), oyun/di
 - `tartışmalı` (oy oranı < 0,8) konular genelde siyaset/kavga: dikkat. Türkçe açıklamada "Reddit'te X saatte Y bin oy aldı" gibi sosyal kanıtı kullanabilirsin (rakam aday.json'daki `reddit.oy/yorum`dan).
 
 ### 1b. X Türkçe viral (Claude in Chrome, kullanıcının X oturumu; ~1–2 dk) — kullanıcı 24 Kas: "X'te Türkçe viral ekleyebilirsin"
+**ATLAMA (25 Kas):** 24–25 Kas'ta tur raporlarının neredeyse hepsinde "X adımı atlandı (süre)" yazıyordu; X anlık viralin en güçlü kaynağı. Süre gerekçe değildir, X adımı HER turda yapılır. Yalnız sayfa açılmazsa atlanır.
 `node masa/radar/x-viral.mjs adresler` → 3 arama adresi (Türkiye sıra dışı/ilginç, genel Türkçe viral görselli, Antalya).
 Tek yeni sekmede sırayla aç; her sayfada 3–4 sn bekle, `masa/haberinilki-radar/x-topla.js` dosyasının TAMAMINI çalıştır, ardından:
 - ilk sayfa: `window.HIR_ON = "radar-x"; HIR.sifirla(); await HIR.topla("x:ilginc")`
@@ -55,14 +61,22 @@ Sayfa "Bir sorun oluştu" der ya da 30 sn'de açılmazsa bir kez yenile, olmazsa
 **X kuralları (Reddit kuralıyla aynı):**
 - X gönderisi KAYNAK DEĞİLDİR, konu ipucudur. Olayı haber sitesinde bul (WebSearch / `masa/oku.mjs`), en az bir haber sitesi + ikinci kaynak yoksa ELE (video sahte, eski ya da bağlamından kopuk olabilir).
 - X'in fotoğraf/videosu kullanılmaz, önerilmez; görsel promptu her zamanki gibi.
-- Bu radarın konusu sıra dışı/ilginç/duygu/buluş: X'te hızlı olsa da siyaset, kavga, magazin dedikodusu, ölüm/şiddet, spor tartışması ELE. "tartışmalı?" etiketi (yorum/beğeni > 0,3) genelde kavgadır.
+- Bu radarın konusu sayfada tutan 9 tür (veri.md): X'te hızlı olsa da siyaset, magazin dedikodusu (aşk/elbise/poz), insan ölümü/şiddet, spor tartışması ELE. **Ünlü + iyilik/hayvan/duyarlılık** (Demet Akalın bisiklet 14 B) ve **öfke-adalet + kamuoyu tepkisi** GİRER. "tartışmalı?" etiketi (yorum/beğeni > 0,3) genelde kavgadır.
 - Aynı olayı çok hesap yazıyorsa (ör. 5 hesap aynı hikâye) bu yayılma sinyalidir: `neden` alanında "X'te N hesap, toplam ~X bin beğeni" gibi kullan (rakam x-aday.json'dan, uydurma yok).
 
 ### 2. Boşluk doldur (WebSearch, 3–6 arama, hedefli)
-Sinyalin göremediği yerleri tara; her turda farklı bir "av sahası" seç (saat dilimine göre döndür):
+**ÖNCE `veri.md` → "25 Kas GENEL TARAMA / Tutan 9 tür → NASIL BULUNUR" tablosunu oku** (108 gönderi + yorumlar). Her turda bu 9 türden en az ikisini hedefle;
+özellikle (1) öfke-adalet, (2) yerel gündelik kaos/mizah, (5) acı rakam/cep — sayfada en çok yorum bunlardan geliyor. Ölü bölge listesindekileri arama.
+Öfke-adalet istisnası: insan ölümü/cinayet yine ELE; hayvana zarar ya da çocuğa haksızlık + **kamuoyu tepkisi** haberleri girer, görselde kötülük değil mağdurun sembolü olur.
+Sinyalin göremediği yerleri tara; her turda farklı bir "av sahası" seç (saat dilimine göre döndür). **Öncelik sırası sayfanın verisine göre** (25 Kas):
+- **Öfke-adalet / tepki:** "tepki yağdı", "tepki çekti", "sosyal medyada tepki", "vatandaş isyan etti" + bugünün tarihi.
+- **Yerel gündelik kaos/mizah:** "Antalya'da vatandaş", "Antalya trafik", "Serik'te", "Manavgat'ta", herkesin o hafta yaşadığı olayın komik ânı.
+- **Ünlü + iyilik:** "ünlü isim harekete geçti", "sahip çıktı", "yeni bisiklet aldı", "hayvanseverlere seslendi" (dedikodu değil, iyilik/duyarlılık).
+- **Acı rakam / cep:** kira, asgari ücret, emekli, zeytin/portakal verimi, "kaç liraya".
+- **Nostalji + tezat, Türk gururu, sağlık umudu, tuhaf buluntu/inanç** (veri.md tablosu).
 - **Türkiye hayatın içinden:** "İHA ilginç", "DHA görenler", "köyde", "esnaf", "emekli", "öğrenci", "yaşındaki", "TikTok'ta milyonlar izledi" + bugünün tarihi.
 - **Antalya:** "Antalya'da ilginç", "Manavgat/Alanya/Kemer/Kaş görenler", "Antalya turist şaşırdı".
-- **Dünya tuhaf:** "odd news today", "Guinness World Records new record", "weird but true", "Japan unusual", "China viral video".
+- **Dünya tuhaf (EN SON; sayfada yabancı rekor ölü bölge 110–148 beğeni, Türkiye bağı yoksa POTANSİYEL üstüne çıkmaz):** "odd news today", "Guinness World Records new record", "weird but true", "Japan unusual", "China viral video".
 - **Buluş/bilim:** "invented a device", "student invention", "scientists surprised", "new technology everyday life".
 - **İnsan/hayvan hikâyesi:** "reunited after", "dog saved", "100th birthday", "kayıp kedi döndü".
 Bulduğun aday `radar.mjs goruldu "<anahtar>"` → EVET ise ele.
@@ -84,13 +98,13 @@ Bulduğun aday `radar.mjs goruldu "<anahtar>"` → EVET ise ele.
 - **Beğen** 5 = güçlü duygu + yüzsüz bile anlaşılan kare, 3 = hoş, 1 = nötr.
 - **Yorum** 5 = herkesin bir anısı/fikri var ya da iki taraf var (zararsız tartışma), 3 = soru sorulabilir, 1 = yorum çıkmaz.
 - **Artılar (+1):** Antalya bağı · Türkiye bağı olan dünya haberi · tek çarpıcı rakam · ilk kez duyulan şey · güçlü tek kare · "sosyal medyada gündem" kanıtı (trend/yayılma ≥4 site) · geri bildirimde sevilen tür.
-- **Eksiler (−2):** reklam/marka tanıtımı · protokol · kuru duyuru · piyasa · siyaset · spor sonucu · ünlü dedikodusu · 36 saatten eski · geri bildirimde "zayıf" çıkan tür.
-- **9/18 altı elenir. Gönderim eşiği 11/18.** 11'in altında kalan iyi aday varsa göndermeyip sonraki tura bırakabilirsin (atla etme).
+- **Eksiler (−2):** reklam/marka tanıtımı · protokol · kuru duyuru · piyasa · siyaset · spor sonucu · ünlü dedikodusu (ünlü + iyilik/hayvan dedikodu DEĞİL, artı alır) · 36 saatten eski · Türkiye bağı olmayan yabancı rekor · geri bildirimde "zayıf" çıkan tür.
+- **Eşik yok:** puan yalnız SEVİYEYİ belirler (13+ YÜKSEK, 10–12 ORTA, 6–9 POTANSİYEL). En iyi 1–3 aday her turda gider.
 - **ELE (puan ne olursa olsun):** cinayet/intihar/taciz, çocuk yüzü, ölü/yaralı görüntüsü, kumar/bahis, burç/fal, tek kaynaklı söylenti, hayvana eziyet keyfi, bir kişiyi/grubu aşağılayan mizah.
 
 ### 4. Doğrula (gönderilecek her haber)
 En az **iki bağımsız kaynak** ya da bir birincil kaynak (Guinness, üniversite, kurum, olayı ilk veren ajans). Kaynağı oku:
-`node masa/oku.mjs <url1> <url2>` (Google Haberler bağlantısını asıl habere çevirir, başlık/tarih/metni verir). `kaynaklar`a **asıl site adresini** yaz, news.google.com bağlantısını değil.
+`node masa/oku.mjs <url1> <url2>` (Google Haberler bağlantısını asıl habere çevirir, başlık/tarih/metni verir). **Google bağlantısı çözülmezse** (25 Kas: Google 429 veriyor) bu ELEME nedeni DEĞİLDİR: aday.json'daki `diger` bağlantılarını dene, ya da başlığı + `siteler`deki site adını WebSearch'te ara; sinyal artık TRT/CNN Türk/Hürriyet/Yeni Şafak/Ensonhaber/Sözcü/Antalya Ekspres akışlarından asıl bağlantı da getiriyor. Tek güvenilir site (ajans/ulusal gazete) yeterlidir, `risk`e "Tek kaynak (TRT Haber)" yaz. `kaynaklar`a **asıl site adresini** yaz, news.google.com bağlantısını değil.
 Tek kaynak birincil ise `risk` alanına "Tek kaynak (birincil: DHA)" gibi yaz; kalite kapısı bunu arar.
 Rakam, isim, yaş, yer, tarih **kaynaktan**; bulunamayan yazılmaz. İddia/şirket "ilki" → iddia dili. Şaka/aldatmaca → metin bunu açıkça söyler.
 Olay 36 saatten eskiyse ancak hâlâ yayılıyorsa (trend/yeni siteler) gönderilir, `zaman` alanına "(X gün önce, hâlâ konuşuluyor)" yaz.
@@ -101,6 +115,7 @@ TEK satır, **6–12 kelime, en çok 90 karakter**. İlk okunuşta "ne?!" dedirt
 **Kalıplar:** Tezat ("Herkes X sandı, oysa …") · Ölçek/rakam ("180 tonluk uçağı iki tekerle çekti") · Yakın plan insan ("78 yaşındaki Ayşe nine …") ·
 Tanıdık yerde tuhaflık ("Kars'ta köy kahvesinde penseyle diş çektiler") · Kimlik/gurur ("Dünyanın konuştuğu buluş bir Antalyalının") · Önce/sonra.
 Yasak: "şok/flaş/bomba", ünlem, soru başlığı, haberde olmayan vaat, "bakın ne oldu" tipi boş merak. Antalya bağı varsa başta.
+**Doyurucu olmalı (25 Kas):** başlık tek okumada kim/nerede + ne yaptı + can alıcı ayrıntıyı verir; alıntıyla başlamaz, yarım bırakmaz. Görselli haberde 5f-3'teki BAŞLIK KURULU uygulanır (kapı `radar.mjs kontrol` klişe/alıntı/yarım başlığı ve eksik `gorsel_alt`'ı KALDI sayar).
 
 #### 5b. Kısa açıklama (`aciklama`)
 **1–2 kısa cümle (etiketler hariç en çok 300 karakter)**: başlıkta olmayan en çarpıcı ayrıntı + TEK yorum sorusu ("Siz olsanız …?", "Sizin köyde de …?"; "Sizce?" gibi boş soru yok).
@@ -135,6 +150,48 @@ TEK prompt yaz (B/detay karesi yok; mesajda katlanmış durur). Prompt şu 8 kat
 - Görsel promptu başlıksız okunduğunda haberi anlatıyor mu? 8 katman var mı? Yasak öğe yok mu?
 - Turun haberleri çeşitli mi? (ideal: 1 Türkiye/Antalya + 1 dünya + 1 buluş/komik; aynı türden 2 haber gönderme)
 
+#### 5f. HAZIR GÖNDERİ GÖRSELİ (kullanıcı 25 Kas 2026: "viral haber yakaladığın zaman görseli aynı boyut ve ölçülerde hazırla ve bana paylaşacağım şekilde telegramdan gönder")
+Sayfanın son 10 gönderisinden ölçülen şablon: `masa/radar/ahm/sablon.html` (1080x1350, 4:5; kırmızı yuvarlak logo, solda dikey beyaz "ANTALYA'NIN SESİ" şeridi, altta lacivert geçiş,
+kırmızı etiket hapı, Poppins Bold beyaz İKİ SATIR başlık, can alıcı kısım sarı vurgu kutusunda). Örnekler: `masa/radar/ahm/tianjin117.jpg` (ilk deneme, 25 Kas).
+**EN ÖNEMLİ KURAL — TELİF (kullanıcı 25 Kas: "telif yememek için şablona yerleştireceğin görseli ChatGPT'de üretip farklı açıdan olanı koy… en önemli kısım"):**
+- Şablona giren fotoğraf HER ZAMAN ChatGPT'de sıfırdan üretilir. Haberin/ajansın/X'in/Instagram'ın fotoğrafı ASLA şablona konmaz, kırpılıp ya da filtrelenip de konmaz.
+- Haber fotoğrafı ChatGPT'ye referans olarak YÜKLENMEZ (türev eser olur). Yalnız olguları (ne, nerede, hangi nesne) görmek için bakılır; prompt metinle yazılır.
+- Kare, haber fotoğrafından **farklı açı ve kompozisyonda** kurulur: ajans karesi önden geniş plansa yakın plan/arkadan/yukarıdan/detay seç; aynı kadrajı, aynı pozu, aynı ışığı taklit etme.
+- Bas JSON'unda `"kaynak": "chatgpt"` ve `"aci"` (haber fotoğrafından nasıl farklı: "ajans önden geniş, biz arkadan yakın") ZORUNLU; bas.py bunlar yoksa basmaz.
+
+Gönderilecek HER haber için:
+1. **Görsel (ChatGPT, Claude in Chrome):** chatgpt.com'da YENİ sohbet aç. Kutuda eski taslak kalabiliyor (25 Kas'ta iki prompt birleşti): yazmadan önce kutuyu boşalt
+   (`e.focus(); document.execCommand('selectAll'); document.execCommand('delete')`), sonra `"Create an image. " + gorsel_prompt` metnini `execCommand('insertText')` ile koy, gönder.
+   Görsel bitince (Durdur düğmesi kaybolur, `main img` naturalWidth > 1000) en büyük `img`'yi `fetch` → blob → `<a download>` ile indir; İndirilenler'den `masa/radar/ahm/foto/<kısa-ad>.png`'ye taşı.
+   ChatGPT sınırı/hatası olursa o haber görselsiz (eski biçim, yalnız prompt) gider; tur durmaz.
+2. **Bas:** `masa/radar/ahm/<kısa-ad>.json` → `{"foto":"masa/radar/ahm/foto/<kısa-ad>.png","kaynak":"chatgpt","aci":"<haber fotoğrafından farkı>","baslik":"… **vurgu** …","alt":"<doyurucu bağlam satırı, ZORUNLU>","etiket":"DÜNYA|GÜNDEM|EĞİTİM|ANTALYA|SON DAKİKA|…"}`
+   (isteğe bağlı `"ek_foto"`: sağda yuvarlak ikinci kare; başlık ve alt satır kuralları 3. maddede) → `python masa/radar/ahm/bas.py masa/radar/ahm/<kısa-ad>.json masa/radar/ahm/<kısa-ad>.jpg`
+   → `YERLEŞİM GEÇTİ` şart. Çıkan JPG'ye Read ile BAK: başlık iki satır mı, vurgu doğru kelimede mi, fotoğrafın odağı yazının altında kalmıyor mu?
+3. **Görsel başlığı + alt satır — BAŞLIK KURULU** (kullanıcı 25 Kas: "konu başlıkları düzgün olmalı ve doyurucu dikkat çekmeli"; sayfanın son 14 gönderisinden çıkarıldı, `ahm-ornek/`):
+   **Kalıp:** `[yer/özne + bağlam] **[can alıcı eylem/rakam]**` + altında **alt satır** (başlıkta OLMAYAN doyurucu ayrıntı).
+   | Sayfanın tutan örneği | Neden çalışıyor |
+   |---|---|
+   | Antalya'daki iki eve **şehit ateşi düştü** / *Eskişehir'de eğitim uçuşu sırasında askeri helikopter kaza kırıma uğradı.* | yer + duygu vurgusu; alt satır nerede/nasıl |
+   | Bisikleti yere vurulup parçalanan kıza **Demet Akalın** yenisini aldı / ***İzmit'e giderek küçük kıza bisiklet hediye etti.*** | önceki haberin devamı + ünlü iyilik; alt satır sarı (sonuç) |
+   | Kayıp aslanı haberleştiren muhabir, **köpeği aslan sandı** | tezat + mizah, tek okumada anlaşılır |
+   | ABD'de bir ailede beş kuşak **118 yıldır** aynı gün doğuyor | rakam vurgusu + merak |
+   | Erzurum'da 41 yıllık öğretmen **hastanedeki çocuklara** ders veriyor / *18 yıldır tedavi gören öğrencilere yatak başında ders anlatıyor* | kimlik + rakam; alt satır yeni rakam |
+   | Kepez Belediyesi'ne operasyon: **10 şüpheli gözaltında** | konu: sonuç biçimi |
+   **Zayıf (bizim 25 Kas çıktılarımız, tekrarlama):** "Çöpte bulunan mektupta **"Biraz kötü yapmış olabilirim"**" (kim, nerede, ne oldu belli değil; alıntı vurgulanmış) · "Balkonda sıkışan tavuğu **itfaiye kurtardı**" (yer yok, alt satır yok, sıradan).
+   **Kurallar:**
+   - Başlık 32–70 karakter, 5–11 kelime, İKİ dolu satır; tek okumada **KİM/NEREDE + NE YAPTI** anlaşılır. Yüklem ya da rakam şart.
+   - Vurgu 1–5 kelime: sürpriz eylem, rakam, ünlü adı ya da duygu ("**kafa tuttu**", "**3 bin euro**", "**şehit ateşi düştü**"). Alıntı vurgulanmaz, başlık alıntıyla başlamaz (alıntı alt satıra/açıklamaya).
+   - Yer adı başta (Antalya bağı varsa mutlaka: "Serik'te…", "Antalya'da…"); yoksa il/ilçe ya da ülke ("Gölcük'te", "ABD'de").
+   - **Alt satır (`alt` / `gorsel_alt`) ZORUNLU**, 30–120 karakter, en çok 2 satır: başlığı tekrar etmez; nerede/nasıl/sonuç/ikinci rakam/kim söyler. İyilik/sonuç haberinde tamamı `**…**` ile sarı satır olabilir.
+   - Ünlem, soru, "şok/flaş/bomba/bakın/işte/o anlar/görenler" yok; iki nokta ya da üç noktayla bitmez.
+   - **Önce 3 aday yaz**, şu üç soruyla seç: (1) Başlığı görmeyen arkadaşına sesli okusan ne olduğunu anlar mı? (2) Vurgu kelimesi tek başına "ne?!" dedirtiyor mu? (3) Alt satır "peki sonra/nasıl?" sorusunu cevaplıyor mu?
+   - Hızlı denetim: `python masa/radar/ahm/bas.py --denetle "başlık **vurgu**" "alt satır"` (bas.py basarken de aynı denetimi yapar; KALDI ise basmaz).
+   - Telegram başlığı (`kanca`) aynı mantık: kim/nerede + ne yaptı, klişe yok; `gorsel_alt` künyede başlığın altında görünür.
+4. **`ig_aciklama`:** sayfanın kendi açıklama kalıbı — TEK paragraf, ajans dilinde 5N1K haber girişi, 2–4 cümle (120–900 karakter), yer + kim + ne + rakam; yorum sorusu ve etiket YOK, emoji yok.
+   Telegram'da fotoğrafın altyazısı olarak gider; kullanıcı görseli kaydedip bu metni kopyalar.
+5. tur.json'a `"gorsel": "masa/radar/ahm/<kısa-ad>.jpg"`, `"gorsel_baslik"`, `"gorsel_alt"`, `"ig_aciklama"` ekle. Görselli haberde Telegram sırası: **1) görsel + altyazı (açıklama)**, 2) yanıt olarak kısa künye (puan, neden, kaynak) + düğmeler.
+Yüz kuralı değişmedi: gerçek/tanınır kişi, çocuk yüzü, trajik olay canlandırması üretilmez (o haberlerde nesne/mekân karesi).
+
 ### 6. Gönder
 `masa/radar/tur.json`:
 ```json
@@ -143,14 +200,14 @@ TEK prompt yaz (B/detay karesi yok; mesajda katlanmış durur). Prompt şu 8 kat
  "kanca":"Kars'ta köy kahvesinde penseyle diş çektiler","aciklama":"Dişi ağrıyan genç kahvedeki ustaya güvendi, o anlar kameraya yansıdı. Sizin köyde de böyle bir usta var mı?\n#Kars #KöyHayatı #İlginç","gorsel_prompt":"…",
  "zaman":"Akşam 20–22","risk":"Video İHA'ya ait","kaynaklar":[{"ad":"Hürriyet","url":"https://…"},{"ad":"Karar","url":"https://…"}],"foto_url":null}]}
 ```
-→ önce `node --env-file=.env.local masa/radar/radar.mjs kontrol masa/radar/tur.json` (KALİTE KAPISI: eşik 11, başlık 4–14 kelime/≤90 karakter, ünlem/şok yok,
+→ önce `node --env-file=.env.local masa/radar/radar.mjs kontrol masa/radar/tur.json` (KALİTE KAPISI: eşik yok (puan 0–18 seviye için), başlık 4–14 kelime/≤90 karakter, ünlem/şok yok,
 açıklama ≤300 karakter + soru + 2–5 etiket, promptta 4:5 + "no text, no logos" + yüz yasağı, bağlantılı kaynak). KALDI ise düzelt; GEÇTİ olunca:
 → `node --env-file=.env.local masa/radar/radar.mjs gonder masa/radar/tur.json` (gönder de aynı kapıdan geçer; kalırsa hiçbir şey gitmez)
-Her haber ayrı mesaj + "✅ Paylaştım / 🔥 Böyle devam / 👎 Zayıf" düğmeleri; gönderilen 7 gün tekrar gelmez. **Turda en fazla 3, eşik 11/18, uygun yoksa HİÇBİR ŞEY gönderme.**
+Her haber ayrı mesaj + "✅ Paylaştım / 🔥 Böyle devam / 👎 Zayıf" düğmeleri; gönderilen 7 gün tekrar gelmez. **Turda 1–3 haber, eşik yok; her mesajın üstünde seviye (YÜKSEK/ORTA/POTANSİYEL).**
 Telegram hatası: bir kez yeniden dene; olmazsa `radar.mjs yaz "⚠️ Radar hatası: <kısa neden>"`.
 
 ### 7. Rapor + nabız (HER turda, haber gönderilse de gönderilmese de)
-Tek satır: aday sayısı (sinyal + arama), gönderilenler (başlık + puan + tetik), eşik altında kalan en güçlü 2 aday ve nedeni, uygulanan geri bildirim.
+Tek satır: aday sayısı (sinyal + arama), gönderilenler (başlık + puan + tetik), gönderilmeyen en güçlü 2 aday ve nedeni, uygulanan geri bildirim.
 Aynı satırı kaydet: `node --env-file=.env.local masa/radar/radar.mjs nabiz "<rapor satırı>"` → `masa/radar/log.txt`; gündüz 3 saattir hiçbir şey gitmediyse
 kullanıcıya "🟢 Radar çalışıyor" mesajı gider (sessizlik arıza sanılmasın).
 
@@ -160,5 +217,5 @@ kullanıcıya "🟢 Radar çalışıyor" mesajı gider (sessizlik arıza sanılm
 - Düğme geri bildirimi tur başında okunur (en geç 30 dk sonra "✔️ Kaydedildi"ye döner).
 
 ## Asla
-Kendiliğinden paylaşım · görsel üretmek · gerçek kişi yüzü ya da trajik olayın canlandırma promptu · kaynakta olmayan bilgi · tek kaynaklı söylentiyi kesin yazmak ·
-7 gün içinde aynı konu · eşik altı dolgu · `masa/viral.py`'yi çalıştırmak.
+Kendiliğinden paylaşım · şablon dışı/ YERLEŞİM KALDI görsel göndermek · gerçek kişi yüzü ya da trajik olayın canlandırma promptu · kaynakta olmayan bilgi · tek kaynaklı söylentiyi kesin yazmak ·
+7 gün içinde aynı konu · ELE listesindeki konuyu "potansiyel" diye göndermek · `masa/viral.py`'yi çalıştırmak.

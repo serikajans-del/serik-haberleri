@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!-- @antalyahabermedya gönderi şablonu (25 Kas 2026, sayfanın son 10 gönderisinden ölçüldü). 1080x1350 (4:5).
+     Tam kare fotoğraf + altta lacivert geçiş, sol üstte sayfanın GERÇEK logosu (logo.png: 24 Kas gönderisinden kesildi, merkez 102,122, çap 155 px), solda dikey beyaz "ANTALYA'NIN SESİ" şeridi ve konum simgesi,
+     isteğe bağlı kırmızı etiket hapı, Poppins Bold beyaz başlık (can alıcı kısım sarı vurgu kutusunda), isteğe bağlı küçük alt satır,
+     isteğe bağlı sağda yuvarlak ek fotoğraf. Veriyi bas.py window.VERI olarak gömer. -->
+<html lang="tr"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: "P"; src: url("../../../manset-araci/fonts/Poppins-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "P"; src: url("../../../manset-araci/fonts/Poppins-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "P"; src: url("../../../manset-araci/fonts/Poppins-ExtraBold.ttf"); font-weight: 800; }
+@font-face { font-family: "L"; src: local("Impact"); }
+html, body { margin: 0; width: 1080px; height: 1350px; overflow: hidden; background: #0d1631; }
+#sahne { position: absolute; inset: 0; overflow: hidden; }
+#foto { position: absolute; left: 0; top: 0; width: 1080px; height: 1350px; object-fit: cover; }
+#gecis { position: absolute; left: 0; right: 0; bottom: 0; height: 760px;
+  background: linear-gradient(to bottom, rgba(13,22,49,0) 0%, rgba(13,22,49,.55) 28%, rgba(13,22,49,.93) 52%, #0d1631 70%, #0d1631 100%); }
+#serit { position: absolute; left: 38px; top: 150px; width: 46px; height: 1066px; border-radius: 0 0 23px 23px; background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+#serit span { position: absolute; left: 50%; top: 650px; transform: translate(-50%, -50%) rotate(-90deg); white-space: nowrap;
+  font: 700 22px "P"; letter-spacing: 1px; color: #0d1631; }
+#pin { position: absolute; left: 11px; bottom: 30px; width: 24px; height: 31px; }
+#logo { position: absolute; left: 21.6px; top: 41px; width: 160px; height: 160px; filter: drop-shadow(0 3px 8px rgba(0,0,0,.28)); }
+
+#ek { position: absolute; right: 70px; top: 250px; width: 390px; height: 390px; border-radius: 50%; border: 9px solid #fff;
+  overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.35); display: none; }
+#ek img { width: 100%; height: 100%; object-fit: cover; }
+#metin { position: absolute; left: 128px; right: 60px; bottom: 170px; }
+#etiket { display: inline-block; background: #e3242b; color: #fff; font: 700 24px "P"; letter-spacing: 1px; padding: 6px 20px 4px;
+  border-radius: 22px; margin-bottom: 24px; }
+#baslik { font: 700 56px/1.28 "P"; color: #fff; letter-spacing: -.3px; text-shadow: 0 2px 12px rgba(0,0,0,.25); }
+#baslik .v { background: #ffd21f; color: #0d1631; padding: 0 12px; border-radius: 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone; text-shadow: none; }
+/* alt satır (sayfa kalıbı, 25 Kas ölçümü): başlıkta olmayan doyurucu bağlam; 1–2 satır, beyaz yarı kalın.
+   **…** verilirse sayfanın sarı alt satırı olur (Demet Akalın gönderisi: "İzmit'e giderek küçük kıza bisiklet hediye etti."). */
+#alt { font: 600 31px/1.4 "P"; color: #fff; margin-top: 22px; opacity: .96; }
+#alt .v { background: #ffd21f; color: #0d1631; padding: 1px 8px; border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+</style></head>
+<body><div id="sahne">
+  <img id="foto" alt="">
+  <div id="gecis"></div>
+  <div id="ek"><img alt=""></div>
+  <div id="serit"><span>ANTALYA'NIN SESİ</span>
+    <svg id="pin" viewBox="0 0 24 30"><path d="M12 1C6 1 2 5.5 2 11c0 7.5 10 18 10 18s10-10.5 10-18C22 5.5 18 1 12 1z" fill="none" stroke="#0d1631" stroke-width="2.6"/><circle cx="12" cy="11" r="3.6" fill="none" stroke="#0d1631" stroke-width="2.6"/></svg>
+  </div>
+  <img id="logo" src="logo.png" alt="Antalya Haber Medya" data-kontrast-serbest>
+  <div id="metin"><div id="etiket"></div><div id="baslik"></div><div id="alt"></div></div>
+</div>
+<script>
+const V = window.VERI || {};
+const kac = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+document.getElementById("foto").src = V.foto || "";
+if (V.ek_foto) { const e = document.getElementById("ek"); e.style.display = "block"; e.querySelector("img").src = V.ek_foto; }
+const et = document.getElementById("etiket"); if (V.etiket) et.textContent = V.etiket.toLocaleUpperCase("tr"); else et.remove();
+document.getElementById("baslik").innerHTML = kac(V.baslik).replace(/\*\*(.+?)\*\*/g, '<span class="v">$1</span>');
+const al = document.getElementById("alt"); if (V.alt) al.innerHTML = kac(V.alt).replace(/\*\*(.+?)\*\*/g, '<span class="v">$1</span>'); else al.remove();
+// sayfa kalıbı: başlık İKİ satır, genişliği dolduran en BÜYÜK punto (sayfada kısa başlık ~66 px, uzun ~54 px).
+// 66'dan başla, iki satıra sığana kadar küçült (en az 48); yine sığmazsa kesik yazı denetimi KALDI der (başlığı kısalt, ~40–62 karakter).
+// ÖLÇÜ Poppins yüklendikten SONRA yapılmalı (25 Kas: yedek fontla ölçünce 2 satır sanıp 3 satır bastı). render.mjs fonts.ready'den
+// sonra window.seek() çağırır; sığdırma orada koşar.
+const b = document.getElementById("baslik");
+function sigdir() {
+  let fs = 66; b.style.maxHeight = ""; b.style.overflow = "";
+  const satir = () => Math.round(b.getBoundingClientRect().height / (fs * 1.28));
+  b.style.fontSize = fs + "px";
+  while (satir() > 2 && fs > 48) { fs -= 2; b.style.fontSize = fs + "px"; }
+  if (satir() > 2) { b.style.maxHeight = (fs * 1.28 * 2) + "px"; b.style.overflow = "hidden"; }
+  // alt satır en çok 2 satır: taşarsa 26 px'e kadar küçült
+  if (V.alt) { let af = 31; al.style.fontSize = af + "px"; const as = () => Math.round(al.getBoundingClientRect().height / (af * 1.4));
+    while (as() > 2 && af > 26) { af -= 1; al.style.fontSize = af + "px"; } }
+}
+if (!V.alt) document.getElementById("metin").style.bottom = "295px";   // ölçü: alt satırsız gönderilerde başlık 1055 px'te biter
+sigdir(); document.fonts.ready.then(sigdir);
+window.SURE = 1; window.seek = () => sigdir();
+</script></body></html>

@@ -35,6 +35,15 @@ async function tg(yontem, govde) {
   if (!j.ok) throw new Error(`telegram ${yontem}: ${j.description}`);
   return j.result;
 }
+// Dosyalı gönderim (sendPhoto multipart): hazır gönderi görseli (masa/radar/ahm/bas.py çıktısı)
+async function tgDosya(yontem, alanlar, alan, yol) {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(alanlar)) fd.append(k, typeof v === "object" ? JSON.stringify(v) : String(v));
+  fd.append(alan, new Blob([readFileSync(yol)], { type: "image/jpeg" }), yol.split(/[\\/]/).pop());
+  const j = await (await fetch(`${API}/${yontem}`, { method: "POST", body: fd })).json();
+  if (!j.ok) throw new Error(`telegram ${yontem}: ${j.description}`);
+  return j.result;
+}
 const html = (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const kalin = (s = "") => html(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); // **kalın** → <b>
 const norm = (s = "") => s.toLocaleLowerCase("tr").replace(/[^a-zçğıöşü0-9 ]/g, " ").replace(/\s+/g, " ").trim();
@@ -71,8 +80,10 @@ const DUGME = (no) => ({ inline_keyboard: [[
 // Kısa biçim (kullanıcı 24 Kas: "çok uzun geliyor, çarpıcı viral başlık + kısa açıklama"):
 // kalın başlık, kısa açıklama, katlanmış görsel promptu, tek satır künye.
 function mesaj(h, i, n) {
+  if (h.gorsel) return kunye(h, i, n);
   const kaynak = (h.kaynaklar || []).filter((k) => k.url).slice(0, 2).map((k) => `<a href="${html(k.url)}">${html(k.ad)}</a>`).join(" · ");
   const satir = [
+    `<b>${seviye(h.puan)}</b>`,
     `🔥 <b>${html(String(h.kanca || h.baslik).replace(/\*\*/g, ""))}</b>`,
     "",
     html(h.aciklama),
@@ -82,6 +93,21 @@ function mesaj(h, i, n) {
     kaynak ? `🔗 ${kaynak}` : null,
   ];
   return satir.filter((x) => x !== null).join("\n");
+}
+
+// Görselli gönderim (kullanıcı 25 Kas: "viral haber yakaladığın zaman görseli aynı boyut ve ölçülerde hazırla, paylaşacağım şekilde gönder"):
+// 1) fotoğraf = sayfanın şablonunda hazır gönderi, altyazısı = Instagram açıklaması (kopyala-yapıştır), 2) yanıt olarak kısa künye + düğmeler.
+const seviye = (p) => (+p >= 13 ? "🔴 SEVİYE: YÜKSEK" : +p >= 10 ? "🟠 SEVİYE: ORTA" : "🟡 SEVİYE: POTANSİYEL");
+function kunye(h, i, n) {
+  const kaynak = (h.kaynaklar || []).filter((k) => k.url).slice(0, 2).map((k) => `<a href="${html(k.url)}">${html(k.ad)}</a>`).join(" · ");
+  return [
+    `<b>${seviye(h.puan)}</b>`,
+    `🔥 <b>${html(String(h.kanca || h.baslik).replace(/\*\*/g, ""))}</b>`,
+    h.gorsel_alt ? html(String(h.gorsel_alt).replace(/\*\*/g, "")) : null,
+    h.neden ? `💡 ${html(h.neden)}` : null,
+    `<i>${n > 1 ? `${i}/${n} · ` : ""}${html(h.puan)}/18 · ${html(h.kategori || "GÜNDEM")} · ${html(h.tetik || "")}${h.zaman ? ` · ⏰ ${html(h.zaman)}` : ""}${h.risk && !/^düşük/i.test(h.risk) ? ` · ⚠️ ${html(h.risk)}` : ""}</i>`,
+    kaynak ? `🔗 ${kaynak}` : null,
+  ].filter((x) => x !== null).join("\n");
 }
 
 // Kalite kapısı: RADAR.md kurallarının ölçülebilir kısmı. Hata varsa HİÇBİR ŞEY gönderilmez, tur düzeltir.
@@ -94,13 +120,23 @@ function kontrol(tur) {
     const ad = `#${i + 1} ${x.baslik || x.anahtar || "?"}`;
     for (const a of ["anahtar", "baslik", "kanca", "aciklama", "gorsel_prompt", "puan", "kategori", "tetik", "zaman"])
       if (x[a] === undefined || x[a] === null || x[a] === "") hata.push(`${ad}: "${a}" boş`);
-    if (+x.puan < 11) hata.push(`${ad}: puan ${x.puan} < 11 (gönderim eşiği)`);
+    // 25 Kas (kullanıcı): "eşik diye bir şey düşünme, potansiyel viral olma ihtimali bile çıkabilir; seviyesi yüksek olanı belirt" → eşik yok, seviye etiketi var
+    if (!(+x.puan >= 0 && +x.puan <= 18)) hata.push(`${ad}: puan 0–18 arasında olmalı`);
     if (x.kanca) {
       const k = x.kanca.replace(/\*\*/g, ""), n = kelimeSay(k);
       if (n < 4 || n > 14) hata.push(`${ad}: başlık (kanca) ${n} kelime (hedef 6–12, tek satır)`);
       if (k.length > 90) hata.push(`${ad}: başlık ${k.length} karakter (en çok 90)`);
       if (/!|(şok|flaş|bomba)/i.test(k)) hata.push(`${ad}: başlık ünlem/şok/flaş içeriyor`);
       if (/\?\s*$/.test(k)) hata.push(`${ad}: başlık soru ile bitiyor`);
+      // 25 Kas (kullanıcı: "konu başlıkları düzgün olmalı ve doyurucu dikkat çekmeli"): başlık tek okumada KİM/NEREDE + NE YAPTI söyler
+      const bos = k.match(/(bakın|işte|o anlar|görenler|herkes şaşırdı|inanamadı|ortalık karıştı|sosyal medyayı salladı)/i);
+      if (bos) hata.push(`${ad}: başlıkta boş merak/klişe "${bos[0]}"; olayın kendisini söyle`);
+      if (/^\s*["“'‘«]/.test(k)) hata.push(`${ad}: başlık alıntıyla başlıyor; önce kim ne yaptı, alıntı açıklamaya`);
+      if (/(:|\.\.\.|…)\s*$/.test(k)) hata.push(`${ad}: başlık yarım (: / … ile bitiyor)`);
+    }
+    if (x.gorsel) {
+      const ga = String(x.gorsel_alt || "").replace(/\*\*/g, "").trim();
+      if (ga.length < 30 || ga.length > 120) hata.push(`${ad}: gorsel_alt ${ga.length} karakter (30–120; görseldeki doyurucu bağlam satırı, bas JSON'undaki "alt" ile aynı)`);
     }
     if (x.aciklama && !/\?/.test(x.aciklama)) hata.push(`${ad}: açıklamada yorum sorusu yok`);
     const govde = (x.aciklama || "").replace(/#[\p{L}\p{N}_]+/gu, "").trim();
@@ -114,6 +150,13 @@ function kontrol(tur) {
       if (!/(seen from behind|face[s]? (turned away|out of frame|hidden|not visible)|no faces|no recognizable|hands only)/i.test(p)) hata.push(`${ad}: ${alan} yüz/kimlik yasağını belirtmiyor`);
       if (p.split(/\s+/).length < 45) uyari.push(`${ad}: ${alan} kısa (${p.split(/\s+/).length} kelime) — 8 katmanı içeriyor mu?`);
       if (/[çğışöüÇĞİŞÖÜ]/.test(p)) uyari.push(`${ad}: ${alan} Türkçe karakter içeriyor (İngilizce olmalı)`);
+    }
+    if (x.gorsel) {   // hazır gönderi görseli
+      if (!existsSync(x.gorsel)) hata.push(`${ad}: gorsel dosyası yok (${x.gorsel}); masa/radar/ahm/bas.py ile bas`);
+      if ((x.gorsel_baslik || "").split("**").length !== 3) hata.push(`${ad}: gorsel_baslik'ta tam bir **vurgu** olmalı`);
+      const ia = (x.ig_aciklama || "").trim();
+      if (ia.length < 120 || ia.length > 900) hata.push(`${ad}: ig_aciklama ${ia.length} karakter (120–900; sayfa kalıbı: 5N1K haber paragrafı)`);
+      if (/\*\*|!/.test(ia)) hata.push(`${ad}: ig_aciklama'da ** ya da ünlem var`);
     }
     const kay = (x.kaynaklar || []).filter((k) => k.url);
     if (!kay.length) hata.push(`${ad}: bağlantılı kaynak yok`);
@@ -157,13 +200,19 @@ if (komut === "deneme") {
   let i = 0;
   for (const h of yeni) {
     i++; const no = ++d.sayac;
+    let foto = null;
+    if (h.gorsel) {
+      try { foto = await tgDosya("sendPhoto", { chat_id: CHAT, caption: String(h.ig_aciklama).trim().slice(0, 1024) }, "photo", h.gorsel); }
+      catch (e) { console.error("görsel gönderilemedi:", e.message); }
+    }
     const parca = parcala(mesaj(h, i, yeni.length));
     let son;
     for (let j = 0; j < parca.length; j++) {
       son = await tg("sendMessage", { chat_id: CHAT, text: parca[j], parse_mode: "HTML", disable_web_page_preview: true,
+        ...(foto && j === 0 ? { reply_to_message_id: foto.message_id } : {}),
         ...(j === parca.length - 1 ? { reply_markup: DUGME(no) } : {}) });
     }
-    if (h.foto_url) {
+    if (h.foto_url && !h.gorsel) {
       try { await tg("sendPhoto", { chat_id: CHAT, photo: h.foto_url, caption: `📷 Haberin kendi görseli (fikir için, telif sahibine aittir): ${h.baslik}`.slice(0, 1000), reply_to_message_id: son.message_id }); }
       catch (e) { console.error("foto gönderilemedi:", e.message); }
     }
@@ -188,7 +237,7 @@ if (komut === "deneme") {
   const sessiz = Date.now() - Math.max(d.son_gonderim || 0, d.son_nabiz || 0) > 3 * 36e5;
   if (sessiz && saat >= 9 && saat <= 23) {
     await tg("sendMessage", { chat_id: CHAT, disable_web_page_preview: true,
-      text: `🟢 Radar çalışıyor — son 3 saatte 11/18 eşiğini geçen haber çıkmadı, dolgu göndermiyorum.\n${rapor}` });
+      text: `🟢 Radar çalışıyor — son 3 saatte gönderilecek aday çıkmadı (yalnız güvenlik/telif yasakları eler).\n${rapor}` });
     d.son_nabiz = Date.now(); kaydet(DURUM, d);
     console.log("NABIZ GÖNDERİLDİ");
   } else console.log("nabız kaydedildi");

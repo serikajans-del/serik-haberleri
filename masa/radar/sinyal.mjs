@@ -20,7 +20,15 @@ const gn = (q, dil = "tr") => dil === "tr"
 const ARAMALAR_TR = ["sosyal medyada gündem oldu", "görenler şaşırdı", "görenleri şaşırttı", "pes dedirten", "ilginç görüntü",
   "yüzleri güldüren", "duygulandıran", "rekor kırdı", "Guinness", "genç mucit", "buluş geliştirdi", "sıra dışı", "akılalmaz",
   "viral oldu", "izlenme rekoru", "Reddit'te", "Reddit kullanıcıları", "Antalya ilginç", "Antalya görenler", "Alanya görenler", "Manavgat ilginç", "Antalya sosyal medya", "köyde ilginç", "dünyada ilk", "Türkiye'de ilk",
-  "yürekleri ısıttı", "kahkahaya boğdu", "beğeni yağdı", "izleyenleri hayran bıraktı", "sosyal medyada çok konuşuldu", "TikTok'ta"];
+  "yürekleri ısıttı", "kahkahaya boğdu", "beğeni yağdı", "izleyenleri hayran bıraktı", "sosyal medyada çok konuşuldu", "TikTok'ta",
+  // 25 Kas: @antalyahabermedya'nın 108 gönderisinden çıkan tutan türler (veri.md "Tarif"):
+  "tepki yağdı", "tepki çekti", "sosyal medyada tepki", "yeni bisiklet hediye etti", "ünlü isim harekete geçti",   // öfke-adalet + ünlü iyilik
+  "yıllar sonra ortaya çıktı", "yıllar önce", "nostalji", "eskiden",                                                // nostalji/tezat
+  "Türk dizisi yurt dışında", "dünya Türk'ü konuşuyor", "Türk gencinin başarısı",                                   // Türk gururu
+  "Antalya'da vatandaş", "Antalyalılar", "Antalya trafik tepki", "Serik'te", "Antalya'da yaşayan",                  // yerel gündelik hayat
+  "kiracı ev sahibi", "asgari ücret gençler", "araştırmaya göre gençler", "emekliler tepki",                         // cep/hak → yorum
+  "tedavide umut", "saç dökülmesi", "yeni tedavi yöntemi", "fareler üzerinde",                                      // sağlık umudu
+  "üretici", "topraksız tarım", "çiftçi ilginç", "zeytin verimi"];                                                 // yerel üretici
 const ARAMALAR_EN = ["bizarre", "weird news", "odd news", "Guinness World Records", "goes viral", "world's first",
   "invention", "scientists discover", "heartwarming", "unusual",
   "went viral on Reddit", "Redditors", "internet is obsessed", "TikTok viral", "wholesome"]; // Reddit API kapalı: Reddit'te patlayanı haberleştiren siteler
@@ -43,30 +51,51 @@ const RSS = [ // 24 Kas: Guinness (boş) ve Oddity Central (Eylül'den beri durm
   ["NTV Yaşam", "https://www.ntv.com.tr/yasam.rss", "tr"],
   ["NTV Türkiye", "https://www.ntv.com.tr/turkiye.rss", "tr"],
   ["NTV Dünya", "https://www.ntv.com.tr/dunya.rss", "tr"],
+  // 25 Kas: sayfada tutan türler (öfke-adalet, yerel kaos, ünlü+iyilik, cep) genel gündem akışlarında; bunlar ASIL site bağlantısı verir
+  // (Google Haberler bağlantıları 429 ile çözülemiyor, radar doğrulayamayıp eliyordu)
+  ["TRT Haber Türkiye", "https://www.trthaber.com/turkiye_articles.rss", "tr"],
+  ["TRT Haber Yaşam", "https://www.trthaber.com/yasam_articles.rss", "tr"],
+  ["CNN Türk Türkiye", "https://www.cnnturk.com/feed/rss/turkiye/news", "tr"],
+  ["Hürriyet Gündem", "https://www.hurriyet.com.tr/rss/gundem", "tr"],
+  ["Yeni Şafak Gündem", "https://www.yenisafak.com/rss?xml=gundem", "tr"],
+  ["Ensonhaber", "https://www.ensonhaber.com/rss/ensonhaber.xml", "tr"],
+  ["Sözcü Gündem", "https://www.sozcu.com.tr/feeds-rss-category-gundem", "tr"],
+  ["Antalya Ekspres", "https://www.antalyaekspres.com.tr/rss", "tr"],
+  ["NTV Sağlık", "https://www.ntv.com.tr/saglik.rss", "tr"],
+  ["Milliyet Magazin", "https://www.milliyet.com.tr/rss/rssnew/magazinrss.xml", "tr"],
 ];
 
 // ---- puan sözlüğü ----------------------------------------------------------------------------------------
 // kök: soldan kelime sınırı (Türkçe ekler serbest) · tam: iki yandan sınır (kısa İngilizce kelimeler için)
-const kok = (s) => new RegExp(`(?<![\p{L}\p{N}])(?:${s})`, "iu");
-const tam = (s) => new RegExp(`(?<![\p{L}\p{N}])(?:${s})(?![\p{L}])`, "iu");
+const kok = (s) => new RegExp(String.raw`(?<![\p{L}\p{N}])(?:` + s + ")", "iu");  // 25 Kas: String.raw şart; düz şablonda \p → "p" oluyordu, sınır hiç çalışmıyordu
+const tam = (s) => new RegExp(String.raw`(?<![\p{L}\p{N}])(?:` + s + String.raw`)(?![\p{L}])`, "iu");
 const ARTI = [ // [düzenli ifade, puan, etiket]
   [kok("şaşırt|şaşkın|pes dedirt|akıl ?almaz|inanılmaz|görenler|sıra ?dışı|ilginç|tuhaf|bizarre|weird|bewilder|unusual"), 3, "tuhaflık"],
   [kok("rekor|guinness|dünyanın en|world'?s (?:first|largest|smallest|oldest|biggest|longest|tallest)|world record"), 3, "rekor"],
   [kok("mucit|buluş(?![tm])|icat|invent|prototype|scientists|bilim insanları|keşfett|discover"), 2, "buluş"],
   [kok("güldür|kahkaha|komik|funny|hilarious|prank"), 3, "komik"],
   [kok("duygulandır|gözyaşı|yürek ?ısıt|heartwarming|reunite|kavuştu|vefa"), 3, "duygu"],
-  [tam("kedi\w*|köpe\w*|ayı|kuş\w*|inek\w*|keçi\w*|yavru\w*|hayvan\w*|dogs?|cats?|bears?|animals?|puppy|kitten|parrot|goat|cow"), 2, "hayvan"],
+  [tam(String.raw`kedi\p{L}*|köpe\p{L}*|ayı|kuş\p{L}*|inek\p{L}*|keçi\p{L}*|yavru\p{L}*|hayvan\p{L}*|dogs?|cats?|bears?|animals?|puppy|kitten|parrot|goat|cow`), 2, "hayvan"],
   [kok("yaşındaki|dede|nine|babaanne|torun|centenarian|year-old|grandm|grandp"), 2, "insan"],
   [kok("viral|gündem oldu|sosyal medyada|milyonlar izl|tiktok"), 2, "sosyal"],
-  [tam("antalya\w*|serik\w*|manavgat\w*|alanya\w*|kemer\w*|belek\w*|konyaaltı\w*|muratpaşa\w*|kepez\w*|gazipaşa\w*|kumluca\w*|finike\w*|demre\w*|kaş'\w*"), 3, "antalya"],
+  [tam(String.raw`antalya\p{L}*|serik\p{L}*|manavgat\p{L}*|alanya\p{L}*|kemer\p{L}*|belek\p{L}*|konyaaltı\p{L}*|muratpaşa\p{L}*|kepez\p{L}*|gazipaşa\p{L}*|kumluca\p{L}*|finike\p{L}*|demre\p{L}*|kaş'\p{L}*`), 3, "antalya"],
   [kok("köy|tarla|kahvehane|pazar|minibüs|apartman|komşu"), 1, "gündelik"],
   [/\d[\d.,]*\s?(milyon|bin|km|kilo|ton|yıl|metre|cm|%)/i, 1, "rakam"],
+  // 25 Kas sayfa ölçümü: bu desenler sayfada 10–29 B beğeni / 600–2.400 yorum aldı
+  [kok("tepki (?:yağdı|çekti|gösterdi)|tepkiye neden|haksızlık|cezasız kalma|sorumlular|aydınlatılması"), 3, "öfke-adalet"],
+  [kok("yıllar sonra|yıllar önce|nostalji|eskiden|o dönem|hatırlayan|19[5-9]\\d'?(?:de|da|te|ta|li)"), 2, "nostalji"],
+  [kok("yurt dışında|dünyanın konuştuğu|rusya'da hâlâ|türk (?:dizisi|genci|bilim|mucit)|gurur"), 2, "gurur"],
+  [kok("kira|kiracı|asgari|maaş|emekli|akaryakıt|benzin|mazot|fatura|gençler"), 1, "cep"],
+  [kok("tedavi|umut|hastalığa çare|saç|kanser"), 1, "sağlık"],
+  [kok("harekete geçti|sahip çıktı|yardım eli|yardımına koştu|bağışladı|hediye etti|sürpriz yaptı|yeni(?:sini)? (?:aldı|hediye)|duyarlılık|örnek oldu|alkış"), 3, "iyilik"],
+  [kok("trafik|kuyruk|yol kapandı|saatlerce|mahsur|su baskını|sağanak|vatandaş(?:lar)? (?:isyan|tepki|zor)|esnaf"), 1, "yerel-kaos"],
 ];
 const EKSI = [
   [kok("seçim|milletvekil|bakan |cumhurbaşkan|chp|akp|ak parti|mhp|dem parti|meclis|trump|biden|putin|netanyahu|zelensk|senate|congress|belediye başkan"), -4, "siyaset"],
   [kok("borsa|dolar|euro |faiz|shares|sensex|nse |unusual volume|hisse|enflasyon|merkez bankası|altın fiyat|bitcoin|stock|nasdaq|ipo|banker|ücretli çalışan|sektör"), -4, "piyasa"],
-  [kok("cinayet|öldürül|bıçak|silahlı|tecavüz|taciz|intihar|köprüden atla|hayatını kaybett|cesed|murder|stabbed|shooting|killed|rape|suicide"), -5, "şiddet"],
+  [kok("şehit|cinayet|öldürül|bıçak|silahlı|tecavüz|taciz|intihar|köprüden atla|hayatını kaybett|cesed|murder|stabbed|shooting|killed|rape|suicide"), -5, "şiddet"],
   [kok("kaza|yangın|deprem|crash|wildfire|earthquake"), -1, "afet"],
+  [kok("operasyon|uyuşturucu|gözaltı|tutuklan|şüpheli|suç örgüt|suç makinesi|dolandır|soruşturma|sonuçları sorgula|çöktü mü"), -4, "asayiş/servis"],
   [kok("names .* facility|helps (?:scale|customers)|unveils|launches|partnership|announces|company|corporation|şirketi|holding|a.ş.|yatırım|proje(?:si)? (?:tanıtıldı|hayata)|ihracat|lng|ai-powered|industrial"), -3, "kurumsal"],
   [kok("kampanya|indirim|lansman|tanıtım|sponsor|reklam|discount|coupon|temizlik ve hijyen"), -3, "reklam"],
   [kok("maç|gol|transfer|derbi|teknik direktör|beşiktaş|fenerbahçe|galatasaray|trabzonspor|league|nba|nfl|f1 |podium|quarterback|coach|76ers|cowboys|lsu|playoff|halftime|teammate|dismissal|presser|postgame|wrestl|wwe|ufc|boxing|cricket|wicket|innings|vada|athlete|olympi|futbolcu|basketbol|voleybol"), -4, "spor"],
@@ -138,6 +167,7 @@ let adaylar = kumeler.map((k) => {
   const konu = ARTI.filter(([re]) => re.test(metin)).length; if (!konu) puan -= 3; // viral özelliği olmayan düz haber
   for (const [re, p, e] of [...ARTI, ...EKSI]) if (re.test(metin)) { puan += p; etiket.push(e); }
   puan += Math.min(siteler.length - 1, 5) * 1.5;                               // yayılma
+  if (bas.dil === "en" && !siteler.some((x) => /türk|turk/i.test(x))) puan -= 1.5;  // 25 Kas sayfa ölçümü: yabancı tuhaf/rekor ölü bölgede (110–148 beğeni)
   const yas = (SIMDI - Math.max(...k.uyeler.map((u) => u.zaman))) / 36e5;
   puan += yas < 3 ? 3 : yas < 8 ? 2 : yas < 18 ? 1 : 0;                         // tazelik
   const tr = trendler.find((t) => t.haberler.some((h) => { const o = [...kelime(h.b)].filter((x) => k.w.has(x)).length; return o >= 3; }));
