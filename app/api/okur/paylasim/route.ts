@@ -3,10 +3,10 @@ import { db } from "@/lib/okur-sunucu/db";
 import { aktifUye, istemciIp } from "@/lib/okur-sunucu/oturum";
 import { kabaDilVar, kisiselVeriVar, sinirAsildi } from "@/lib/okur-sunucu/denetim";
 import { fotoYukle } from "@/lib/okur-sunucu/gorsel";
-import { yoneticiyeBildir } from "@/lib/okur-sunucu/bildirim";
-import { KATEGORILER, MAHALLELER, SITE_URL, slugify } from "@/lib/okur";
+import { onayBildirimi } from "@/lib/okur-sunucu/bildirim";
+import { KATEGORILER, MAHALLELER, slugify } from "@/lib/okur";
 
-// Yeni paylaşım. Güvenilir üyeninki doğrudan yayına girer; diğerleri moderatör onayına düşer.
+// Yeni paylaşım: onaya düşer, yöneticinin telefonuna düğmeli bildirim gider.
 export async function POST(req: NextRequest) {
   const uye = await aktifUye();
   if (!uye) return NextResponse.json({ hata: "Paylaşım yapmak için giriş yapmalısın." }, { status: 401 });
@@ -40,15 +40,16 @@ export async function POST(req: NextRequest) {
 
   const metin = `${baslik} ${icerik} ${g("isletme_adi")} ${g("yer")}`;
   const supheli = kabaDilVar(metin) || kisiselVeriVar(metin);
-  const yayinda = uye.guvenilir && !supheli;
+  // Kullanıcı kararı (27 Kas 2026): her paylaşım yönetici onayından sonra yayına girer.
+  const yayinda = false;
 
   const { data, error } = await db.from("meydan_paylasimlar").insert([{
     slug, uye_id: uye.id, kategori, baslik, icerik, fotolar, mahalle,
     yer: g("yer").slice(0, 140), olay_tarihi: tarih, olay_saati: saat, isletme_adi: g("isletme_adi").slice(0, 100),
     durum: yayinda ? "yayinda" : "beklemede", yayin_at: yayinda ? new Date().toISOString() : null, ip: await istemciIp(),
-  }]).select("slug").single();
+  }]).select("id, slug").single();
   if (error || !data) return NextResponse.json({ hata: "Paylaşım kaydedilemedi, tekrar dene." }, { status: 500 });
 
-  if (!yayinda) await yoneticiyeBildir("Okur Haberleri: onay bekleyen paylaşım", "Yeni bir paylaşım onay bekliyor.", `${SITE_URL}/admin/okur`);
+  if (!yayinda) await onayBildirimi({ id: data.id, kategori, mahalle, foto: fotolar.length, supheli });
   return NextResponse.json({ ok: true, slug: data.slug, yayinda });
 }

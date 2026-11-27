@@ -29,8 +29,8 @@ export default function KurallarSayfasi() {
       <section className="kart p-6 mt-8">
         <h2 className="text-xl font-extrabold">Moderasyon nasıl işliyor?</h2>
         <ul className="list-disc pl-5 mt-3 grid gap-2 text-sm text-slate-700 leading-relaxed">
-          <li>Yeni üyelerin ilk paylaşımları moderatör onayından sonra yayına girer. Üç paylaşımı onaylanan üyenin paylaşımları doğrudan yayınlanır.</li>
-          <li>Küfür veya kişisel bilgi içerdiği otomatik olarak fark edilen paylaşım ve yorumlar onaya düşer.</li>
+          <li>Tüm paylaşımlar moderatör onayından sonra yayına girer; onay genellikle kısa sürede verilir.</li>
+          <li>Küfür veya kişisel bilgi içerdiği otomatik olarak fark edilen yorumlar onaya düşer.</li>
           <li>Üç farklı kişi tarafından bildirilen içerik inceleme bitene kadar yayından kaldırılır.</li>
           <li>Paylaşımlar kullanıcılara aittir; Serik Haberleri bunları önceden denetleme yükümlülüğü olmayan yer sağlayıcı olarak yayınlar (5651 sayılı Kanun).</li>
         </ul>
