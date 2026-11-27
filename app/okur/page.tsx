@@ -6,6 +6,12 @@ import { genelSayilar, paylasimlar } from "@/lib/okur-sunucu/veri";
 export const dynamic = "force-dynamic";
 
 const SIRALAR = { yeni: "En yeni", gundem: "Gündemde", cozulen: "Çözülenler" } as const;
+const ESIK_UYE = 50;
+const ADIMLAR = [
+  ["✍️", "Rumuzunla paylaş", "Adın görünmez; fotoğraf ve mahalle eklemek yeter."],
+  ["🛡️", "Ekibimiz kontrol eder", "Hakaret ve kişisel bilgi ayıklanır, sonra yayına girer."],
+  ["🤝", "Serikliler yanıtlar", "Şikâyetin durumu izlenir: açık → iletildi → çözüldü."],
+] as const;
 
 export default async function AnaSayfa({ searchParams }: { searchParams: Promise<{ sira?: string; sayfa?: string }> }) {
   const { sira: s, sayfa: sy } = await searchParams;
@@ -31,12 +37,24 @@ export default async function AnaSayfa({ searchParams }: { searchParams: Promise
           </form>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          {[[sayilar.paylasim, "paylaşım"], [sayilar.uye, "Serikli üye"], [sayilar.cozulen, "çözülen sorun"]].map(([n, a]) => (
-            <div key={a as string} className="kart p-4 text-center">
-              <b className="block text-2xl sm:text-3xl font-extrabold baslik tabular-nums">{(n as number).toLocaleString("tr-TR")}</b>
-              <span className="text-xs text-soluk">{a}</span>
-            </div>
-          ))}
+          {/* Sayılar küçükken "1 üye" gibi görünüp güveni kırmasın: eşiğe kadar nasıl işlediğini anlat */}
+          {sayilar.uye >= ESIK_UYE ? (
+            [[sayilar.paylasim, "paylaşım"], [sayilar.uye, "Serikli üye"], [sayilar.cozulen, "çözülen sorun"]].map(([n, a]) => (
+              <div key={a as string} className="kart p-4 text-center">
+                <b className="block text-2xl sm:text-3xl font-extrabold baslik tabular-nums">{(n as number).toLocaleString("tr-TR")}</b>
+                <span className="text-xs text-soluk">{a}</span>
+              </div>
+            ))
+          ) : (
+            <ol className="col-span-3 kart p-4 grid gap-3" aria-label="Nasıl işliyor">
+              {ADIMLAR.map(([ikon, baslik, aciklama], i) => (
+                <li key={baslik} className="flex gap-3 items-start">
+                  <span className="w-9 h-9 shrink-0 rounded-xl grid place-items-center bg-ana-acik text-lg" aria-hidden>{ikon}</span>
+                  <span className="text-sm leading-snug"><b className="baslik">{i + 1}. {baslik}</b><br /><span className="text-soluk">{aciklama}</span></span>
+                </li>
+              ))}
+            </ol>
+          )}
           <div className="col-span-3 grid grid-cols-2 gap-3">
             {KATEGORILER.slice(0, 4).map((k) => (
               <Link key={k.slug} href={`/okur/paylas?kategori=${k.slug}`} className="kart kart-hover p-3 flex items-center gap-2.5 text-sm font-semibold">

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { categories } from "@/lib/news";
 import ExchangeTicker from "@/components/ExchangeTicker";
+import { usePathname } from "next/navigation";
+import BolumSeridi from "@/components/BolumSeridi";
+import { bolumBul } from "@/components/HaberBolumuKapisi";
 
 type WeatherData = {
   temp: number;
@@ -30,6 +33,7 @@ export default function Header() {
   const [weather, setWeather] = useState<WeatherData>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const bolum = bolumBul(usePathname());
 
   useEffect(() => {
     fetch("/api/hava")
@@ -38,8 +42,18 @@ export default function Header() {
       .catch(() => {});
   }, []);
 
+  // Okur ve Ustam kendi başlığını taşır: orada yalnız bölüm şeridi kalır (çift başlık yok)
+  if (bolum !== "haber") {
+    return (
+      <header style={{ position: "sticky", top: 0, zIndex: 100 }}>
+        <BolumSeridi aktif={bolum} />
+      </header>
+    );
+  }
+
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 100, backgroundColor: "#fff", boxShadow: "0 2px 12px rgba(15,23,42,0.06)" }}>
+      <BolumSeridi aktif="haber" />
       {/* Piyasa şeridi */}
       <ExchangeTicker />
 

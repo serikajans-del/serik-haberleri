@@ -28,7 +28,7 @@ export default async function Ust() {
         </form>
 
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/okur/paylas" className="hidden md:inline-flex dugme-ana !py-2.5 !px-4 text-sm">
+          <Link href="/okur/paylas" className="dugme-ana !hidden md:!inline-flex !py-2.5 !px-4 text-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"><path d="M12 5v14M5 12h14" /></svg>
             Paylaş
           </Link>

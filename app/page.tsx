@@ -7,6 +7,11 @@ import NewsCard from "@/components/NewsCard";
 import AdBanner from "@/components/AdBanner";
 import OkurAnaSayfaKutusu from "@/components/okur/AnaSayfaKutusu";
 import { categories } from "@/lib/news";
+
+const KAPILAR = [
+  { href: "/okur/paylas", ikon: "💬", baslik: "Serik'te ne oluyor?", alt: "Şikâyetini, sorunu, tavsiyeni paylaş", zemin: "linear-gradient(135deg,#fff 55%,#FFECEC)" },
+  { href: "/ustam/talep", ikon: "🛠️", baslik: "Usta mı lazım?", alt: "Ücretsiz teklif al", zemin: "linear-gradient(135deg,#fff 55%,#FFF1E3)" },
+];
 import { getLatestNewsFromDB, getMostReadFromDB, getNewsByCategoryFromDB } from "@/lib/db";
 
 export const revalidate = 30;
@@ -50,6 +55,21 @@ export default async function HomePage() {
     <>
       <h1 className="sr-only">Serik Haberleri: Serik, Belek, Kadriye ve Boğazkent&apos;ten güncel haberler</h1>
       <BreakingNews />
+
+      {/* Serik'in meydanı: sitenin iki katılım kapısı haberlerden önce görünür */}
+      <section className="max-w-7xl mx-auto px-4 pt-5" aria-label="Serikliler için">
+        <div className="grid grid-cols-2 gap-3">
+          {KAPILAR.map((k) => (
+            <Link key={k.href} href={k.href} className="tk-card p-3.5 sm:p-5 flex items-center gap-3 hover:shadow-md transition-shadow" style={{ background: k.zemin }}>
+              <span className="text-2xl sm:text-3xl" aria-hidden>{k.ikon}</span>
+              <span className="min-w-0">
+                <b className="block text-sm sm:text-base font-black leading-tight" style={{ color: "#111827" }}>{k.baslik}</b>
+                <span className="block text-xs sm:text-sm text-gray-600 leading-snug mt-0.5">{k.alt}</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* Manşet alanı */}
       <section className="max-w-7xl mx-auto px-4 pt-6" aria-label="Manşet">
